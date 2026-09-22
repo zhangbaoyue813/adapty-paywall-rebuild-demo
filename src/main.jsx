@@ -7,35 +7,82 @@ import {
   Bell,
   Blocks,
   Check,
+  CheckCircle2,
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   CircleHelp,
   Copy,
+  Database,
+  Download,
+  Eye,
+  Pencil,
+  GripVertical,
   Image as ImageIcon,
   LayoutTemplate,
   MoreVertical,
   Plus,
+  RotateCw,
   Search,
   Smartphone,
   Sparkles,
   Upload,
   WandSparkles,
   X,
-  Download,
-  Eye,
-  GripVertical,
-  RotateCw,
+  Clock,
+  Tag,
+  Layers,
+  Globe,
+  Zap,
+  Sliders,
+  Sparkle,
+  Trash2,
+  Crown,
+  Gift,
+  Users,
+  Flame,
+  ArrowRight,
+  Settings,
+  Lock,
 } from "lucide-react";
 import "./styles.css";
+import "./paywall-components.css";
+import BackendArchitectureDocs from "./views/BackendArchitectureDocs";
+import PrivilegeSwitchManager, { ALL_HELLOTALK_PRIVILEGES } from "./components/PrivilegeSwitchManager";
+import BenefitChecklistManager from "./components/BenefitChecklistManager";
+import CoreBenefitsManager, { HELLOTALK_OFFICIAL_PRIVILEGES } from "./components/CoreBenefitsManager";
+import { DEFAULT_ENTRY_CONFIG } from "./components/EntryPriceConfigManager";
+import ComparisonTableManager, { DEFAULT_FREE_VS_VIP_ITEMS, DEFAULT_VIP_VS_PLUS_ITEMS } from "./components/ComparisonTableManager";
+import HelloTalkMascot from "./components/HelloTalkMascot";
+import ContentPaywallManager from "./components/ContentPaywallManager";
+import {
+  ContentCrownMascot,
+  ContentBinocularsMascot,
+  ContentTranslateCoinMascot,
+} from "./components/ContentPaywallMascots";
 
 const originalPaywalls = [
-  { id: "test", name: "test", state: "Live", products: 3, startedAt: "3 Apr 2026", icon: false },
-  { id: "test-2", name: "test 2", state: "Draft", products: 2, startedAt: "25 Mar 2026", icon: true },
+  // HelloTalk CMS「VIP 样式管理」核心 Paywall 商业化矩阵
+  { id: "ht-content-paywall", name: "内容Paywall样式与规则联动 (CONTENT_PAYWALL)", state: "Live", products: 1, startedAt: "20 Sep 2026", templateId: "ht-content-paywall", scene: "内容弹窗/访客/失效挽留" },
+  { id: "ht-vip-package", name: "会员套餐与蓝色特权页 (VIP_PACKAGE · BLUE_PRIVILEGE)", state: "Live", products: 3, startedAt: "01 Jan 2026", templateId: "ht-vip-package", scene: "会员套餐与蓝色特权主售卖" },
+  { id: "ht-entry-aggregation", name: "入门价格页 (ENTRY_PRICE)", state: "Live", products: 2, startedAt: "22 Jun 2026", templateId: "ht-entry-aggregation", scene: "新手特惠 (双模板+倒计时)" },
+  { id: "ht-onboarding", name: "注册引导与免费试用页 (FREE_TRIAL)", state: "Live", products: 2, startedAt: "12 Apr 2026", templateId: "ht-onboarding", scene: "0元试用与新客引导" },
+  { id: "ht-retain", name: "支付未完成页 (PAYMENT_UNFINISHED)", state: "Live", products: 2, startedAt: "10 May 2026", templateId: "ht-retain", scene: "支付流失挽留" },
+  { id: "ht-vip-pop", name: "SKU半窗 (SKU_POPUP)", state: "Live", products: 3, startedAt: "14 Jun 2026", templateId: "ht-vip-pop", scene: "额度拦截半屏" },
+  { id: "ht-send-gift", name: "赠送礼物页 (SEND_GIFT)", state: "Live", products: 2, startedAt: "18 Nov 2025", templateId: "ht-black-friday", scene: "商业化礼物赠送" },
+  { id: "ht-switch-compare", name: "VIP分级页面-默认VIP (VIP_LEVEL)", state: "Live", products: 2, startedAt: "25 May 2026", templateId: "ht-switch-compare", scene: "VIP进阶方案" },
+  { id: "ht-tier-compare", name: "VIP分级页面-默认VIPPlus (VIP_PLUS_LEVEL)", state: "Draft", products: 2, startedAt: "01 Jun 2026", templateId: "ht-tier-compare", scene: "VIP+黑金旗舰" },
+  // 高频特权阻断与营销卡片
+  { id: "ht-guest-card", name: "谁看过我访客特权拦截 (GUEST_CARD)", state: "Live", products: 2, startedAt: "20 Mar 2026", templateId: "ht-guest-card", scene: "访客足迹拦截" },
+  { id: "ht-nearby-city", name: "寻找语伴定位漫游拦截 (NEARBY & CITY CARD)", state: "Live", products: 2, startedAt: "15 Feb 2026", templateId: "ht-nearby-city", scene: "定位漫游拦截" },
+  { id: "ht-multi-languages", name: "多语种同时学习特权卡 (TEACH_MULTIPLE_LANGUAGES)", state: "Live", products: 2, startedAt: "08 Mar 2026", templateId: "ht-multi-languages", scene: "多语言学习门槛" },
 ];
 
 const nav = [
-  ["Paywalls", Smartphone],
+  ["Paywalls", Smartphone, "list"],
+  ["内容Paywall (样式与规则)", Layers, "content-paywall"],
+  ["CMS 架构摸底", Database, "backend"],
 ];
 
 const missingItems = [
@@ -78,7 +125,7 @@ const missingItems = [
   {
     id: "B-01",
     feature: "Builder 属性保存",
-    known: "已见 Layout settings、Links 的 Content 字段/开关、Hero Image、Card、Timer、Products 的 Content / Style / Layout 面板、设备预览与语言列表。十个 Add element 入口均已逐项点击：Text 默认 text；Image/Card/List/Carousel/Products 默认空容器；Web Paywall Button 默认 Pay on web；Button 默认 button text；Links 默认 Terms/Privacy/Restore/Login；Timer 默认 04:59:59。Save 会要求 Paywall publishing confirmation，确认后重载仍存在。",
+    known: "已见 Layout settings、Links 的 Content 字段/开关、Hero Image、Card、Timer、Products 的 Content / Style / Layout 面板、设备预览与语言列表。十个 Add element 入口均已逐项点击。",
     unknown: "字段校验、多语言覆盖、Discard / Undo 以及未逐项记录的 Card 布局字段未实测。",
   },
   {
@@ -90,63 +137,337 @@ const missingItems = [
 ];
 
 const templates = [
-  { id: "knowledge", title: "Unlock the World of Knowledge", subtitle: "Premium learning library", tags: ["1 product", "Trial timeline", "Reviews"], productCount: 1, media: "image", components: ["Trial timeline", "Reviews"], category: "Popular", theme: "lavender", visual: "knowledge", asset: "/real-adapty-templates/knowledge.png" },
-  { id: "trial", title: "What to expect during your free trial", subtitle: "Day-by-day trial guide", tags: ["1 product", "Trial timeline"], productCount: 1, media: "image", components: ["Trial timeline"], category: "Popular", theme: "violet", visual: "timeline", asset: "/real-adapty-templates/trial.png" },
-  { id: "connection", title: "Build deeper connections, one conversation at a time", subtitle: "Transform how you communicate and understand each other's needs", tags: ["1 product", "Image"], productCount: 1, media: "image", components: [], category: "All", theme: "mist", visual: "connection", asset: "/real-adapty-templates/connection.png" },
-  { id: "family", title: "Unlock fluency for the whole family", subtitle: "Speak Easy with Family Plan", tags: ["1 product", "Image"], productCount: 1, media: "image", components: [], category: "Popular", theme: "night", visual: "family", asset: "/real-adapty-templates/family.png" },
-  { id: "document", title: "Get premium document management at an exclusive price", subtitle: "Exclusive launch offer", tags: ["1 product", "No media"], productCount: 1, media: "none", components: [], category: "All", theme: "paper", visual: "document", asset: "/real-adapty-templates/document.png" },
-  { id: "trial-white", title: "How your free trial works", subtitle: "Clear renewal timeline", tags: ["1 product", "Trial timeline"], productCount: 1, media: "none", components: ["Trial timeline"], category: "All", theme: "white", visual: "trial-white", asset: "/real-adapty-templates/trial-white.png" },
-  { id: "trial-blue", title: "How your free trial works", subtitle: "7-day renewal timeline", tags: ["1 product", "Trial timeline"], productCount: 1, media: "image", components: ["Trial timeline"], category: "All", theme: "violet", visual: "trial-blue", asset: "/real-adapty-templates/trial-blue.png" },
-  { id: "yoga", title: "START YOUR YOGA JOURNEY TODAY!", subtitle: "Personal wellness plan", tags: ["1 product", "Image"], productCount: 1, media: "image", components: [], category: "Popular", theme: "peach", visual: "yoga", asset: "/real-adapty-templates/yoga.png" },
-  { id: "report", title: "Receive your personalized report", subtitle: "Explore your profile", tags: ["1 product", "Image"], productCount: 1, media: "image", components: [], category: "All", theme: "midnight", visual: "report", asset: "/real-adapty-templates/report.png" },
-  { id: "avatar", title: "Create your 3D avatar", subtitle: "Try it free for seven days", tags: ["1 product", "Image"], productCount: 1, media: "image", components: [], category: "All", theme: "sky", visual: "avatar", asset: "/real-adapty-templates/avatar.png" },
-  { id: "access", title: "Get Unlimited Access", subtitle: "Premium wallpaper collection", tags: ["1 product", "No media"], productCount: 1, media: "none", components: [], category: "All", theme: "ocean", visual: "access", asset: "/real-adapty-templates/access.png" },
-  { id: "weather", title: "Exclusive Weather Insights: Unlock Premium Forecast", subtitle: "Unlock premium forecasting", tags: ["1 product", "No media"], productCount: 1, media: "none", components: [], category: "All", theme: "black", visual: "weather", asset: "/real-adapty-templates/weather.png" },
-  { id: "mindfulness", title: "Mindfulness Unlocked", subtitle: "Experience guided meditations", tags: ["1 product", "Free trial toggle"], productCount: 1, media: "image", components: ["Free trial toggle"], category: "All", theme: "lime", visual: "mindfulness", asset: "/real-adapty-templates/mindfulness.png" },
-  { id: "workout", title: "Your Personal First Day Workout is Ready", subtitle: "A plan built for today", tags: ["1 product", "Image"], productCount: 1, media: "image", components: [], category: "All", theme: "clean", visual: "workout", asset: "/real-adapty-templates/workout.png" },
-  { id: "halloween", title: "BE FEARLESS!", subtitle: "Halloween offer now on", tags: ["1 product", "Reviews"], productCount: 1, media: "image", components: ["Reviews"], category: "Seasonal", theme: "halloween", visual: "halloween", asset: "/real-adapty-templates/fearless.png" },
-  { id: "black-friday", title: "BLACK FRIDAY 50% OFF", subtitle: "Weekly Activity Planner", tags: ["1 product"], productCount: 1, media: "none", components: [], category: "Seasonal", theme: "sale", visual: "black-friday", assetParts: ["/real-adapty-templates/black-friday.png", "/real-adapty-templates/black-friday-offer.png"] },
-  { id: "new-year", title: "BEGIN THE NEW YEAR", subtitle: "50% OFF", tags: ["1 product"], productCount: 1, media: "image", components: [], category: "Seasonal", theme: "sale", visual: "new-year", asset: "/real-adapty-templates/new-year.png" },
-  { id: "christmas", title: "Make the season brighter!", subtitle: "Limited time only", tags: ["1 product", "Image"], productCount: 1, media: "image", components: [], category: "Seasonal", theme: "sale", visual: "christmas", asset: "/real-adapty-templates/christmas.png" },
-  { id: "black-friday-timer", title: "Lifetime Access", subtitle: "EXPIRES IN: 04:59:59", tags: ["1 product", "Image"], productCount: 1, media: "image", components: [], category: "Seasonal", theme: "sale", visual: "black-friday-timer", asset: "/real-adapty-templates/black-friday-timer.png" },
-  { id: "editing-plan", title: "Choose the plan that works best for you!", subtitle: "AI-powered edits", tags: ["1 product"], productCount: 1, media: "video", components: [], category: "All", theme: "clean", visual: "editing-plan", asset: "/real-adapty-templates/editing-plan.png" },
-  { id: "audiobooks", title: "Get access to collection of audiobooks for kids", subtitle: "Hand-on labs with lecturers", tags: ["1 product"], productCount: 1, media: "image", components: [], category: "All", theme: "clean", visual: "audiobooks", asset: "/real-adapty-templates/audiobooks.png" },
-  { id: "herbs", title: "Get Full Access to The Guide of Medicinal Herbs", subtitle: "The collection of over 5,000 plants", tags: ["1 product"], productCount: 1, media: "image", components: [], category: "All", theme: "clean", visual: "herbs", asset: "/real-adapty-templates/herbs.png" },
-  { id: "fitness-trial", title: "How your free trial works", subtitle: "Popular VIP content", tags: ["1 product", "Trial timeline"], productCount: 1, media: "image", components: ["Trial timeline"], category: "All", theme: "clean", visual: "fitness-trial", asset: "/real-adapty-templates/fitness-trial.png" },
-  { id: "video-access", title: "Get Full Access", subtitle: "Faster video processing", tags: ["1 product"], productCount: 1, media: "none", components: [], category: "All", theme: "ocean", visual: "video-access", asset: "/real-adapty-templates/video-access.png" },
-  { id: "design-life", title: "Design your life", subtitle: "A beautiful week", tags: ["1 product"], productCount: 1, media: "image", components: [], category: "All", theme: "sky", visual: "design-life", asset: "/real-adapty-templates/design-life.png" },
-  { id: "training", title: "Start training today", subtitle: "Access to premium art styles", tags: ["1 product"], productCount: 1, media: "image", components: [], category: "All", theme: "black", visual: "training", asset: "/real-adapty-templates/training.png" },
-  { id: "premium-access", title: "Premium Access", subtitle: "Less Work More Relaxing with Robot", tags: ["1 product", "Trial timeline"], productCount: 1, media: "image", components: ["Trial timeline"], category: "All", theme: "clean", visual: "premium-access", asset: "/real-adapty-templates/premium-access.png" },
-  { id: "full-app", title: "Unlock the full app with 50% off", subtitle: "All lessons unlocked", tags: ["1 product"], productCount: 1, media: "image", components: [], category: "All", theme: "clean", visual: "full-app", asset: "/real-adapty-templates/full-app.png" },
-  { id: "item-placeholder", title: "Item One", subtitle: "This is a brief description for the first placeholder item.", tags: ["1 product"], productCount: 1, media: "none", components: [], category: "All", theme: "clean", visual: "item-placeholder", asset: "/real-adapty-templates/item-placeholder.png" },
-  { id: "item-placeholder-dark", title: "Item One", subtitle: "This is a brief description for the first placeholder item.", tags: ["1 product"], productCount: 1, media: "none", components: [], category: "All", theme: "black", visual: "item-placeholder-dark", asset: "/real-adapty-templates/item-placeholder-dark.png" },
-  { id: "fantasy-access", title: "Transparent template #3", subtitle: "Advantageous offer", tags: ["1 product"], productCount: 1, media: "image", components: [], category: "All", theme: "midnight", visual: "fantasy-access", asset: "/real-adapty-templates/fantasy-access.png" },
+  // HelloTalk CMS「VIP 样式管理」10 大核心与拓展商业化模版
+  {
+    id: "ht-vip-package",
+    title: "会员套餐与蓝色特权页 (VIP_PACKAGE · BLUE_PRIVILEGE)",
+    subtitle: "整合 HelloTalk 经典蓝色特权轮播与 3 档会员套餐主售卖",
+    tags: ["3 products", "16项特权轮播", "双开关管理", "日单价折算"],
+    productCount: 3,
+    media: "image",
+    category: "HelloTalk 官方 (VIP样式管理)",
+    theme: "violet",
+    visual: "vipplus",
+  },
+  {
+    id: "ht-onboarding",
+    title: "注册引导与免费试用页 (FREE_TRIAL)",
+    subtitle: "模版四-单张样式新版 / 模版五-多张轮播图新版 · 3天会员免费试用 · 官方后台 1:1 对标",
+    tags: ["模版四-单张样式", "模版五-多张轮播图", "3天VIP免费试用", "挽留弹窗"],
+    productCount: 2,
+    media: "image",
+    category: "HelloTalk 官方",
+    theme: "violet",
+    visual: "onboarding",
+  },
+  {
+    id: "ht-guest-card",
+    title: "谁看过我访客特权拦截 (GUEST_CARD)",
+    subtitle: "Visitor blur avatar wall & visitor history unlock",
+    tags: ["2 products", "Badges", "Dual buttons"],
+    productCount: 2,
+    media: "image",
+    category: "HelloTalk 官方",
+    theme: "night",
+    visual: "guest",
+  },
+  {
+    id: "ht-nearby-city",
+    title: "寻找语伴定位漫游拦截 (NEARBY & CITY CARD)",
+    subtitle: "Distance radar & instant global city teleport",
+    tags: ["2 products", "Badges", "Map Radar"],
+    productCount: 2,
+    media: "image",
+    category: "HelloTalk 官方",
+    theme: "ocean",
+    visual: "nearby",
+  },
+  {
+    id: "ht-multi-languages",
+    title: "多语种同时学习特权卡 (TEACH_MULTIPLE_LANGUAGES)",
+    subtitle: "Learn English, Japanese, Korean simultaneously",
+    tags: ["2 products", "Badges", "Language chips"],
+    productCount: 2,
+    media: "image",
+    category: "HelloTalk 官方",
+    theme: "lavender",
+    visual: "languages",
+  },
+  {
+    id: "ht-black-friday",
+    title: "黑五限时 5 折狂欢大促 (YEAR_PRICE_TEMPLATE1)",
+    subtitle: "50% discount with ticking countdown timer",
+    tags: ["2 products", "Timer", "Badges"],
+    productCount: 2,
+    media: "none",
+    category: "HelloTalk 官方",
+    theme: "sale",
+    visual: "black-friday",
+  },
+  {
+    id: "ht-retain",
+    title: "VIP 到期专属流失挽留 (PrivilegeRetainStyle)",
+    subtitle: "Jinja dynamic interpolation with ¥50 coupon",
+    tags: ["2 products", "Badges", "Jinja Variables"],
+    productCount: 2,
+    media: "image",
+    category: "HelloTalk 官方",
+    theme: "peach",
+    visual: "retain",
+  },
+  {
+    id: "ht-switch-compare",
+    title: "VIP / VIP+ 双档位切换模版 (SwitchComparisonStyle)",
+    subtitle: "Top tab switcher between VIP & VIP+ plans",
+    tags: ["2 products", "Switch Tabs", "VIP+ Perks"],
+    productCount: 2,
+    media: "image",
+    category: "HelloTalk 官方",
+    theme: "violet",
+    visual: "switch",
+  },
+  {
+    id: "ht-tier-compare",
+    title: "VIP / VIP+ 双阶特权对比矩阵 (PrivilegeComparisonStyle)",
+    subtitle: "3-column matrix comparing Free, VIP and VIP+",
+    tags: ["2 products", "Comparison Table"],
+    productCount: 2,
+    media: "none",
+    category: "HelloTalk 官方",
+    theme: "white",
+    visual: "compare",
+  },
+  {
+    id: "ht-vip-pop",
+    title: "SKU半窗 (SKU_POPUP)",
+    subtitle: "In-app quota bottom sheet with 3-tier selector",
+    tags: ["3 products", "Bottom Sheet", "Fast IAP"],
+    productCount: 3,
+    media: "image",
+    category: "HelloTalk 官方",
+    theme: "white",
+    visual: "bottom-sheet",
+  },
+  {
+    id: "ht-entry-aggregation",
+    title: "入门价格页 (ENTRY_PRICE)",
+    subtitle: "官方双模板 (粉白折扣版 / 暖橙礼包版) · 24h倒计时 · 5维色值系统",
+    tags: ["双模板切换", "24h倒计时", "5维色值系统", "最多3项特权"],
+    productCount: 2,
+    media: "image",
+    category: "HelloTalk 官方 (VIP样式管理)",
+    theme: "lime",
+    visual: "entry",
+  },
+  {
+    id: "ht-vip-plus-aggregation",
+    title: "旗舰 VIP+ 全语种进阶模版 (VIP_PLUS_AGGREGATION)",
+    subtitle: "AI tutor, 1-on-1 coaching & black gold skin",
+    tags: ["2 products", "VIP+ Perks", "Lifetime Plan"],
+    productCount: 2,
+    media: "image",
+    category: "HelloTalk 官方",
+    theme: "night",
+    visual: "vipplus",
+  },
+  {
+    id: "ht-content-paywall",
+    title: "内容Paywall样式与规则联动 (CONTENT_PAYWALL)",
+    subtitle: "官方三套内容弹窗 (VIP失效/非VIP访客/非订阅状态) · 动态变量插值 · 规则引擎联动",
+    tags: ["3套样式类型", "动态变量矩阵", "规则引擎联动", "1:1官方对标"],
+    productCount: 1,
+    media: "image",
+    category: "HelloTalk 官方 (VIP样式管理)",
+    theme: "violet",
+    visual: "content-paywall",
+  },
+  // Adapty 国际化模版库
+  { id: "knowledge", title: "Unlock the World of Knowledge", subtitle: "Premium learning library", tags: ["1 product", "Trial timeline", "Reviews"], productCount: 1, media: "image", category: "Popular", theme: "lavender", visual: "knowledge" },
+  { id: "trial", title: "What to expect during your free trial", subtitle: "Day-by-day trial guide", tags: ["1 product", "Trial timeline"], productCount: 1, media: "image", category: "Popular", theme: "violet", visual: "trial" },
+  { id: "family", title: "Unlock fluency for the whole family", subtitle: "Speak Easy with Family Plan", tags: ["1 product", "Image"], productCount: 1, media: "image", category: "Popular", theme: "night", visual: "family" },
 ];
 
-const componentCatalog = ["Text", "Image", "Card", "Web Paywall Button", "Button", "List", "Links", "Timer", "Carousel", "Products"];
+const sourceTreeObserved = new Set([
+  "ht-content-paywall",
+  "ht-vip-package",
+  "ht-onboarding",
+  "ht-guest-card",
+  "ht-nearby-city",
+  "ht-multi-languages",
+  "ht-black-friday",
+  "ht-retain",
+  "ht-switch-compare",
+  "ht-tier-compare",
+  "ht-vip-pop",
+  "ht-entry-aggregation",
+  "ht-vip-plus-aggregation",
+  "ht-carousel-style",
+  "knowledge",
+  "trial",
+  "family",
+]);
 
-const sourceTreeObserved = new Set(["knowledge", "trial", "connection", "family", "premium-access", "document", "yoga", "black-friday", "black-friday-timer", "christmas", "halloween", "new-year", "report", "avatar", "mindfulness", "trial-white", "trial-blue", "fitness-trial", "access", "weather", "workout", "audiobooks", "herbs", "video-access", "design-life", "full-app", "item-placeholder", "item-placeholder-dark", "fantasy-access", "editing-plan", "training"]);
+const componentTypeLabelsZh = {
+  "Header": "标题",
+  "Subhead": "副标题",
+  "Badge Tag": "徽标标签",
+  "Benefit List": "核心特权",
+  "Comparison Table": "对比表格",
+  "Switch Tabs": "切换标签",
+  "Carousel Cards": "特权轮播",
+  "Products": "产品套餐",
+  "横向套餐卡片": "横向套餐卡片",
+  "纵向套餐列表": "纵向套餐列表",
+  "产品双套餐": "产品双套餐",
+  "特惠价格": "特惠价格",
+  "Timer": "倒计时",
+  "Toggle": "开关选项",
+  "Purchase Button": "购买按钮",
+  "Dismiss Button": "关闭按钮",
+  "Legal Footer": "免责声明",
+  "Hero Image": "背景图",
+  "Language Chips": "语言标签",
+  "User Profile": "用户画像",
+  "Dynamic Metrics": "动态指标",
+  "Mascot Illustration": "吉祥物插画",
+  "Text": "文本",
+  // Common aliases
+  "purchase": "购买按钮",
+  "dismiss": "关闭按钮",
+  "headline": "标题",
+  "subhead": "副标题",
+  "badge": "徽标标签",
+  "products": "产品套餐",
+  "benefits": "核心特权",
+  "timer": "倒计时",
+  "toggle": "开关选项",
+  "links": "免责声明",
+  "hero-image": "背景图",
+  "hero": "背景图",
+  "user-profile": "用户画像",
+  "metrics": "动态指标",
+  "mascot": "吉祥物插画",
+};
 
-// Template-card filters must only rely on Builder trees observed in Adapty.
-const sourceVerifiedTemplateComponents = Object.freeze({
-  knowledge: ["Trial timeline", "Reviews"],
-  trial: ["Trial timeline"],
-  "trial-white": ["Trial timeline"],
-  "trial-blue": ["Trial timeline"],
-  "fitness-trial": ["Trial timeline"],
-  "premium-access": ["Trial timeline"],
-  halloween: ["Reviews"],
-  mindfulness: ["Free trial toggle"],
-});
+const zhToTypeMap = {
+  "标题": "Header",
+  "主标题": "Header",
+  "副标题": "Subhead",
+  "徽标标签": "Badge Tag",
+  "背景图": "Hero Image",
+  "顶部大图": "Hero Image",
+  "顶部头图": "Hero Image",
+  "顶部头图与吉祥物": "Hero Image",
+  "顶部头图与两行标题": "Hero Image",
+  "核心特权": "Benefit List",
+  "核心特权卡片": "Benefit List",
+  "对比表格": "Comparison Table",
+  "切换标签": "Switch Tabs",
+  "特权轮播": "Carousel Cards",
+  "轮播卡片": "Carousel Cards",
+  "3张轮播卡片": "Carousel Cards",
+  "3天试用时间轴": "Toggle",
+  "产品双套餐": "Products",
+  "横向套餐卡片": "Products",
+  "纵向套餐列表": "Products",
+  "横向三档套餐": "Products",
+  "3档会员套餐": "Products",
+  "产品套餐": "Products",
+  "特惠价格": "Products",
+  "倒计时": "Timer",
+  "开关选项": "Toggle",
+  "购买按钮": "Purchase Button",
+  "主购买按钮": "Purchase Button",
+  "主购买": "Purchase Button",
+  "关闭按钮": "Dismiss Button",
+  "免责声明": "Legal Footer",
+  "法律免责": "Legal Footer",
+  "语言标签": "Language Chips",
+  "用户画像": "User Profile",
+  "动态指标": "Dynamic Metrics",
+  "动态指标矩阵": "Dynamic Metrics",
+  "吉祥物插画": "Mascot Illustration",
+  "文本": "Text",
+};
 
-const node = (id, type, content = "", depth = 0, extra = {}) => ({ id, type, label: "", content, depth, ...extra });
+const typeToZhMap = componentTypeLabelsZh;
+
+const cleanLabel = (text = "") => {
+  if (!text) return "";
+  let cleaned = text.replace(/\s*[\(（][^\)）]*[\)）]/g, "").trim();
+  if (cleaned.includes("法律免责") || cleaned.includes("免责声明")) return "免责声明";
+  if (cleaned.includes("顶部大图") || cleaned.includes("头图") || cleaned.includes("背景图")) return "背景图";
+  if (cleaned.includes("购买按钮") || cleaned === "主购买按钮" || cleaned === "主购买") return "购买按钮";
+  if (cleaned.includes("倒计时") || cleaned.toLowerCase().includes("timer")) return "倒计时";
+  if (componentTypeLabelsZh[cleaned]) return componentTypeLabelsZh[cleaned];
+  for (const [en, zh] of Object.entries(componentTypeLabelsZh)) {
+    if (cleaned.toLowerCase() === en.toLowerCase()) return zh;
+  }
+  return cleaned || text;
+};
+
+const getNodeLabel = (node) => {
+  if (!node) return "";
+  const raw = node.label || node.type || "";
+  if (node.type === "Purchase Button" || raw.includes("购买按钮") || raw === "主购买按钮") {
+    return "购买按钮";
+  }
+  if (node.type === "Hero Image" || node.id?.includes("hero") || node.config?.variant?.includes("hero") || raw.includes("头图") || raw.includes("背景图")) {
+    return "背景图";
+  }
+  if (node.type === "Timer" || raw.includes("倒计时") || node.id?.includes("timer")) {
+    return "倒计时";
+  }
+  if (node.type === "Products") {
+    if (node.config?.variant === "entry-price-tier" || raw === "特惠价格" || node.id === "t1-products" || node.id === "t2-products") {
+      return "特惠价格";
+    }
+    if (node.config?.variant === "onboarding-dual-tiers" || raw === "产品双套餐" || node.id === "trial-t1-products") {
+      return "产品双套餐";
+    }
+    if (node.config?.variant === "3-column-tiers" || raw === "横向套餐卡片" || raw === "横向三档套餐") {
+      return "横向套餐卡片";
+    }
+    if (node.config?.variant === "vertical-list-tiers" || raw === "纵向套餐列表") {
+      return "纵向套餐列表";
+    }
+    if (raw && raw !== "产品套餐" && raw !== "Products" && raw !== "products") {
+      return cleanLabel(raw);
+    }
+    if (node.config?.tiers && !node.config?.listTiers) {
+      return "横向套餐卡片";
+    }
+    return "纵向套餐列表";
+  }
+  return cleanLabel(raw);
+};
+
+const componentCatalog = [
+  "标题",
+  "副标题",
+  "徽标标签",
+  "背景图",
+  "核心特权",
+  "特权轮播",
+  "产品双套餐",
+  "横向套餐卡片",
+  "纵向套餐列表",
+  "特惠价格",
+  "对比表格",
+  "切换标签",
+  "倒计时",
+  "开关选项",
+  "购买按钮",
+  "关闭按钮",
+  "免责声明",
+  "语言标签",
+  "文本",
+];
 
 function nodeParentId(nodes, index) {
-  const current = nodes[index];
-  if (current?.parentId) return current.parentId;
-  const depth = current?.depth ?? 0;
-  if (!depth) return null;
-  for (let cursor = index - 1; cursor >= 0; cursor -= 1) {
+  const depth = nodes[index]?.depth ?? 0;
+  if (depth === 0) return null;
+  for (let cursor = index - 1; cursor >= 0; cursor--) {
     if ((nodes[cursor].depth ?? 0) === depth - 1) return nodes[cursor].id;
   }
   return null;
@@ -178,629 +499,483 @@ function moveBuilderNode(nodes, sourceId, targetId, position) {
   return [...remaining.slice(0, insertAt), ...moving, ...remaining.slice(insertAt)];
 }
 
-function createBuilderNodes(templateId = "knowledge") {
+function createBuilderNodes(templateId = "ht-onboarding") {
   const template = templates.find((item) => item.id === templateId) ?? templates[0];
-  const hero = () => node("hero-image", "Hero Image", template.visual, 0, { theme: template.theme });
-  const pending = (id, type, depth = 0) => node(id, type, "", depth, { sourcePending: true });
+  const node = (id, type, content, depth = 0, config = {}) => {
+    let nodeLabel = config.label;
+    if (!nodeLabel || nodeLabel === "purchase" || nodeLabel.toLowerCase() === type.toLowerCase()) {
+      nodeLabel = componentTypeLabelsZh[type] || type;
+    } else {
+      nodeLabel = cleanLabel(nodeLabel);
+    }
+    return {
+      id,
+      type,
+      content,
+      depth,
+      config,
+      label: nodeLabel,
+    };
+  };
+  const hero = () => node("hero-image", "Hero Image", template.theme === "violet" ? "learning" : template.id, 0);
 
-  if (template.id === "knowledge") {
+  // -1. 内容Paywall模版 (VIP样式管理 - 内容Paywall样式与规则联动)
+  if (template.id === "ht-content-paywall") {
+    return [
+      node("cp-close", "Dismiss Button", "✕", 0, { variant: "close-icon", position: "top-left", label: "关闭按钮" }),
+      node("cp-user", "User Profile", "Yeah|🇩🇪", 0, { userName: "Yeah", userFlag: "🇩🇪", label: "用户画像" }),
+      node("cp-metrics", "Dynamic Metrics", "972、762、487、673、837、899、116、156、939、446、650、442", 0, {
+        styleType: "VIP失效样式",
+        metricValues: [972, 762, 487, 673, 837, 899, 116, 156, 939, 446, 650, 442],
+        visitorCount: 21,
+        label: "动态指标矩阵",
+      }),
+      node("cp-subhead", "Subhead", "你的进步有目共睹！", 0, { variant: "body", label: "副标题" }),
+      node("cp-headline", "Header", "VIP现已过期\n立即续订，别让沟通速度慢下来！", 0, {
+        variant: "content-headline",
+        highlightWord: "立即续订",
+        highlightColor: "#6C3EDE",
+        label: "主标题",
+      }),
+      node("cp-mascot", "Mascot Illustration", "crown-gift", 0, { mascotType: "crown-gift", label: "吉祥物插画" }),
+      node("cp-purchase", "Purchase Button", "立即续订", 0, { label: "购买按钮", color: "#6C3EDE" }),
+    ];
+  }
+
+  // 0. 会员套餐与蓝色特权页 (VIP_PACKAGE · BLUE_PRIVILEGE) - 深度整合
+  if (template.id === "ht-vip-package" || template.id === "ht-carousel-style") {
     return [
       hero(),
-      node("headline", "Text", "Unlock the World of Knowledge", 0, { label: "title", variant: "headline" }),
-      node("body-text", "Text", "Smart summaries and audio insights designed for lifelong learners", 0, { label: "caption", variant: "body" }),
-      node("benefits", "List", "Comprehensive Book Analysis|Deep dives into 500+ bestsellers across business, self-help, science, and fiction genres.\nSmart Recommendations|AI-powered suggestions based on your reading history, interests, and learning goals.\nOffline Access & Sync|Download summaries and audiobooks for offline learning, syncing seamlessly across all devices.", 0, { label: "benefits" }),
-      node("explore-library", "Text", "Explore the full library...", 0, { label: "link", variant: "link" }),
-      node("social-proof", "Text", "Over 50,000 satisfied learners globally", 0, { label: "social proof", variant: "body" }),
-      node("timeline-title", "Text", "How your free trial works", 0, { label: "section title", variant: "section" }),
-      node("trial-card", "Card", "Today|Begin with unlimited access to our complete summary library and premium features.\nDay 6 reminder|We'll send a friendly notification about your trial status and next steps.\nDay 7 activation|Your premium membership activates automatically. Cancel anytime with one tap.", 0, { label: "trial timeline" }),
-      node("reviews", "Carousel", "Absolutely brilliant! I've absorbed insights from 12 books in my first week. The audio summaries are perfect for my morning jogs.\n---\nThis app is a goldmine. I can quickly grasp key concepts from business books and apply them to my company immediately.\n---\nLove how I can switch between reading and listening. Perfect for studying during busy clinical rotations.", 0, { label: "reviews" }),
-      node("product-intro", "Text", "Choose your learning path:", 0, { label: "products caption", variant: "section" }),
-      node("products", "Products", "Monthly|Great for getting started|$79.99 /month", 0),
-      node("product-note", "Text", "Subscribe to unlock our complete knowledge library!", 0, { label: "product note", variant: "body" }),
-      node("links", "Links", "Terms of Service · Privacy Policy · Restore Purchase", 0),
-      node("legal-copy", "Text", "By starting your trial, you agree to our Terms. Your subscription will auto-renew unless cancelled 24 hours before the current period ends via Account Settings.", 0, { label: "legal", variant: "legal" }),
-      node("purchase", "Purchase Button", "START YOUR FREE 7-DAY TRIAL", 0, { label: "purchase" }),
-      node("footer", "Footer", "Without commitment. Cancel anytime.", 0),
+      node("badge", "Badge Tag", "VIP 特权中心", 0, { color: "#6366F1", variant: "pill" }),
+      node("headline", "Header", "成为 HelloTalk VIP · 解锁核心特权", 0, { variant: "headline" }),
+      node("subhead", "Subhead", "左右滑动探索 16 大母语学习特权与专属功能", 0, { variant: "body" }),
+      node("carousel-cards", "Carousel Cards", "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球 150+ 城市母语圈\n👀 解锁谁看了我|查看完整访客足迹，开启隐身访问\n🤖 无限翻译&字幕|实时母语级纠错，告别中式表达\n⚡ 匹配不同母语语伴|优先匹配多母语语伴\n🎧 无损原声发音下载|离线随时随地跟读练习，纯正发音纠偏", 0, { privileges: ALL_HELLOTALK_PRIVILEGES }),
+      node("products", "Products", "12 个月|¥368|¥30.67/月|节省56%\n3 个月|¥208|¥67.33/月|季卡灵活\n终身 VIP|¥798|终身尊享|一次付费", 0, { variant: "rich-tiers" }),
+      node("purchase", "Purchase Button", "开启 VIP 特权 · 继续", 0, { label: "purchase", subtitle: "加入全球 5000 万语言学习者的行列" }),
+      node("dismiss", "Dismiss Button", "暂时不用，谢谢", 0, { color: "#94a3b8" }),
+      node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
     ];
   }
 
-  if (template.id === "trial") {
+  // 1. 新客引导 0 元试用
+  if (template.id === "ht-onboarding") {
     return [
       hero(),
-      node("headline", "Header", "What to expect during your free trial", 0, { variant: "headline" }),
-      node("trial-list", "List", "", 0),
-      node("today", "List item", "Today|Unlock full premium access with unlimited AI tutoring sessions today.", 1),
-      node("day-2", "List item", "Day 2|We'll let you know when your trial period is ending.", 1),
-      node("day-3", "List item", "Day 3|Subscription activates today. Cancel anytime before to avoid charges.", 1),
-      node("footer", "Footer", "Without commitment. Cancel anytime.", 0),
-      node("products", "Products", "Try 3 days free|continue for $6.67/month|Billed annually at $79.99", 0),
-      node("purchase", "Button", "Get Free Access", 0, { label: "purchase" }),
-      node("fine-print", "Text", "", 0, { label: "text", variant: "legal" }),
-      node("links", "Links", "Terms of Service · Privacy Policy · Restore Purchase", 0),
+      node("badge", "Badge Tag", "7天免费体验", 0, { color: "#1ECA92", variant: "pill" }),
+      node("headline", "Header", "免费开启 HelloTalk VIP 特权", 0, { variant: "headline" }),
+      node("subhead", "Subhead", "零门槛体验全球语伴畅聊与 AI 实时纠错", 0, { variant: "body" }),
+      node("benefits", "Benefit List", "每日无限制即时翻译与纠错\nAI 语法助手实时母语级润色\n全球漫游找语伴与高级筛选\n听原声发音与专属头像标识", 0),
+      node("trial-toggle", "Toggle", "免费试用 7 天|试用期结束前可随时取消，不收取费用", 0, { defaultState: "On" }),
+      node("products", "Products", "年费 VIP (赠7天试用)|¥0 免费试用|7天后扣款 ¥198/年 (¥0.54/天)|超值推荐\n连续包月 VIP|¥28/月|折合 ¥0.93/天|灵活月付", 0, { variant: "rich-tiers" }),
+      node("purchase", "Purchase Button", "立即免费开启 7 天试用", 0, { label: "purchase", subtitle: "到期后 ¥198/年，试用期间可随时取消" }),
+      node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
     ];
   }
 
-  if (template.id === "trial-blue") {
+  // 2. 谁看过我访客拦截
+  if (template.id === "ht-guest-card") {
     return [
       hero(),
-      node("headline", "Header", "How your free trial works", 0, { variant: "headline" }),
-      node("trial-list", "List", "", 0),
-      node("today", "Today", "Get your free trial and gain complete access to app.", 1),
-      node("day-5", "Day 5", "Receive a notification that your trial is nearing its end.", 1),
-      node("day-7", "Day 7", "You'll be billed today. Cancel at any time before.", 1),
-      node("footer", "Footer", "", 0),
-      node("products", "Products", "Japanese Ai - 1 Year|$79.99/year ($6.67/month)", 0, { variant: "purchase" }),
-      node("purchase", "Purchase Button", "Continue", 0, { label: "purchase" }),
-      node("caption", "Caption", "Auto-renewable. Cancel anytime.", 0, { variant: "legal" }),
+      node("badge", "Badge Tag", "谁看过我专享特权", 0, { color: "#FAAD14", variant: "pill" }),
+      node("headline", "Header", "谁刚刚访问了你的主页？", 0, { variant: "headline" }),
+      node("subhead", "Subhead", "已有 38 位母语语伴查看了你的个人档案", 0, { variant: "body" }),
+      node("benefits", "Benefit List", "解锁全部 38 位来访者完整个人资料\n解除访客头像高斯模糊与真实在线状态\n优先推荐向来访语伴打招呼与已读回执", 0),
+      node("products", "Products", "访客特惠包月|¥18/月|仅 ¥0.60/天|首月特惠\n畅享季卡 VIP|¥45/季|¥0.50/天|人气推荐", 0, { variant: "rich-tiers" }),
+      node("purchase", "Purchase Button", "立即解锁访客记录", 0, { label: "purchase", subtitle: "查看全部对你感兴趣的跨国母语者" }),
+      node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
     ];
   }
 
-  if (template.id === "fitness-trial") {
+  // 3. 定位漫游与同城找语伴
+  if (template.id === "ht-nearby-city") {
     return [
       hero(),
-      node("headline", "Headline", "How your free trial works", 0, { variant: "headline" }),
-      node("benefits", "List", "", 0),
-      node("item-0", "Item 0", "Day|Start enjoying full access to the most popular VIP tools.", 1),
-      node("item-1", "Item 1", "In 5 days|You'll get a reminder that your trial is about to end.", 1),
-      node("item-2", "Item 2", "In 7 days|Your VIP subscription will begin and you'll be charged. Cancel anytime before.", 1),
-      node("products", "Products", "", 0),
-      node("annual-product", "Japanese Ai - 1 Year", "Japanese Ai - 1 Year|$79.99 / 1 year", 0),
-      node("footer", "Footer", "One-time opportunity", 0),
-      node("purchase", "Purchase Button", "Start free trial", 0, { label: "purchase" }),
+      node("badge", "Badge Tag", "城市漫游特权", 0, { color: "#13C2C2", variant: "pill" }),
+      node("headline", "Header", "定位漫游 · 结识全球本地语伴", 0, { variant: "headline" }),
+      node("subhead", "Subhead", "突破地理距离限制，一键瞬移至东京、巴黎、纽约", 0, { variant: "body" }),
+      node("benefits", "Benefit List", "任意切换目标城市，精准结识本地母语者\n同城语伴精准推荐，沟通回复率提升 300%\n优先匹配当前在线的高活跃度跨国语伴", 0),
+      node("products", "Products", "漫游包年 VIP|¥198/年|低至 ¥0.54/天|最推荐\n漫游单月尝鲜|¥30/月|¥1.00/天|体验包", 0, { variant: "rich-tiers" }),
+      node("purchase", "Purchase Button", "立即解锁全球漫游", 0, { label: "purchase", subtitle: "开启全球文化交流无界探索" }),
+      node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
     ];
   }
 
-  if (template.id === "trial-white") {
+  // 4. 多语种同时学习特权卡
+  if (template.id === "ht-multi-languages") {
     return [
       hero(),
-      node("headline", "Header", "HOW YOUR FREE TRIAL WORKS", 0, { variant: "headline" }),
-      node("caption", "Caption", "Unlock the most powerful app features with Premium.", 0, { variant: "body" }),
-      node("trial-list", "List", "NOW|Unlock all the features and start your journey today.\nIN 5 DAYS|Get a notification reminder that your trial is ending.\nIN 7 DAYS|You'll be charged for Premium. Cancel anytime.", 0, { label: "trial timeline" }),
-      node("footer", "Footer", "", 0),
-      node("products", "Products", "Japanese Ai - 1 Year|$79.99 per year ($6.67/month)", 0, { variant: "purchase" }),
-      node("purchase", "Purchase Button", "Continue", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
+      node("badge", "Badge Tag", "多语种畅学特权", 0, { color: "#722ED1", variant: "pill" }),
+      node("headline", "Header", "同时学习多门外语", 0, { variant: "headline" }),
+      node("subhead", "Subhead", "解除单语种限制，轻松掌握多国语言交流", 0, { variant: "body" }),
+      node("lang-chips", "Language Chips", "🇺🇸 英语|🇯🇵 日语|🇰🇷 韩语|🇪🇸 西语|🇫🇷 法语", 0),
+      node("benefits", "Benefit List", "同时开启 3 门外语专属动态与语伴信息流\n各语种独立词库与原声跟读进度自动云同步\n享受多语言专业导师 1 对 1 专属答疑通道", 0),
+      node("products", "Products", "多语种全能年卡|¥268/年|¥0.73/天|全语种畅学\n双语种进阶年卡|¥218/年|¥0.59/天|精通两门", 0, { variant: "rich-tiers" }),
+      node("purchase", "Purchase Button", "立即解锁多语种学习", 0, { label: "purchase", subtitle: "随时随地自由切换母语交流环境" }),
+      node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
     ];
   }
 
-  if (template.id === "access") {
+  // 5. 黑五限时 5 折狂欢
+  if (template.id === "ht-black-friday") {
     return [
       hero(),
-      node("app-icon", "App Icon", "", 0),
-      node("headline", "Header", "Get Unlimited Access", 0, { variant: "headline" }),
-      node("features", "Feature list", "Create Live wallpapers|\nUnlock Premium content|\nDaily content updates|\nAd-free experience|", 0),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year|$79.99/year", 1),
-      node("footer", "Footer", "All this for just $79.99/year. Auto-renewable, you can cancel anytime.", 0),
-      node("purchase", "Purchase Button", "Continue →", 0, { label: "purchase" }),
-      node("links", "Links", "Terms of Use · Privacy Policy · Restore", 0),
+      node("timer", "Timer", "04:59:59", 0, { label: "倒计时", timerLabel: "黑五限时活动倒计时", variant: "card", hours: 24 }),
+      node("badge", "Badge Tag", "黑五年度 5 折大促", 0, { color: "#FF4D4F", variant: "pill" }),
+      node("headline", "Header", "HelloTalk 黑五狂欢 · 限时 5 折", 0, { variant: "headline" }),
+      node("subhead", "Subhead", "全年仅此一次最低折扣，外语学习特权全部解锁", 0, { variant: "body" }),
+      node("benefits", "Benefit List", "无限制翻译与 AI 语法智能纠错\n全球任意国家和城市无缝漫游\n专属黑五金色 VIP 身份勋章与头像框\n尊享客服通道与优先语伴匹配", 0),
+      node("products", "Products", "终身 VIP 会员|¥398 (原价 ¥796)|仅需一次付费，终身享用|立省 ¥398\n年度 VIP 会员|¥128/年|仅 ¥0.35/天|5折特惠", 0, { variant: "rich-tiers" }),
+      node("purchase", "Purchase Button", "立即以 5 折锁定特权", 0, { label: "purchase", subtitle: "倒计时结束即恢复原价" }),
+      node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
     ];
   }
 
-  if (template.id === "weather") {
+  // 6. VIP 到期专属流失挽留
+  if (template.id === "ht-retain") {
     return [
       hero(),
-      node("weather-image", "Image", "SKYCAST", 0),
-      node("headline", "Header", "Exclusive Weather Insights: Unlock Premium Forecasting", 0, { variant: "headline" }),
-      node("terms", "Terms", "Recurring billing · Cancel any time", 0),
-      node("verify", "Verify", "✓ Verified by App Store", 0),
-      node("divider-1", "Divider", "", 0),
-      node("list-1", "List 1", "Ad-Free Experience|Enjoy uninterrupted weather tracking with our ad-free experience", 0),
-      node("divider-2", "Divider", "", 0),
-      pending("tag", "Tag"),
-      pending("header-2", "Header 2"),
-      pending("caption-2", "Caption 2"),
-      pending("header-3", "Header 3"),
-      pending("caption-3", "Caption 3"),
-      pending("list-2", "List 2"),
-      node("divider-3", "Divider", "", 0),
-      pending("header-4", "Header 4"),
-      pending("caption-4", "Caption 4"),
-      pending("list-3", "List 3"),
-      node("divider-4", "Divider", "", 0),
-      pending("links", "Links"),
-      pending("legal", "Legal"),
-      pending("footer", "Footer"),
-      node("purchase", "Purchase Button", "SUBSCRIBE NOW", 0, { label: "purchase" }),
+      node("badge", "Badge Tag", "老用户专属挽留", 0, { color: "#FF7A45", variant: "pill" }),
+      node("headline", "Header", "{{ nick_name }}，别错过你的特权！", 0, { variant: "headline" }),
+      node("subhead", "Subhead", "你的 VIP 会员特权将在 {{ vip_expired_days }} 天后失效", 0, { variant: "body" }),
+      node("benefits", "Benefit List", "保留你的 12 位常聊专属语伴置顶\n保留离线词库与原声发音下载特权\n赠送老用户专享续费立减 ¥50 礼券", 0),
+      node("products", "Products", "专属续费年卡|¥148/年 (券后价)|立减 ¥50 |专享保留\n专属续费月卡|¥25/月|折合 ¥0.83/天|月度过渡", 0, { variant: "rich-tiers" }),
+      node("purchase", "Purchase Button", "领取 ¥50 礼券并特惠续订", 0, { label: "purchase", subtitle: "已自动抵扣 ¥50 专属优惠券" }),
+      node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
     ];
   }
 
-  if (template.id === "workout") {
+  // 7. VIP分级页面-默认VIP (Figure 1 官方规范拆解)
+  if (template.id === "ht-switch-compare") {
+    return [
+      node("switch-tabs", "Switch Tabs", "VIP|VIP+", 0, {
+        label: "切换标签",
+        activeTab: 0,
+      }),
+      node("headline", "Header", "HelloTalk VIP", 0, {
+        label: "标题",
+        variant: "brand-hero",
+        bullets: [
+          "无限翻译",
+          "查看谁喜欢了你",
+          "搜索全世界的语伴",
+        ],
+      }),
+      node("compare-table", "Comparison Table", "", 0, {
+        label: "对比表格",
+        compareMode: "free-vs-vip",
+        featureColTitle: "特权功能",
+        col1Title: "普通会员",
+        col2Title: "VIP会员",
+        items: DEFAULT_FREE_VS_VIP_ITEMS,
+        showExpandCaret: true,
+      }),
+      node("timer", "Timer", "20% OFF 14:43:23", 0, {
+        label: "倒计时",
+        variant: "pill-capsule",
+        discount: "20% OFF",
+        time: "14:43:23",
+      }),
+      node("products", "Products", "1个月|¥78|¥78/月\n12个月|¥488|¥40.6/月|最受欢迎\n终身|¥998|原价 ¥1698", 0, {
+        label: "横向套餐卡片",
+        variant: "3-column-tiers",
+        tiers: [
+          { name: "1个月", monthly: "¥78", total: "¥78/月", isRecommended: false },
+          { name: "12个月", monthly: "¥488", total: "¥40.6/月", badge: "最受欢迎", isRecommended: true },
+          { name: "终身", monthly: "¥998", total: "原价 ¥1698", isRecommended: false },
+        ],
+      }),
+      node("purchase", "Purchase Button", "升级 VIP", 0, {
+        label: "购买按钮",
+        variant: "pill-gradient",
+      }),
+      node("links", "Legal Footer", "如果当前缴费期限24小时没有取消续订，系统会自动续订，费用将从你的iTunes账户收取，你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的服务条款及隐私政策", 0, {
+        label: "免责声明",
+      }),
+    ];
+  }
+
+  // 8. VIP分级页面-默认VIPPlus (Figure 4 官方规范拆解)
+  if (template.id === "ht-tier-compare") {
+    return [
+      node("switch-tabs", "Switch Tabs", "VIP|VIP+", 0, {
+        label: "切换标签",
+        activeTab: 1,
+      }),
+      node("headline", "Header", "HelloTalk VIP PLUS +", 0, {
+        label: "标题",
+        variant: "brand-hero",
+        bullets: [
+          "无限翻译",
+          "查看谁喜欢了你",
+          "结识全球母语者",
+        ],
+      }),
+      node("compare-table", "Comparison Table", "", 0, {
+        label: "对比表格",
+        compareMode: "vip-vs-plus",
+        featureColTitle: "特权功能",
+        col1Title: "VIP会员",
+        col2Title: "VIP+会员",
+        items: DEFAULT_VIP_VS_PLUS_ITEMS,
+        showExpandCaret: true,
+      }),
+      node("timer", "Timer", "20% OFF 14:43:23", 0, {
+        label: "倒计时",
+        variant: "pill-capsule",
+        discount: "20% OFF",
+        time: "14:43:23",
+      }),
+      node("products", "Products", "1个月|¥78|¥78/月\n12个月|¥488|¥40.6/月|最受欢迎\n终身|¥998|原价 ¥1698", 0, {
+        label: "横向套餐卡片",
+        variant: "3-column-tiers",
+        tiers: [
+          { name: "1个月", monthly: "¥78", total: "¥78/月", isRecommended: false },
+          { name: "12个月", monthly: "¥488", total: "¥40.6/月", badge: "最受欢迎", isRecommended: true },
+          { name: "终身", monthly: "¥998", total: "原价 ¥1698", isRecommended: false },
+        ],
+      }),
+      node("purchase", "Purchase Button", "升级 VIP+", 0, {
+        label: "购买按钮",
+        variant: "pill-gradient",
+      }),
+      node("links", "Legal Footer", "如果当前缴费期限24小时没有取消续订，系统会自动续订，费用将从你的iTunes账户收取，你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的服务条款及隐私政策", 0, {
+        label: "免责声明",
+      }),
+    ];
+  }
+
+
+  // 9. SKU半窗 (SKU_POPUP) - 官方真实半窗规范，组件化自由组装
+  if (template.id === "ht-vip-pop") {
+    return [
+      node("close", "Dismiss Button", "✕", 0, { variant: "circle-close", position: "top-right", label: "关闭按钮" }),
+      node("headline", "Header", "标题标题标题标题", 0, { variant: "pop-headline", align: "left", label: "标题" }),
+      node("subhead", "Subhead", "副标题副标题副标题副标题副标题", 0, { align: "left", color: "#000000", label: "副标题" }),
+      node("hero", "Hero Image", "媒体展示位", 0, { variant: "media-placeholder", label: "背景图" }),
+      node("products", "Products", "1 个月|¥78|¥78/ 月\n12 个月|¥388 (原价 ¥488)|节省 59%|🔥 8折\n终身|¥798 (原价 ¥1698)|永久会员权益|🔥 4.8折", 0, {
+        variant: "3-column-tiers",
+        label: "横向套餐卡片",
+        tiers: [
+          { name: "1 个月", monthly: "¥78", total: "¥78/ 月", badge: "", save: "", isRecommended: false },
+          { name: "12 个月", monthly: "¥388", originalPrice: "¥488", total: "¥388", badge: "🔥 8折", save: "节省 59%", isRecommended: true },
+          { name: "终身", monthly: "¥798", originalPrice: "¥1698", total: "¥798", badge: "🔥 4.8折", save: "永久会员权益", isRecommended: false },
+        ],
+      }),
+      node("purchase", "Purchase Button", "领取 8折优惠", 0, { label: "购买按钮", color: "#7C5CFC" }),
+      node("links", "Legal Footer", "如果当前缴费期前 24 小时没有取消续订，系统会自动续订，费用将从你的 iTunes 账户收取，你可随时前往 iTunes 商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的[服务条款]及[隐私政策]", 0, { label: "免责声明" }),
+    ];
+  }
+
+  // 10. 入门价格页 (ENTRY_PRICE) - 官方双模板规范，组件化自由组装
+  if (template.id === "ht-entry-aggregation") {
+    return [
+      node("close", "Dismiss Button", "✕", 0, { variant: "close-icon", position: "top-left", label: "关闭按钮" }),
+      node("headline", "Header", "首年额外 20% 优惠！", 0, { variant: "headline", kicker: "HelloTalk VIP 👑", label: "主标题" }),
+      node("subhead", "Subhead", "仅限今日", 0, { variant: "body", color: "#DE6876", label: "副标题" }),
+      node("products", "Products", "原价 ¥488/年\n折扣价 ¥388/年", 0, {
+        variant: "entry-price-tier",
+        displayMode: "clean-text",
+        priceOriginal: "原价 ¥488/年",
+        priceNow: "折扣价 ¥388/年",
+        label: "特惠价格",
+      }),
+      node("benefits", "Benefit List", "搜索附近的人\n解锁谁看了我\n无限翻译&字幕", 0, {
+        maxCount: 3,
+        styleVariant: "entry-checks",
+        selectedBenefits: ["搜索附近的人", "解锁谁看了我", "无限翻译&字幕"],
+        label: "核心特权",
+      }),
+      node("timer", "Timer", "优惠截止时间 20:08:08", 0, {
+        label: "优惠截止时间",
+        hours: 20,
+        minutes: 8,
+        seconds: 8,
+        variant: "clean-text",
+      }),
+      node("purchase", "Purchase Button", "继续", 0, { label: "购买按钮", color: "#C85B6B" }),
+      node("links", "Legal Footer", "可随时取消\n如果当前缴费期前24小时没有取消续订，系统会自动续订，费用将从你的 iTunes 账户收取，你可随时前往 iTunes 商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的[服务条款]及[隐私政策]", 0, { variant: "entry-legal", label: "免责声明" }),
+    ];
+  }
+
+  // 11. 旗舰 VIP+ 全语种高阶模版
+  if (template.id === "ht-vip-plus-aggregation") {
     return [
       hero(),
-      node("logo", "Logo", "POWERLY", 0),
-      node("header-1", "HEADER 1", "Your Personal First Day Workout is Ready", 0, { variant: "headline" }),
-      node("image-1", "Image 1", "", 0),
-      node("title-1", "Title 1", "Core Plank", 0),
-      node("repeats-1", "Repeats 1", "30 SECONDS", 0),
-      node("caption-1", "Caption 1", "Assume a push-up position, aligning hands beneath shoulders. Engage core muscles, maintaining a straight line from head to heels.", 0),
-      pending("image-2", "Image 2"),
-      pending("title-2", "Title 2"),
-      pending("repeats-2", "Repeats 2"),
-      pending("caption-2", "Caption 2"),
-      pending("image-3", "Image 3"),
-      pending("title-3", "Title 3"),
-      pending("repeats-3", "Repeats 3"),
-      pending("caption-3", "Caption 3"),
-      pending("image-4", "Image 4"),
-      pending("title-4", "Title 4"),
-      pending("repeats-4", "Repeats 4"),
-      pending("caption-4", "Caption 4"),
-      pending("header-2", "HEADER 2"),
-      pending("subheader-2", "Subheader 2"),
-      pending("features", "Features"),
-      pending("header-3", "HEADER 3"),
-      pending("subheader-3", "Subheader 3"),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year", 1),
-      pending("links", "Links"),
-      pending("legal", "Legal"),
-      pending("footer", "Footer"),
-      node("purchase", "Purchase Button", "Continue", 0, { label: "purchase" }),
+      node("badge", "Badge Tag", "VIP+ 旗舰特权", 0, { color: "#F59E0B", variant: "pill" }),
+      node("headline", "Header", "HelloTalk VIP+ 旗舰会员", 0, { variant: "headline" }),
+      node("subhead", "Subhead", "面向深度语言学者与国际职场人士的全语种高端定制特权", 0, { variant: "body" }),
+      node("benefits", "Benefit List", "AI 母语导师 24 小时随身口语对话陪练\n无限次全球任意城市漫游与母语者精准结对\n每周独家外教直播微课与学习打卡督导\n专属黑金 VIP+ 徽章与优先客服通道", 0),
+      node("products", "Products", "VIP+ 旗舰终身会员|¥898 (限时)|一次付费，终身尊享|尊享首选\nVIP+ 旗舰包年|¥298/年|¥0.81/天|含全套外教微课", 0, { variant: "rich-tiers" }),
+      node("purchase", "Purchase Button", "开通 VIP+ 旗舰特权", 0, { label: "购买按钮", subtitle: "支持全平台多设备数据实时无缝同步" }),
+      node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
     ];
   }
 
-  if (template.id === "audiobooks") {
-    return [
-      hero(),
-      node("headline", "Headline", "Get access to collection of audiobooks for kids", 0, { variant: "headline" }),
-      node("benefits", "List", "", 0),
-      node("item-0", "Item 0", "Access all quizzes and exams", 1),
-      node("item-1", "Item 1", "Offline mode", 1),
-      node("item-2", "Item 2", "Hands-on labs with lecturers", 1),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year|$79.99 / 1 year", 1),
-      node("footer", "Footer", "", 0),
-      node("purchase", "Purchase Button", "Continue", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "herbs") {
-    return [
-      hero(),
-      node("headline", "Headline", "Get Full Access to The Guide of Medicinal Herbs", 0, { variant: "headline" }),
-      node("subhead", "Subhead", "The collection of over 5,000 plants", 0, { variant: "body" }),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year|$4.99 / 1 week", 1),
-      node("footer", "Footer", "One-time opportunity", 0),
-      node("purchase", "Purchase Button", "Continue", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "video-access") {
-    return [
-      hero(),
-      node("headline", "Headline", "Get Full Access", 0, { variant: "headline" }),
-      node("benefits", "List", "", 0),
-      node("item-0", "Item 0", "Faster Video Processing", 1),
-      node("item-1", "Item 1", "Exclusive Effects & Styles", 1),
-      node("item-2", "Item 2", "No Watermark", 1),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year|$79.99 / 1 year", 1),
-      node("footer", "Footer", "The Best offer", 0),
-      node("purchase", "Purchase Button", "Subscribe Now", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "design-life") {
-    return [
-      hero(),
-      node("headline", "Headline", "Design your life", 0, { variant: "headline" }),
-      node("subhead", "Subhead", "Join 1 million people taking control of their sleep and energy", 0, { variant: "body" }),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year|$79.99 / 1 year", 1),
-      node("footer", "Footer", "Advantageous offer", 0),
-      node("purchase", "Purchase Button", "Subscribe Now", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "full-app") {
-    return [
-      hero(),
-      node("headline", "Headline", "Unlock the full app with 50% off today", 0, { variant: "headline" }),
-      node("subhead", "Subhead", "All lessons unlocked · Full access to all languages · Remove all ads", 0, { variant: "body" }),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year|$79.99 · $1.54/week", 1),
-      node("footer", "Footer", "", 0),
-      node("purchase", "Purchase Button", "Subscribe Now", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (["item-placeholder", "item-placeholder-dark"].includes(template.id)) {
-    return [
-      hero(),
-      node("items", "List", "Item One|This is a brief description for the first placeholder item.\nItem Two|Here is a short explanation for the second placeholder item.\nItem Three|This description provides details about the third placeholder item.", 0),
-      node("image", "Image", "", 0),
-      node("text", "Text", "This is a placeholder text for your content. It serves as an example to illustrate where actual information will go.", 0, { variant: "body" }),
-      node("products", "Products", "", 0),
-      node("annual-product", "Japanese Ai - 1 Year", "Japanese Ai - 1 Year|$4.99 / 1 week", 0),
-      node("footer", "Footer", "Try before you buy · $2.16/month", 0),
-      node("purchase", "Purchase", "Continue", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore · Login", 0),
-    ];
-  }
-
-  if (template.id === "fantasy-access") {
-    return [
-      hero(),
-      node("products", "Products", "", 0),
-      node("annual-product", "Japanese Ai - 1 Year", "Japanese Ai - 1 Year|$79.99 / 1 year", 0),
-      node("footer", "Footer", "Advantageous offer", 0),
-      node("purchase", "Purchase Button", "Start", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "editing-plan") {
-    return [
-      node("hero-video", "Hero Video", template.visual, 0, { theme: template.theme }),
-      node("headline", "Headline", "Choose the plan that works best for you!", 0, { variant: "headline" }),
-      node("benefits", "List", "", 0),
-      node("item-0", "Item 0", "Effortless AI-Powered Edits|Turn any video into a professional masterpiece with just a few taps, thanks to cutting-edge AI technology.", 1),
-      node("item-1", "Item 1", "Exclusive Filters and Effects|Access a wide range of unique filters, transitions, and effects to make your content stand out.", 1),
-      node("item-2", "Item 2", "Save Time with Auto-Enhance", 1),
-      node("footer", "Footer", "", 0),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year|$45.99 per year · $4.16 per month", 1),
-      node("purchase", "Purchase Button", "Start free trial", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "training") {
-    return [
-      hero(),
-      node("headline", "Headline", "Start training today", 0, { variant: "headline" }),
-      node("benefits", "List", "", 0),
-      node("item-0", "Item 0", "Access to premium art styles", 1),
-      node("item-1", "Item 1", "Unlimited artwork creation", 1),
-      node("item-2", "Item 2", "NFT minting", 1),
-      node("products", "Products", "", 0),
-      node("annual-product", "Product", "Japanese Ai - 1 Year|$79.99 / 1 year", 1),
-      node("footer", "Footer", "One-time opportunity", 0),
-      node("purchase", "Purchase Button", "Start", 0, { label: "purchase" }),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "black-friday") {
-    return [
-      hero(),
-      node("black-friday-image", "Black Friday Image", "BLACK FRIDAY", 0),
-      node("discount", "Discount", "50% OFF", 0, { variant: "headline" }),
-      node("benefits", "List", "Weekly Activity Planner|Easily organize and track your weekly activities, whether recurring or varied.\nUnlimited History Charts|Track your progress with detailed stats and session history.\nAccess to Future Premium Features|Enjoy early access to exciting new features planned for the future.", 0),
-      node("footer-top", "Footer Top Part", "", 0),
-      node("products", "Products", "Japanese Ai - 1 Year|$9.99/month", 0, { variant: "purchase" }),
-      node("footer", "Footer", "There's no better deal than this one", 0),
-      node("button-links", "Button and Links", "GET FULL ACCESS|Terms · Privacy · Restore", 0, { label: "purchase" }),
-    ];
-  }
-
-  if (template.id === "new-year") {
-    return [
-      hero(),
-      node("offer-card", "Card", "BEGIN THE NEW YEAR|with exclusive Christmas Offer!\n50% OFF", 0),
-      node("review-carousel", "Carousel", "Megan Ross|User-friendly interface and robust features. Upgrading to Pro was worth it for the full range of functions!", 0, { label: "review" }),
-      node("products", "Products", "Japanese Ai - 1 Year|$79.99/year|$1.54/week", 0, { variant: "purchase" }),
-      node("footer", "Footer", "Special holiday offer", 0),
-    ];
-  }
-
-  if (template.id === "premium-access") {
-    return [
-      hero(),
-      node("headline", "Headline", "Premium Access", 0, { variant: "headline" }),
-      node("subhead", "Subhead", "Less Work More Relaxing with Robot", 0, { variant: "body" }),
-      node("trial-list", "List", "", 0),
-      node("item-0", "List item", "Today|Start enjoying full access to advanced features", 1),
-      node("item-1", "List item", "In 5 days|Get a reminder that your free trial will be ending soon", 1),
-      node("item-2", "List item", "In 7 days|You will automatically be charged unless you cancel at any time", 1),
-      node("products", "Products", "$79.99 / 1 year|Time-limited offer|$79.99 / 1 year", 0),
-      node("footer", "Footer", "", 0),
-      node("purchase", "Purchase Button", "Try 7 days free and subscribe", 0),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "family") {
-    return [
-      hero(),
-      node("family-card", "Card", "", 0, { label: "hero content" }),
-      node("family-kicker", "Text", "Speak Easy with Family Plan", 1, { variant: "body" }),
-      node("headline", "Text", "Unlock fluency for the whole family", 1, { variant: "headline" }),
-      node("benefits", "List", "Learn together, progress together\nPremium features for up to 5 family members across all devices\n3 day free trial, then $149.99/year until cancelled ($12.49/month)", 0),
-      node("footer", "Footer", "Without commitment. Cancel anytime.", 0),
-      node("products", "Products", "Start learning now|3 day free trial, then $149.99/year until cancelled ($12.49/month)|", 0, { variant: "purchase" }),
-      node("post-product", "Text", "", 0, { label: "text", variant: "legal" }),
-      node("links", "Links", "Terms · Restore Purchase", 0),
-    ];
-  }
-
-  if (template.id === "connection") {
-    return [
-      hero(),
-      node("story-card", "Card", "", 0, { label: "hero content" }),
-      node("headline", "Text", "Build deeper connections, one conversation at a time", 1, { variant: "headline" }),
-      node("couple-image", "Image", "James with Jenny", 1, { label: "image" }),
-      node("subhead", "Text", "Transform how you communicate and understand each other's needs", 0, { variant: "body" }),
-      node("products", "Products", "$6.67/monthly|Partner access included|$6.67/monthly", 0),
-      node("product", "Product", "Japanese Ai - 1 Year", 1),
-      node("footer", "Footer", "", 0),
-      node("purchase", "Purchase Button", "START YOUR JOURNEY TOGETHER", 0),
-      node("legal-copy", "Text", "Subscription renews automatically unless cancelled.", 0, { label: "legal", variant: "legal" }),
-      node("links", "Links", "Terms of Use · Privacy Policy", 0),
-      node("restore-links", "Links", "Restore Purchase", 0),
-    ];
-  }
-
-  if (template.id === "document") {
-    return [
-      hero(),
-      node("offer-card", "Card", "", 0, { label: "launch offer" }),
-      node("offer-kicker", "Text", "SPECIAL LAUNCH OFFER", 1, { variant: "section" }),
-      node("headline", "Text", "Get premium document management at an exclusive price", 1, { variant: "headline" }),
-      node("offer-copy", "Text", "This limited-time offer gives you access to all premium features including unlimited scans, advanced organization, and priority sync at a fraction of the regular cost.", 1, { variant: "body" }),
-      node("basic-plan", "Button", "Continue with basic plan", 0, { label: "secondary action" }),
-      node("gift-image", "Image", "Launch offer gift", 0, { label: "image" }),
-      node("footer", "Footer", "", 0),
-      node("products", "Products", "CLAIM OFFER|$0.99 for 2 weeks, then|$1.54 /week", 0, { variant: "purchase" }),
-      node("product", "Product", "Japanese Ai - 1 Year", 1),
-    ];
-  }
-
-  if (template.id === "yoga") {
-    return [
-      hero(),
-      node("yoga-image", "Image", "Yoga hero", 0, { label: "image" }),
-      node("headline", "Header", "START YOUR YOGA JOURNEY TODAY!", 0, { variant: "headline" }),
-      node("features", "Feature list", "Access to 300+ tailored workouts\nProfessional coaching videos\nDiscover delicious vegan recipes\nFace yoga and stretching routines", 0, { label: "feature list" }),
-      node("products", "Products", "CONTINUE|1 year days free, then|$79.99 /year", 0, { variant: "purchase" }),
-      node("product", "Product", "Japanese Ai - 1 Year", 1),
-      node("caption", "Caption", "You can opt out at any point during the trial period.", 0, { variant: "body" }),
-      node("legal", "Legal", "Payment will be charged to your iTunes at confirmation of purchase. Subscriptions will automatically renew unless auto-renew is turned off at least 24 hours before the end of the current period. Your account will be charged for renewal, in accordance with your plan, within 24 hours prior to the end of the current period. You can manage or turn off auto-renew in your Apple ID account settings anytime after purchase. Any unused portion of a free trial period, if offered, will be forfeited when the user purchases a subscription to that publication, where applicable.", 0, { variant: "legal" }),
-      node("footer", "Footer", "", 0),
-    ];
-  }
-
-  if (template.id === "black-friday-timer") {
-    return [
-      hero(),
-      node("top-text", "Top Text", "Lifetime Access", 0, { variant: "section" }),
-      node("black-friday-image", "Black Friday Image", "BLACK FRIDAY", 0, { label: "image" }),
-      node("offer-image", "Image", "Limited-time offer", 0, { label: "image" }),
-      node("offer-card", "Card", "Get unlimited access to all premium features with a single lifetime purchase. No recurring fees.|EXPIRES IN: 04:59:59", 0, { label: "offer" }),
-      node("product-image", "Image", "A one-time payment", 1, { label: "image" }),
-      node("products", "Products", "$79.99|instead of $79.99/year|$79.99", 0),
-      node("purchase", "Purchase Button", "Continue", 0),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-      node("footer", "Footer", "", 0),
-    ];
-  }
-
-  if (template.id === "christmas") {
-    return [
-      hero(),
-      node("holiday-card", "Card", "SPECIAL HOLIDAY DISCOUNT!|50% OFF", 0, { label: "holiday offer" }),
-      node("countdown-card", "Card", "LIMITED TIME ONLY|06:23:59:59", 0, { label: "countdown visual" }),
-      node("products", "Products", "$79.99 /year|$1.54 /month|$79.99 /year", 0),
-      node("product", "Product", "Japanese Ai - 1 Year", 1),
-      node("footer", "Footer", "with 1 week trial", 0),
-      node("price-card", "Card", "", 0, { label: "price block" }),
-      node("purchase", "Purchase Button", "CONTINUE", 0),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "halloween") {
-    const reviews = [
-      "User-friendly interface and robust features. Upgrading to Pro was worth it for the full range of tools. Highly recommend! — Jay Hawkins",
-      "Love this app! The Pro upgrade is a game-changer with its additional features. It’s well worth the investment. Five stars! — TechGuru99",
-      "Excellent app for productivity! The Pro version offers advanced tools that are incredibly useful. Highly recommend upgrading for full access. — CreativeMind86",
-      "Very impressed with this app! Easy to use and packed with features. Pro upgrade provides even more value. Totally worth it. — StarGazer24",
-      "This app is amazing! Great features and simple to navigate. The Pro upgrade unlocks powerful tools. Highly recommend to everyone! — PixlWizard",
-    ];
-    return [
-      hero(),
-      node("headline-card", "Card", "BE FEARLESS!|Halloween offer now on!", 0, { label: "headline" }),
-      node("reviews", "Carousel", reviews.join("\n---\n"), 0, { label: "reviews" }),
-      ...reviews.map((review, index) => node(`review-card-${index + 1}`, "Card", "", 1, { label: `review ${index + 1}` })),
-      node("footer", "Footer", "", 0),
-      node("products", "Products", "$79.99 / 1 year|Special Halloween offer|$79.99", 0),
-      node("purchase", "Purchase Button", "Continue", 0),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "report") {
-    return [
-      hero(),
-      node("headline", "Header", "Receive your personalized report", 0, { variant: "headline" }),
-      node("stars", "Stars", "★★★★★", 0, { label: "rating" }),
-      node("features", "Feature list", "Delve into personalized horoscopes\nExplore your compatibility reports\nExperience real-time palm reading\nEnhance your self-awareness and understanding of others.", 0, { label: "feature list" }),
-      node("footer", "Footer", "", 0),
-      node("products", "Products", "$1.54 / week|cancel anytime.|$1.54 / week", 0),
-      node("product", "Product", "Japanese Ai - 1 Year", 1),
-      node("purchase", "Purchase Button", "CONTINUE", 0),
-      node("links", "Links", "Terms · Privacy · Restore", 0),
-    ];
-  }
-
-  if (template.id === "avatar") {
-    return [
-      hero(),
-      node("offer", "Text", "✪ ONE-TIME OFFER", 0, { variant: "section" }),
-      node("headline", "Header", "Create your 3D avatar", 0, { variant: "headline" }),
-      node("products", "Products", "Enjoy 7 days for FREE, then $7.99/week.|Auto renewable.|$7.99 / week", 0),
-      node("footer", "Footer", "", 0),
-      node("purchase", "Purchase Button", "Continue with trial →", 0),
-      node("caption", "Caption", "Auto renewable. Cancel anytime.", 0, { variant: "body" }),
-    ];
-  }
-
-  if (template.id === "mindfulness") {
-    return [
-      hero(),
-      node("mindfulness-card", "Card", "", 0, { label: "hero content" }),
-      node("mindfulness-image", "Image", "Mindfulness meditation illustration", 1, { label: "image" }),
-      node("mindfulness-headline", "Header", "Mindfulness Unlocked", 1, { variant: "headline" }),
-      node("mindfulness-caption", "Caption", "Experience guided meditations", 1, { variant: "body" }),
-      node("reviews", "Carousel", "Amazing app!|The Pro version is a must-have with its extensive features. Easy to use and very intuitive. Highly recommended for everyone.\n---\nAmazing app!|The Pro version is a must-have with its extensive features. Easy to use and very intuitive. Highly recommended for everyone.", 0, { label: "2 reviews" }),
-      node("footer", "Footer", "", 0),
-      node("products", "Products", "Continue|Annual access|$119.88/year", 0, { variant: "purchase" }),
-      node("trial-toggle", "Toggle", "Not sure? Get free trial|Cancel anytime", 0, { label: "free trial", defaultState: "Off" }),
-      node("toggle-on", "Toggle On", "", 1, { label: "active state", evidence: "partial" }),
-      node("toggle-off", "Toggle Off", "", 1, { label: "inactive state", evidence: "partial" }),
-      node("links", "Links", "Terms of use · Privacy policy", 0),
-    ];
-  }
-
-  // Source screenshots confirm the visible copy for these cards, but their Builder trees have not been captured yet.
+  // 默认兜底模版
   return [
     hero(),
-    node("source-reference", "Source reference", "Source visual captured. Builder layer tree is still being collected.", 0, { label: "unverified structure", evidence: "preview" }),
+    node("headline", "Header", template.title, 0, { variant: "headline" }),
+    node("subhead", "Subhead", template.subtitle, 0, { variant: "body" }),
+    node("benefits", "Benefit List", "核心学习特权|无限制解锁使用\n专属客服支持|1小时内极速响应\n跨设备同步|iPhone、iPad与网页端无缝同步", 0),
+    node("products", "Products", "年度会员|¥198/年|¥0.54/天|立省50%\n连续包月|¥28/月|按月扣费", 0),
+    node("purchase", "Purchase Button", "立即继续", 0, { label: "购买按钮" }),
+    node("links", "Legal Footer", "服务条款 · 隐私政策 · 恢复购买", 0),
   ];
 }
 
-function createComponentNode(type, index) {
-  const contentByType = {
-    Text: "text", Image: "", Card: "", "Web Paywall Button": "Pay on web", Button: "button text", List: "", "List item": "title|caption", Links: "Terms · Privacy · Restore · Login", Timer: "04:59:59", Carousel: "", Products: "",
+function createComponentNode(rawType, index) {
+  const type = zhToTypeMap[rawType] || rawType;
+  let label = typeToZhMap[type] || rawType;
+  let config = {};
+  let content = "";
+
+  if (rawType === "产品双套餐") {
+    label = "产品双套餐";
+    config = {
+      variant: "onboarding-dual-tiers",
+      selectedTier: 0,
+      tiers: [
+        { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+        { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+      ],
+    };
+    content = "12个月|¥40.67/月|总价 ¥488|48%OFF|免费试用\n月费会员|¥78.00/月|按月扣费||直接购买";
+  } else if (rawType === "特惠价格") {
+    label = "特惠价格";
+    config = {
+      variant: "entry-price-tier",
+      displayMode: "clean-text",
+      priceOriginal: "原价 ¥488/年",
+      priceNow: "折扣价 ¥388/年",
+    };
+    content = "原价 ¥488/年\n折扣价 ¥388/年";
+  } else if (rawType === "横向套餐卡片" || rawType === "横向三档套餐") {
+    label = "横向套餐卡片";
+    config = {
+      variant: "3-column-tiers",
+      selectedTier: 1,
+      tiers: [
+        { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+        { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+        { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+      ],
+    };
+    content = "3个月|¥37.33/月|¥112\n12个月|¥24.99/月|¥298|省54%|推荐\n终身|¥798|一次性购买";
+  } else if (rawType === "纵向套餐列表" || rawType === "产品套餐" || type === "Products") {
+    label = "纵向套餐列表";
+    config = {
+      variant: "vertical-list-tiers",
+      listTiers: [
+        { name: "连续包年 VIP", price: "¥198/年", daily: "¥0.54/天", tag: "推荐", isDefault: true },
+        { name: "连续包月 VIP", price: "¥28/月", daily: "¥0.93/天", tag: "月付", isDefault: false },
+      ],
+    };
+    content = "连续包年 VIP|¥198/年|¥0.54/天|推荐\n连续包月 VIP|¥28/月|¥0.93/天|月付";
+  } else if (rawType === "背景图" || type === "Hero Image") {
+    label = "背景图";
+    config = {
+      bgMode: "illustration",
+      sloganText: "寻找身边母语者",
+      themeColor: "orange",
+      showCloseBtn: true,
+      bubbleBg: "#2563eb",
+    };
+    content = "寻找身边母语者";
+  } else {
+    const contentByType = {
+      Header: "新建标题内容",
+      Subhead: "新建副标题说明文案",
+      "Badge Tag": "新特权标签",
+      "Benefit List": "核心特权一|特权详细说明\n核心特权二|特权详细说明",
+      "Comparison Table": "特权对比|普通VIP|VIP+旗舰\n每日翻译|50次/天|无限制\n全球漫游|2个城市|无限制",
+      "Switch Tabs": "VIP 进阶版|VIP+ 旗舰版",
+      "Carousel Cards": "特权一|特权描述介绍\n特权二|特权描述介绍",
+      "Language Chips": "🇺🇸 英语|🇯🇵 日语|🇰🇷 韩语|🇪🇸 西语",
+      Timer: "04:59:59",
+      Toggle: "免费试用 7 天|随时可取消",
+      "Purchase Button": "立即开始试用",
+      "Dismiss Button": "暂时不用，谢谢",
+      "Legal Footer": "服务条款 · 隐私政策 · 恢复购买",
+      "Hero Image": "banner-hero",
+      Text: "文本内容",
+    };
+    content = contentByType[type] ?? "";
+  }
+
+  return {
+    id: `added-${type.toLowerCase().replace(/[^a-z]+/g, "-")}-${index}`,
+    type,
+    label,
+    depth: 0,
+    content,
+    config,
   };
-  return { id: `added-${type.toLowerCase().replace(/[^a-z]+/g, "-")}-${index}`, type, label: "", depth: 0, content: contentByType[type] ?? "" };
+}
+
+function getVerticalListTiers(node) {
+  if (node?.config?.listTiers && node.config.listTiers.length > 0) {
+    return node.config.listTiers;
+  }
+  const lines = (node?.content || "").split("\n").filter(Boolean);
+  if (lines.length > 0) {
+    return lines.map((line, idx) => {
+      const [name, price, daily, tag] = line.split("|");
+      return {
+        name: name || `套餐 ${idx + 1}`,
+        price: price || "¥198/年",
+        daily: daily || "",
+        tag: tag || "",
+        isDefault: idx === 0,
+      };
+    });
+  }
+  return [
+    { name: "连续包年 VIP", price: "¥198/年", daily: "¥0.54/天", tag: "推荐", isDefault: true },
+    { name: "连续包月 VIP", price: "¥28/月", daily: "¥0.93/天", tag: "月付", isDefault: false },
+  ];
+}
+
+function saveVerticalListTiers(node, newTiers, updateNode) {
+  const newContent = newTiers.map((t) => `${t.name}|${t.price}|${t.daily || ""}|${t.tag || ""}`).join("\n");
+  updateNode(node.id, {
+    content: newContent,
+    config: {
+      ...node.config,
+      variant: "vertical-list-tiers",
+      listTiers: newTiers,
+    },
+  });
 }
 
 const productOptions = [
-  "月度会员 / Monthly",
-  "Japanese ai / 3 months",
-  "Japanese Ai - 1 Year / Annual",
+  "HelloTalk VIP 年度会员 / Annual",
+  "HelloTalk VIP 连续包月 / Monthly",
+  "HelloTalk VIP+ 旗舰全语种 / Annual",
 ];
 
 const observedProductRows = [
-  { product: "Japanese Ai - 1 Year", period: "Annual", offer: "Black Friday" },
-  { product: "Japanese ai", period: "3 months", offer: "No offers for this product" },
-  { product: "月度会员", period: "Monthly", offer: "springsale" },
-];
-
-const localeLabels = {
-  en: "English",
-  zh: "Simplified Chinese",
-  ja: "Japanese",
-};
-
-const appCategories = [
-  "Entertainment", "Weather", "Medical", "Productivity", "Travel", "Music",
-  "Reference", "Health & fitness", "Stickers", "Finance", "Developer tools",
-  "Social networking", "Business", "Education", "Graphics & design", "Games",
-  "Sports", "Books", "Lifestyle", "Shopping", "Utilities", "Food & drink",
-  "Magazines & newspapers", "Photo & Video",
+  { product: "HelloTalk VIP 年度会员", period: "Annual", offer: "黑五大促 5 折" },
+  { product: "HelloTalk VIP 连续包月", period: "Monthly", offer: "首月特惠" },
+  { product: "HelloTalk VIP+ 旗舰年卡", period: "Annual", offer: "赠外教微课" },
 ];
 
 const zhCopy = {
   "Paywalls": "付费墙", "Test": "测试", "Help": "帮助", "App settings": "应用设置", "Account": "账户",
-  "Add a new app": "新建应用", "Evidence & gaps": "已验证与缺口", "Only observed behavior is reproduced. These routes are deliberately not invented.": "仅复刻已观察到的行为；未验证的结果不会被编造。",
+  "Add a new app": "新建应用", "Evidence & gaps": "已验证与缺口",
   "Create paywall": "创建付费墙", "Create as draft": "创建草稿", "General": "基础设置", "Products": "产品套餐",
   "Paywall name": "付费墙名称", "Paywall screenshot": "付费墙截图", "Upload screenshot": "上传截图",
   "Build no-code paywall": "使用无代码构建器", "Choose a template": "选择模板", "Generate Paywall with AI": "使用 AI 生成付费墙",
   "Copy a Design from Your Apps": "从其他应用复制设计", "Builder & Generator": "构建器与生成器", "Choose how to start": "选择创建方式",
-  "Start with the visual Builder.": "从可视化构建器开始。", "Observed template library and filters.": "查看已观察到的模板库与筛选项。",
-  "Entry is known; generation output is not.": "入口已验证，生成结果尚未验证。", "Visual Builder configuration only.": "仅复制可视化构建器配置。",
   "Metrics": "指标", "View in analytics": "在分析中查看", "Duplicate": "复制", "Test on Device": "在设备上测试", "Archive": "归档",
   "State": "状态", "Started at": "创建时间", "Open Builder": "打开构建器",
   "Discard": "放弃更改", "Save": "保存", "Save & publish": "保存并发布", "Add product": "添加产品",
   "Template": "模板", "Change template": "更换模板", "Layout settings": "布局设置", "Elements": "元素", "Show on device": "在设备上展示",
-  "Source visual": "源端画面", "Editable structure": "可编辑结构", "Source reference": "源端参考画面",
-  "Source preview": "源端画面", "Structure pending": "结构待采集",
-  "This template has a captured source visual, but its exact Builder layer tree has not been verified. Editing is intentionally unavailable until the source structure is collected.": "该模板已采集源端画面，但精确的构建器图层树尚未验证；在采集完成前，不开放伪造的编辑能力。",
-  "The matching source visual is shown in the device preview. No generic editable nodes are substituted for this template.": "设备预览显示与模板卡一致的源端画面；不会用通用可编辑节点替代该模板。",
+  "Source visual": "源端画面", "Editable structure": "可编辑结构",
   "On": "开启", "Add element": "添加元素", "Localization": "本地化", "English": "英语", "French": "法语", "Simplified Chinese": "简体中文",
   "Add locale": "添加语言", "Content": "内容", "Style": "样式", "Layout": "布局", "Text": "文本", "Image": "图片", "Card": "卡片",
-  "Web Paywall Button": "网页付费按钮", "Button": "按钮", "List": "列表", "Links": "链接", "Timer": "倒计时", "Carousel": "轮播图",
-  "Toggle": "试用开关", "Toggle On": "开关开启状态", "Toggle Off": "开关关闭状态", "Default toggle state": "默认开关状态", "Active": "已开启",
-  "Hero Image": "主视觉图片", "Header": "标题", "Headline": "主标题", "Subhead": "副标题", "Caption": "说明文案", "Legal": "法律说明", "Top Text": "顶部文案", "Feature list": "权益列表", "List item": "列表项", "Product": "产品", "Purchase Button": "购买按钮", "Stars": "星级", "Black Friday Image": "黑色星期五图片", "Footer": "底部区域", "Purchase": "购买", "Continue": "继续", "Terms of service": "服务条款",
-  "Privacy policy": "隐私政策", "Restore": "恢复购买", "Close": "关闭", "Cancel": "取消", "Accept": "确认",
-  "Paywall publishing confirmation": "付费墙发布确认", "Archive paywall": "归档付费墙", "Filters": "筛选",
-  "Number of products": "产品数量", "Image / video": "图片 / 视频", "Components": "组件", "Length": "内容长度", "Background theme": "背景主题",
-  "Category": "分类", "1 product (31)": "1 个产品（31）", "More than 1 product (56)": "多个产品（56）", "All": "全部",
-  "With Image or Video (77)": "含图片或视频（77）", "No media (3)": "无媒体（3）", "Free trial toggle (5)": "免费试用开关（5）",
-  "Trial timeline (24)": "试用时间线（24）", "Reviews (7)": "评价（7）", "Timer (5)": "倒计时（5）", "Short": "短", "Long": "长",
-  "Light": "浅色", "Dark": "深色", "All paywalls (56)": "全部付费墙（56）", "Popular (5)": "热门（5）", "Seasonal (7)": "季节活动（7）",
-  "Generate a Design with AI": "使用 AI 生成设计", "Start Generating": "开始生成", "Choose Paywall": "选择付费墙",
-  "Selected template": "已选模板", "No template selected": "尚未选择模板", "Open in Builder": "在构建器中打开",
-  "Annual plan with trial": "年度方案与试用", "Upgrade your routine": "升级你的日常", "Simple annual offer": "简洁年度优惠",
-  "Premium membership": "高级会员", "Seasonal subscription": "季节订阅", "Start your journey": "开启你的旅程",
-  "Unlock the World of Knowledge": "解锁知识的世界", "What to expect during your free trial": "免费试用期间会发生什么", "Build deeper connections": "建立更深的连接",
-  "Unlock fluency for the whole family": "为全家解锁流畅表达", "Premium document management": "高级文档管理", "How your free trial works": "免费试用如何运作",
-  "Start your yoga journey today": "今天开始你的瑜伽之旅", "Receive your personalized report": "领取你的专属报告", "Create your 3D avatar": "创建你的 3D 形象",
-  "Get Unlimited Access": "解锁无限访问", "Exclusive Weather Insights": "专属天气洞察", "Mindfulness Unlocked": "解锁正念体验",
-  "Your Personal First Day Workout is Ready": "你的首日专属训练已准备好", "Be Fearless": "勇敢无畏", "Black Friday Lifetime Access": "黑色星期五终身访问",
-  "Premium learning library": "高级学习内容库", "Day-by-day trial guide": "逐日试用指引", "A focused conversation plan": "专注对话计划",
-  "Family learning plan": "家庭学习方案", "Exclusive launch offer": "专属首发优惠", "Clear renewal timeline": "清晰续订时间线",
-  "Personal wellness plan": "个人健康计划", "Explore your profile": "探索你的个人档案", "Try it free for seven days": "免费体验七天",
-  "Premium wallpaper collection": "高级壁纸合集", "Unlock premium forecasting": "解锁高级天气预报", "Experience guided meditations": "体验引导式冥想",
-  "A plan built for today": "为今天定制的计划", "Halloween offer now on": "万圣节优惠正在进行", "Limited holiday discount": "限时节日优惠",
-  "Element content": "元素内容", "Layer label": "图层标签", "Delete element": "删除元素", "Preview orientation": "预览方向", "Preview visibility": "预览可见性",
-  "No locally reconstructed templates match this filter combination.": "没有本地还原模板符合当前筛选组合。", "All paywalls": "全部付费墙", "Popular": "热门", "Seasonal": "季节活动",
-  "No locally captured Adapty templates match this filter combination.": "没有已采集的 Adapty 真实模板符合当前筛选组合。",
-  "Don't have a design? Our AI will create a unique paywall for you from scratch.": "还没有设计？AI 会从零为你生成一张独特的付费墙。",
-  "Reuse a design you've built with Paywall Builder in another app.": "复用你在其他应用中通过付费墙构建器创建的设计。", "Get Free Access": "免费开始使用",
-  "1 product · Trial timeline · Reviews": "1 个产品 · 试用时间线 · 评价", "1 product · Image": "1 个产品 · 图片", "1 product · Free trial toggle": "1 个产品 · 免费试用开关",
-  "Text Required": "文本内容", "Max lines": "最大行数", "Overflow": "溢出处理", "Scale text": "缩放文字", "Close preview": "关闭预览",
-  "PREMIUM ACCESS": "高级访问", "Smart summaries and audio insights designed for lifelong learners": "为持续学习者准备的智能摘要与音频洞察",
-  "Premium content and tools": "高级内容与工具", "A plan that fits your routine": "适合你日常节奏的方案", "Cancel anytime from settings": "可随时在设置中取消",
-  "Today": "今天", "Full access starts now": "完整访问从现在开始", "Day 6": "第 6 天", "We will remind you": "我们会提醒你", "Day 7": "第 7 天", "Your plan renews": "你的方案将续订",
-  "Loved by thousands of members": "受到数千名会员的喜爱", "Annual access": "年度访问", "Start your free trial": "开始免费试用", "Without commitment. Cancel anytime.": "无需承诺，随时可取消。",
-  "New text": "新增文本", "New card": "新增卡片", "Open web checkout": "打开网页结算", "First benefit": "第一项权益", "Second benefit": "第二项权益", "Customer story": "用户故事",
-  "Quarterly access": "季度访问", "Supporting text": "辅助文案", "Heading": "标题",
-  "1 product": "1 个产品", "2 products": "2 个产品", "Trial timeline": "试用时间线", "Reviews": "评价", "No media": "无媒体",
-  "Create a web paywall": "创建网页付费墙", "Create web paywall": "创建网页付费墙", "Learn more": "了解更多",
-  "Paste the web paywall link": "粘贴网页付费墙链接", "Save link": "保存链接", "Choose how to trigger the web purchase flow": "选择如何触发网页购买流程",
-  "Read docs": "查看文档", "You’re ready to launch!": "已准备好发布！", "Table": "表格", "JSON": "JSON", "Import/Export": "导入/导出",
-  "Locales": "语言", "Import": "导入", "Export": "导出", "Add value": "添加配置项", "String": "文本", "Number": "数字",
-  "Boolean": "布尔值", "Default": "默认", "Remove French": "移除法语", "AI Translate": "AI 翻译",
-  "Revenue": "收入", "Unique views": "独立浏览量", "ARPAS": "每位活跃订阅用户收入", "Trials": "试用", "Purchases": "购买", "Refunds": "退款",
-  "Last month": "上个月", "week": "按周", "Group by Product": "按产品分组", "Add filter": "添加筛选", "Audience based": "按受众",
-  "Filter metrics by install date": "按安装日期筛选指标", "Search": "搜索", "Reset": "重置", "Apply": "应用",
-  "Create your first Paywall": "创建第一个付费墙", "New paywall": "新建付费墙", "Acquisition": "拉新", "Cancellation": "取消订阅",
-  "Start blank": "从空白开始", "Use template": "使用模板", "Publish": "发布", "Localize": "本地化", "Share": "分享",
-  "Name": "名称", "Terms": "条款", "Privacy": "隐私政策", "Restore Purchase": "恢复购买", "Login button": "登录按钮",
-  "External browser": "外部浏览器", "Offer": "优惠", "Primary text": "主文案", "Secondary text": "辅助文案",
-  "No offer": "无优惠", "Action": "动作", "Action ID": "动作 ID",
-  "Interface language": "界面语言", "Chinese": "中文",
-  "1 product · Trial timeline": "1 个产品 · 试用时间线", "Off": "关闭", "Link text": "链接文案", "Link URL": "链接地址",
-  "Restore button": "恢复购买按钮", "Button text": "按钮文案", "Terms of Service URL": "服务条款链接", "Privacy Policy URL": "隐私政策链接",
-  "Complete template setup": "完成模板设置", "Custom Fonts": "自定义字体", "Review the font setup before saving this template.": "保存模板前请检查字体设置。",
-  "The first template save was observed to surface Custom Fonts and require Terms of Service and Privacy Policy URLs in Links.": "已观察到首次保存模板时会提示自定义字体，并要求在“链接”中填写服务条款与隐私政策地址。",
-  "LEARN WITHOUT LIMITS": "突破学习限制", "Unlock your potential": "释放你的潜能", "Personal lessons, smart practice and everything you need to make progress.": "个性化课程、智能练习，以及持续进步所需的一切。",
-  "Unlimited conversations": "无限对话", "Personalized learning plan": "个性化学习计划", "Annual": "年度", "Monthly": "月度", "BEST VALUE": "最优方案",
-  "All prices, titles, and offers displayed are placeholders. The actual data from App Store and Google Play will be shown in the app.": "预览中的价格、标题和优惠均为占位内容；应用内会显示 App Store 与 Google Play 的实际数据。",
-  "iPhone 15 Pro": "iPhone 15 Pro", "System (SF Pro, Roboto) Regular": "系统字体（SF Pro、Roboto）常规", "Top button 1": "顶部按钮 1", "Top button 2": "顶部按钮 2",
-  "Default font": "默认字体", "Purchase flow": "购买流程", "Products as list + purchase button": "产品列表 + 购买按钮", "Background color": "背景颜色",
-  "Enable Dark mode": "启用深色模式", "Content layout": "内容布局", "Default child margin": "子元素默认边距", "Spacing": "间距", "Add max width": "添加最大宽度",
-  "Show after delay": "延迟显示", "Fill color": "填充颜色", "Border color": "边框颜色", "Border thickness": "边框粗细", "Icon color": "图标颜色",
-  "Upload image": "上传图片", "Upload video": "上传视频", "Choose a file from your computer": "从电脑中选择文件", "Enter custom media ID": "输入自定义媒体 ID",
-  "Media": "媒体", "Video": "视频", "Display": "展示方式", "Overlay": "叠加", "Transparent": "透明", "Flat": "平铺", "Tint": "色调",
-  "Terms of Service": "服务条款", "Privacy Policy": "隐私政策",
-  "Read the docs": "查看文档", "All placements": "全部展示位置", "States (3)": "状态（3）", "Live": "已发布", "Draft": "草稿", "Inactive": "未启用",
-  "Search by paywall name": "按付费墙名称搜索", "Proceeds": "实收款项", "Net proceeds": "净实收款项", "1 - 2 of 2": "第 1 - 2 项，共 2 项",
-  "Create a draft and configure it with products and a no-code builder.": "创建草稿，并在产品套餐与无代码构建器中完成设置。",
-  "Actions for test": "test 的操作", "Actions for test 2": "test 2 的操作", "Edit": "编辑",
-  "No switch (all products are visible)": "不切换（展示所有产品）", "Selected product": "选中的产品", "Products grouping": "产品分组",
-  "Custom media ID": "自定义媒体 ID", "Background image": "背景图片", "Fill": "填充", "Border": "边框", "Corner radius": "圆角",
-  "Height": "高度", "Aspect": "宽高比", "Original": "原始比例", "Cover": "覆盖", "Padding": "内边距", "Vertical offset": "垂直偏移",
-  "Format": "格式", "Separator": "分隔符", "Starting value": "初始值", "Text before": "前置文案", "Text after": "后置文案", "Reset on every opening": "每次打开时重置",
-  "Default icon": "默认图标", "Icon position": "图标位置", "Connector": "连接线", "Autoplay": "自动播放", "Timing": "时长", "Transition": "切换效果", "Pause on user interaction": "用户操作时暂停",
-  "Toggle color": "开关颜色", "Active color": "开启颜色", "Title text": "标题文案", "Text spacing": "文字间距",
-  "Pagination dots": "分页圆点", "Dot color": "圆点颜色", "Dot size": "圆点尺寸", "Dot spacing": "圆点间距", "Horizontal": "横向", "Vertical": "纵向",
-  "Opacity": "透明度", "Top padding": "上内边距", "Right padding": "右内边距", "Bottom padding": "下内边距", "Left padding": "左内边距",
-  "PAYWALL": "付费墙", "✓ Unlimited conversations": "✓ 无限对话", "✓ Personalized learning plan": "✓ 个性化学习计划",
-  "$49.99 / year": "$49.99 / 年", "$8.99 / month": "$8.99 / 月", "Terms of service · Privacy policy · Restore": "服务条款 · 隐私政策 · 恢复购买",
-  "2 products · Reviews": "2 个产品 · 评价", "1 product · Timer": "1 个产品 · 倒计时", "2 products · Image": "2 个产品 · 图片",
-  "2 products · Timer": "2 个产品 · 倒计时", "1 product · No media": "1 个产品 · 无媒体", "Icon": "图标", "Align": "对齐", "Left": "左侧",
-  "1 - ": "第 1 - ", " of ": "，共 "
+  "Button": "按钮", "List": "列表", "Links": "链接", "Timer": "倒计时", "Carousel": "轮播图",
+  "Toggle": "试用开关", "Header": "标题", "Headline": "主标题", "Subhead": "副标题", "Purchase Button": "购买按钮",
+  "Close": "关闭", "Cancel": "取消", "Accept": "确认", "All paywalls": "全部付费墙",
 };
 
 const enCopy = Object.fromEntries(Object.entries(zhCopy).map(([english, chinese]) => [chinese, english]));
@@ -832,32 +1007,34 @@ function localizeInterface(root, locale) {
 }
 
 function App() {
-  const [view, setView] = useState("list");
+  const defaultTemplateIdx = templates.findIndex((t) => t.id === "ht-entry-aggregation");
+  const initialIdx = defaultTemplateIdx >= 0 ? defaultTemplateIdx : 0;
+  const [view, setView] = useState("builder");
   const [paywalls, setPaywalls] = useState(originalPaywalls);
-  const [selectedId, setSelectedId] = useState("test-2");
+  const [selectedId, setSelectedId] = useState("ht-entry-aggregation");
   const [search, setSearch] = useState("");
   const [stateFilter, setStateFilter] = useState("Live,Draft,Inactive");
   const [modal, setModal] = useState(null);
   const [toast, setToast] = useState("");
   const [draft, setDraft] = useState({
-    name: "RESEARCH - Rebuild Draft",
-    products: ["月度会员 / Monthly", "Japanese Ai - 1 Year / Annual"],
+    name: "入门价格页 (ENTRY_PRICE)",
+    products: ["VIP 超值年卡 / Annual", "VIP 连续包月 / Monthly"],
   });
   const [compliance, setCompliance] = useState(false);
   const [rememberCompliance, setRememberCompliance] = useState(false);
-  const [templateSelected, setTemplateSelected] = useState(null);
-  const [appliedTemplate, setAppliedTemplate] = useState(null);
-  const [templateLinks, setTemplateLinks] = useState({ terms: "terms-link", privacy: "privacy-link" });
+  const [templateSelected, setTemplateSelected] = useState(initialIdx);
+  const [appliedTemplate, setAppliedTemplate] = useState(initialIdx);
+  const [templateLinks, setTemplateLinks] = useState({ terms: "https://hellotalk.com/terms", privacy: "https://hellotalk.com/privacy" });
   const [builderTab, setBuilderTab] = useState("tree");
-  const [builderNodes, setBuilderNodes] = useState(() => createBuilderNodes());
-  const [activeNode, setActiveNode] = useState("links");
-  const [unknownOpen, setUnknownOpen] = useState(true);
+  const [builderNodes, setBuilderNodes] = useState(() => createBuilderNodes("ht-entry-aggregation"));
+  const [activeNode, setActiveNode] = useState("t1-headline");
+  const [unknownOpen, setUnknownOpen] = useState(false);
   const [placementFilter, setPlacementFilter] = useState([]);
   const [placementDraft, setPlacementDraft] = useState([]);
   const [placementMenuOpen, setPlacementMenuOpen] = useState(false);
   const [rowMenuId, setRowMenuId] = useState(null);
   const [appMenuOpen, setAppMenuOpen] = useState(false);
-  const [locale, setLocale] = useState("en");
+  const [locale, setLocale] = useState("zh-CN");
 
   useEffect(() => {
     const root = document.querySelector(".app");
@@ -882,61 +1059,90 @@ function App() {
 
   const openPaywall = (item) => {
     setSelectedId(item.id);
-    setView("general");
+    const tId = item.templateId || item.id;
+    const templateIdx = templates.findIndex((t) => t.id === tId);
+    if (templateIdx !== -1) {
+      setTemplateSelected(templateIdx);
+      setAppliedTemplate(templateIdx);
+      setBuilderNodes(createBuilderNodes(tId));
+      setActiveNode(
+        tId === "ht-onboarding"
+          ? "trial-t1-hero"
+          : tId === "ht-content-paywall"
+          ? "cp-metrics"
+          : "headline"
+      );
+    }
+    setView("builder");
   };
 
   const createDraft = () => {
     if (!compliance) return;
-    const id = `research-${Date.now()}`;
-    const created = { id, name: draft.name || "Untitled paywall", state: "Draft", products: draft.products.length, startedAt: "20 Aug 2026", icon: false };
+    const id = `ht-custom-${Date.now()}`;
+    const created = { id, name: draft.name || "Untitled paywall", state: "Draft", products: draft.products.length, startedAt: "17 Sep 2026", templateId: "ht-onboarding", scene: "自定义" };
     setPaywalls((current) => [...current, created]);
     setSelectedId(id);
-    setView("general");
+    setBuilderNodes(createBuilderNodes("ht-onboarding"));
+    setView("builder");
     setModal(null);
     setCompliance(false);
-    notify(rememberCompliance ? "Draft created. Future confirmation preference saved." : "Draft created.");
+    notify(rememberCompliance ? "草稿创建成功并进入构建器。" : "草稿创建成功。");
   };
 
   const duplicate = (source = selected) => {
     setDraft((current) => ({ ...current, name: `${source.name} (Copy)`, products: productOptions.slice(0, source.products) }));
     setView("create");
-    notify("Duplicate opens an unsaved copy. It is not added to the list yet.");
+    notify("已创建未保存副本，请在基础设置中确认。");
   };
 
   const archiveCurrent = () => {
     setPaywalls((current) => current.filter((item) => item.id !== selected.id));
     setView("list");
-    setModal(null);
-    notify("Paywall successfully archived.");
+    notify("付费墙已归档。");
   };
 
-  const markUnknown = (item) => {
-    setModal({ kind: "unknown", item });
+  const markUnknown = (id) => {
+    setSelectedId(id);
+    setUnknownOpen(true);
   };
-
-  const updateBuilderNode = (id, patch) => setBuilderNodes((current) => current.map((node) => node.id === id ? { ...node, ...patch } : node));
+  const updateBuilderNode = (id, partial) => {
+    setBuilderNodes((current) => current.map((item) => (item.id === id ? { ...item, ...partial } : item)));
+  };
   const removeBuilderNode = (id) => {
-    setBuilderNodes((current) => current.filter((node) => node.id !== id));
-    setActiveNode((current) => current === id ? "headline" : current);
+    setBuilderNodes((current) => {
+      const remaining = current.filter((item) => item.id !== id);
+      setActiveNode((cur) => (cur === id ? (remaining[0]?.id || "") : cur));
+      return remaining;
+    });
   };
   const applyTemplate = (templateIndex) => {
     const template = templates[templateIndex];
     setTemplateSelected(templateIndex);
     setAppliedTemplate(templateIndex);
     setBuilderNodes(createBuilderNodes(template.id));
-    setActiveNode("headline");
+    setActiveNode(
+      template.id === "ht-onboarding"
+        ? "trial-t1-hero"
+        : template.id === "ht-content-paywall"
+        ? "cp-metrics"
+        : "headline"
+    );
   };
 
   return (
     <div className="app">
       <aside className="sidebar">
-        <div className="brand">a</div>
+        <div className="brand" style={{ background: "linear-gradient(135deg, #1ECA92 0%, #6366F1 100%)" }}>H</div>
         <nav>
-          {nav.map(([label, Icon]) => (
-            <button className={`nav-item ${label === "Paywalls" ? "active" : ""}`} key={label} onClick={() => label === "Paywalls" && setView("list")}>
+          {nav.map(([label, Icon, targetView]) => (
+            <button
+              className={`nav-item ${view === targetView || (targetView === "list" && ["list", "create", "general", "builder", "metrics"].includes(view)) ? "active" : ""}`}
+              key={label}
+              onClick={() => setView(targetView)}
+            >
               <Icon size={18} />
               <span>{label}</span>
-              {label === "Flows" && <em>Beta</em>}
+              {targetView === "list" && <em style={{ background: "#f0fdf4", color: "#15803d" }}>{paywalls.length}</em>}
             </button>
           ))}
         </nav>
@@ -945,18 +1151,43 @@ function App() {
       <main className="main">
         <header className="topbar">
           <div className="app-switcher-wrap">
-            <button className="app-switcher" onClick={() => setAppMenuOpen((open) => !open)}><b>T</b> Test <ChevronDown size={15} /></button>
+            <button className="app-switcher" onClick={() => setAppMenuOpen((open) => !open)}>
+              <b style={{ background: "#1ECA92" }}>HT</b> HelloTalk VIP 商业化中心 <ChevronDown size={15} />
+            </button>
             {appMenuOpen && (
               <div className="app-menu">
-                <button className="app-menu-current"><b>T</b><span>Test</span><Check size={15} /></button>
-                <button onClick={() => { setAppMenuOpen(false); setModal({ kind: "add-app" }); }}><Plus size={16} /> Add a new app</button>
+                <button className="app-menu-current"><b style={{ background: "#1ECA92" }}>HT</b><span>HelloTalk VIP 商业化</span><Check size={15} /></button>
+                <button onClick={() => { setAppMenuOpen(false); setModal({ kind: "add-app" }); }}><Plus size={16} /> 新建业务线</button>
               </div>
             )}
           </div>
-          <div className="top-actions"><div className="language-console" data-no-translate><span>{locale === "zh-CN" ? "界面语言" : "Interface language"}</span><button className={locale === "en" ? "active" : ""} onClick={() => setLocale("en")}>EN</button><button className={locale === "zh-CN" ? "active" : ""} onClick={() => setLocale("zh-CN")}>中文</button></div><Bell size={20} /><span>Help</span><span>App settings</span><span>Account</span></div>
+          <div className="top-actions">
+            <div className="language-console" data-no-translate>
+              <span>{locale === "zh-CN" ? "界面语言" : "Interface language"}</span>
+              <button className={locale === "zh-CN" ? "active" : ""} onClick={() => setLocale("zh-CN")}>中文</button>
+              <button className={locale === "en" ? "active" : ""} onClick={() => setLocale("en")}>EN</button>
+            </div>
+            <Bell size={18} color="#71717a" />
+            <span style={{ color: "#71717a", cursor: "pointer" }}>配置指南</span>
+            <span style={{ color: "#71717a", cursor: "pointer" }}>账号设置</span>
+          </div>
         </header>
 
         <div className="content">
+          {view === "backend" && <BackendArchitectureDocs />}
+          {view === "content-paywall" && (
+            <ContentPaywallManager
+              onOpenInBuilder={(tplId) => {
+                const targetId = tplId || "ht-content-paywall";
+                openPaywall({
+                  id: targetId,
+                  templateId: targetId,
+                  name: "内容Paywall样式与规则联动 (CONTENT_PAYWALL)",
+                });
+              }}
+              notify={notify}
+            />
+          )}
           {view === "list" && (
             <PaywallList
               paywalls={filteredPaywalls}
@@ -989,7 +1220,7 @@ function App() {
               markUnknown={markUnknown}
             />
           )}
-          {view === "general" && (
+          {(view === "general" || view === "builder") && (
             <PaywallWorkspace
               selected={selected}
               draft={draft}
@@ -1013,32 +1244,7 @@ function App() {
               templateLinks={templateLinks}
               setTemplateLinks={setTemplateLinks}
               notify={notify}
-            />
-          )}
-          {view === "builder" && (
-            <PaywallWorkspace
-              selected={selected}
-              draft={draft}
-              setDraft={setDraft}
-              view={view}
-              setView={setView}
-              duplicate={duplicate}
-              setModal={setModal}
-              markUnknown={markUnknown}
-              builderNodes={builderNodes}
-              setBuilderNodes={setBuilderNodes}
-              updateBuilderNode={updateBuilderNode}
-              removeBuilderNode={removeBuilderNode}
-              activeNode={activeNode}
-              setActiveNode={setActiveNode}
-              builderTab={builderTab}
-              setBuilderTab={setBuilderTab}
-              templateSelected={templateSelected}
-              setTemplateSelected={setTemplateSelected}
-              appliedTemplate={appliedTemplate}
-              templateLinks={templateLinks}
-              setTemplateLinks={setTemplateLinks}
-              notify={notify}
+              applyTemplate={applyTemplate}
             />
           )}
           {view === "metrics" && <Metrics setView={setView} markUnknown={markUnknown} />}
@@ -1047,12 +1253,12 @@ function App() {
 
       <aside className={`evidence-panel ${unknownOpen ? "open" : ""}`}>
         <button className="evidence-head" onClick={() => setUnknownOpen((open) => !open)}>
-          <span><CircleHelp size={17} /> Evidence & gaps</span>
+          <span><CircleHelp size={17} /> 摸底缺口与实测边界</span>
           <ChevronRight size={16} />
         </button>
         {unknownOpen && (
           <div className="evidence-body">
-            <p>Only observed behavior is reproduced. These routes are deliberately not invented.</p>
+            <p>基于真实后台与 Adapty 逆向证据，未验证行为均已标注。</p>
             {missingItems.map((item) => (
               <button className="gap-card" key={item.id} onClick={() => markUnknown(item)}>
                 <small>{item.id}</small>
@@ -1082,7 +1288,7 @@ function App() {
           rememberCompliance={rememberCompliance}
           setRememberCompliance={setRememberCompliance}
           onClose={() => setModal(null)}
-          onAccept={() => { setModal(null); setCompliance(false); notify("Builder changes saved locally after the observed confirmation."); }}
+          onAccept={() => { setModal(null); setCompliance(false); notify("构建器改动已成功保存。"); }}
           context="builder"
         />
       )}
@@ -1100,17 +1306,17 @@ function App() {
           setSelected={setTemplateSelected}
           onClose={() => setModal(null)}
           onOpenAi={() => setModal({ kind: "ai" })}
-          onOpenBuilder={(templateIndex) => { const template = templates[templateIndex]; applyTemplate(templateIndex); setModal(null); setView("builder"); notify(sourceTreeObserved.has(template.id) ? "已应用基于源端核心结构的可编辑复现。" : "已应用源端预览内容；精确节点树仍在采集。"); }}
+          onOpenBuilder={(templateIndex) => {
+            applyTemplate(templateIndex);
+            setModal(null);
+            setView("builder");
+            notify(`已成功应用模版：${templates[templateIndex].title}`);
+          }}
           markUnknown={markUnknown}
         />
       )}
       {modal?.kind === "ai" && <AiModal onClose={() => setModal(null)} markUnknown={markUnknown} />}
-      {modal?.kind === "migration" && (
-        <MigrationModal
-          onClose={() => setModal(null)}
-          markUnknown={markUnknown}
-        />
-      )}
+      {modal?.kind === "migration" && <MigrationModal onClose={() => setModal(null)} markUnknown={markUnknown} />}
       {modal?.kind === "add-app" && <AddAppModal onClose={() => setModal(null)} markUnknown={markUnknown} />}
       {modal?.kind === "unknown" && <UnknownModal item={modal.item} onClose={() => setModal(null)} />}
     </div>
@@ -1137,7 +1343,7 @@ function PaywallList({
   duplicate,
   locale,
 }) {
-  const placementName = placementFilter.length ? placementFilter.join(", ") : "All placements";
+  const placementName = placementFilter.length ? placementFilter.join(", ") : `全部业务场景 (${paywalls.length})`;
   const paginationText = locale === "zh-CN" ? `第 1 - ${paywalls.length} 项，共 ${paywalls.length} 项` : `1 - ${paywalls.length} of ${paywalls.length}`;
   const togglePlacement = (placement) => setPlacementDraft((current) => current.includes(placement) ? current.filter((item) => item !== placement) : [...current, placement]);
   const applyPlacementFilter = () => {
@@ -1148,53 +1354,85 @@ function PaywallList({
   return (
     <section>
       <div className="page-heading">
-        <div><h1>Paywalls <span>↗</span></h1><p>Read the docs</p></div>
-        <button className="primary" onClick={() => setView("create")}>Create paywall</button>
+        <div>
+          <h1>HelloTalk Paywalls <span>↗</span></h1>
+          <p>涵盖新客破冰、功能阻断、节日大促、到期挽留与双阶对比等 {paywalls.length} 套全场景模版</p>
+        </div>
+        <button className="primary" onClick={() => setView("create")}>创建付费墙</button>
       </div>
       <div className="list-controls">
-        <label className="search"><Search size={19} /><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search by paywall name" /></label>
+        <label className="search">
+          <Search size={18} />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="搜索付费墙名称或业务场景..." />
+        </label>
         <div className="placement-filter">
-          <button className="select" onClick={() => { setPlacementDraft(placementFilter); setPlacementMenuOpen((open) => !open); }}>{placementName} <ChevronDown size={17} /></button>
+          <button className="select" onClick={() => { setPlacementDraft(placementFilter); setPlacementMenuOpen((open) => !open); }}>
+            <span>{placementName}</span> <ChevronDown size={16} style={{ flexShrink: 0 }} />
+          </button>
           {placementMenuOpen && (
             <div className="placement-menu">
-              <label><input type="checkbox" checked={placementDraft.includes("test placement1")} onChange={() => togglePlacement("test placement1")} /> test placement1</label>
-              <div><button className="secondary" onClick={() => setPlacementMenuOpen(false)}>Cancel</button><button className="primary" onClick={applyPlacementFilter}>Apply</button></div>
+              <label><input type="checkbox" checked={placementDraft.includes("新客引导")} onChange={() => togglePlacement("新客引导")} /> 新客引导</label>
+              <label><input type="checkbox" checked={placementDraft.includes("功能阻断")} onChange={() => togglePlacement("功能阻断")} /> 功能阻断</label>
+              <label><input type="checkbox" checked={placementDraft.includes("大促运营")} onChange={() => togglePlacement("大促运营")} /> 大促运营</label>
+              <label><input type="checkbox" checked={placementDraft.includes("到期挽留")} onChange={() => togglePlacement("到期挽留")} /> 到期挽留</label>
+              <label><input type="checkbox" checked={placementDraft.includes("会员中心")} onChange={() => togglePlacement("会员中心")} /> 会员中心</label>
+              <div><button className="secondary" onClick={() => setPlacementMenuOpen(false)}>取消</button><button className="primary" onClick={applyPlacementFilter}>应用</button></div>
             </div>
           )}
         </div>
-        <select value={stateFilter} onChange={(event) => setStateFilter(event.target.value)}>
-          <option value="Live,Draft,Inactive">States (3)</option>
-          <option value="Live">Live</option>
-          <option value="Draft">Draft</option>
-          <option value="Inactive">Inactive</option>
-        </select>
       </div>
       <div className="table-wrap">
         <table>
-          <thead><tr><th><span aria-hidden="true">⌄</span> <span>Paywall name</span> <Sort /></th><th><Help /> Revenue</th><th><Help /> Proceeds</th><th><Help /> Net proceeds</th><th><Help /> Purchases</th><th><Help /> Trials</th><th><Help /> Refunds</th><th><Help /> Products</th><th>Started at <Sort /></th><th>State <Sort /></th><th /></tr></thead>
+          <thead>
+            <tr>
+              <th><span>付费墙名称</span> <Sort /></th>
+              <th><Help /> 业务触发场景</th>
+              <th><Help /> 关联模版架构</th>
+              <th><Help /> 产品套餐数</th>
+              <th>创建时间 <Sort /></th>
+            </tr>
+          </thead>
           <tbody>
-            {paywalls.map((item) => (
-              <tr key={item.id} onClick={() => openPaywall(item)}>
-                <td><ChevronDown size={16} /> <strong>{item.name}</strong> {item.icon && <ImageIcon size={16} color="#71717a" />}</td>
-                <td>$0</td><td>$0</td><td>$0</td><td>0</td><td>0</td><td>0</td><td>{item.products}</td><td>{item.startedAt}</td>
-                <td><StateBadge state={item.state} /></td>
-                <td className="row-actions">
-                  <button className="icon tiny" aria-label={`Actions for ${item.name}`} onClick={(event) => { event.stopPropagation(); setRowMenuId((current) => current === item.id ? null : item.id); }}><MoreVertical size={19} /></button>
-                  {rowMenuId === item.id && (
-                    <div className="row-menu">
-                      <button onClick={(event) => { event.stopPropagation(); setRowMenuId(null); openPaywall(item); setView("metrics"); }}>Metrics</button>
-                      <button onClick={(event) => { event.stopPropagation(); setRowMenuId(null); openPaywall(item); }}>Edit</button>
-                      <button onClick={(event) => { event.stopPropagation(); setRowMenuId(null); duplicate(item); }}>Duplicate</button>
-                      <button className="danger-menu" onClick={(event) => { event.stopPropagation(); setRowMenuId(null); openPaywall(item); setModal({ kind: "archive" }); }}>Archive</button>
+            {paywalls.map((item) => {
+              const match = (item.name || "").match(/^(.*?)\s*\((.*?)\)$/);
+              const title = match ? match[1] : item.name;
+              const code = match ? match[2] : "";
+
+              return (
+                <tr key={item.id} onClick={() => openPaywall(item)} style={{ cursor: "pointer" }}>
+                  <td>
+                    <div className="paywall-row-title-container">
+                      <div className="paywall-device-icon" title="移动端真机付费墙">
+                        <Smartphone size={16} />
+                      </div>
+                      <div className="paywall-name-content">
+                        <strong className="paywall-name-primary" title={title}>{title}</strong>
+                        {code && (
+                          <div className="paywall-name-secondary" title={code}>
+                            <span className="paywall-code-pill">{code}</span>
+                          </div>
+                        )}
+                      </div>
                     </div>
-                  )}
-                </td>
-              </tr>
-            ))}
+                  </td>
+                  <td>
+                    <span style={{ fontSize: 11, padding: "3px 8px", background: "#f8fafc", border: "1px solid #e2e8f0", borderRadius: 4, color: "#334155", fontWeight: 500 }}>
+                      {item.scene || "常规"}
+                    </span>
+                  </td>
+                  <td><code style={{ fontSize: 11, color: "#475569" }}>{item.templateId}</code></td>
+                  <td>{item.products} 个套餐</td>
+                  <td>{item.startedAt}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
-      <div className="pagination"><span>{paginationText}</span><div><button disabled><ChevronLeft size={18} /></button><button className="current">1</button><button disabled><ChevronRight size={18} /></button></div></div>
+      <div className="pagination">
+        <span>{paginationText}</span>
+        <div><button disabled><ChevronLeft size={18} /></button><button className="current">1</button><button disabled><ChevronRight size={18} /></button></div>
+      </div>
     </section>
   );
 }
@@ -1202,13 +1440,16 @@ function PaywallList({
 function CreatePaywall({ draft, setDraft, setView, setModal, createDraft, markUnknown }) {
   return (
     <section className="create">
-      <button className="back" onClick={() => setView("list")}><ArrowLeft size={18} /> Paywalls</button>
-      <div className="create-header"><div><h1>Create paywall</h1><p>Create a draft and configure it with products and a no-code builder.</p></div><button className="primary" onClick={() => setModal({ kind: "compliance" })}>Create as draft</button></div>
+      <button className="back" onClick={() => setView("list")}><ArrowLeft size={18} /> 返回付费墙列表</button>
+      <div className="create-header">
+        <div><h1>新建付费墙</h1><p>创建草稿并直接进入 iPhone 15 Pro 实时无代码构建器。</p></div>
+        <button className="primary" onClick={() => setModal({ kind: "compliance" })}>创建为草稿</button>
+      </div>
       <div className="create-grid">
         <div className="form-card">
-          <h2>General</h2>
-          <Field label="Paywall name"><input value={draft.name} onChange={(event) => setDraft((state) => ({ ...state, name: event.target.value }))} /></Field>
-          <Field label="Products">
+          <h2>基础信息</h2>
+          <Field label="付费墙名称"><input value={draft.name} onChange={(event) => setDraft((state) => ({ ...state, name: event.target.value }))} /></Field>
+          <Field label="关联合约套餐">
             {draft.products.map((product, index) => (
               <ProductRow
                 key={`${product}-${index}`}
@@ -1219,72 +1460,932 @@ function CreatePaywall({ draft, setDraft, setView, setModal, createDraft, markUn
                 markUnknown={markUnknown}
               />
             ))}
-            <button className="secondary" onClick={() => setDraft((state) => ({ ...state, products: [...state.products, productOptions[0]] }))}><Plus size={16} /> Add product</button>
+            <button className="secondary" onClick={() => setDraft((state) => ({ ...state, products: [...state.products, productOptions[0]] }))}><Plus size={16} /> 添加产品套餐</button>
           </Field>
-          <Field label="Paywall screenshot"><button className="upload unknown-action" onClick={() => markUnknown({ id: "U-01", feature: "Screenshot upload", known: "PNG / WEBP / JPG, maximum 10 MB and recommended 320x568 were observed.", unknown: "This reconstruction intentionally does not simulate file validation or the exact backend upload response." })}><Upload size={18} /> Upload screenshot <small>PNG, WEBP or JPG up to 10 MB</small></button></Field>
+          <Field label="原型截图"><button className="upload unknown-action" onClick={() => markUnknown({ id: "U-01", feature: "Screenshot upload", known: "PNG / WEBP / JPG, maximum 10 MB", unknown: "本地暂不模拟文件二进制上传。" })}><Upload size={18} /> 点击上传或拖拽截图文件 <small>支持 PNG、JPG，最大 10 MB</small></button></Field>
         </div>
         <div className="start-card">
-          <span className="eyebrow">Builder & Generator</span><h2>Choose how to start</h2>
-          <button onClick={() => setView("builder")}><Blocks size={22} /><span><strong>Build no-code paywall</strong><small>Start with the visual Builder.</small></span><ChevronRight size={18} /></button>
-          <button onClick={() => setModal({ kind: "templates" })}><LayoutTemplate size={22} /><span><strong>Choose a template</strong><small>Observed template library and filters.</small></span><ChevronRight size={18} /></button>
-          <button onClick={() => setModal({ kind: "ai" })}><WandSparkles size={22} /><span><strong>Generate Paywall with AI</strong><small>Entry is known; generation output is not.</small></span><ChevronRight size={18} /></button>
-          <button onClick={() => setModal({ kind: "migration" })}><Copy size={22} /><span><strong>Copy a Design from Your Apps</strong><small>Visual Builder configuration only.</small></span><ChevronRight size={18} /></button>
+          <span className="eyebrow">Builder & Generator</span><h2>选择创建方式</h2>
+          <button onClick={() => setView("builder")}><Blocks size={22} /><span><strong>进入可视化构建器</strong><small>3 栏式元素图层与真机预览。</small></span><ChevronRight size={18} /></button>
+          <button onClick={() => setModal({ kind: "templates" })}><LayoutTemplate size={22} /><span><strong>从官方模版库选择</strong><small>12 套 HelloTalk 现网全场景模版。</small></span><ChevronRight size={18} /></button>
+          <button onClick={() => setModal({ kind: "ai" })}><WandSparkles size={22} /><span><strong>AI 智能生成付费墙</strong><small>根据提示词自动拼装模版。</small></span><ChevronRight size={18} /></button>
+          <button onClick={() => setModal({ kind: "migration" })}><Copy size={22} /><span><strong>从其他应用复制设计</strong><small>复用已有视觉 Builder 配置。</small></span><ChevronRight size={18} /></button>
         </div>
       </div>
-      <button className="subtle-action" onClick={createDraft}>Development shortcut: create a local draft after confirmation</button>
+      <button className="subtle-action" onClick={createDraft}>快捷入口：直接创建并打开构建器</button>
     </section>
   );
 }
 
-function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate, setModal, markUnknown, builderNodes, setBuilderNodes, updateBuilderNode, removeBuilderNode, activeNode, setActiveNode, builderTab, setBuilderTab, appliedTemplate, templateLinks, setTemplateLinks, notify }) {
+function MiniTemplateVisual({ tpl }) {
+  const isBottomSheet = tpl.displayMode === "bottom-sheet";
+  const isModal = tpl.displayMode === "modal";
+  const isDark = Boolean(tpl.theme?.isDark || tpl.id === "pkg-tpl-1");
+  const primaryColor = tpl.theme?.primaryColor || tpl.theme?.otherColor || (tpl.id === "pkg-tpl-1" ? "#0284C7" : tpl.id === "tpl-1" ? "#FF4D6D" : tpl.id === "trial-tpl-1" ? "#10B981" : "#6366F1");
+
+  return (
+    <div
+      style={{
+        width: 32,
+        height: 44,
+        borderRadius: 4,
+        border: "1.5px solid #cbd5e1",
+        background: isDark
+          ? "#0f172a"
+          : isBottomSheet
+          ? "linear-gradient(180deg, #dbeafe 0%, #bfdbfe 36%, #ffffff 37%)"
+          : tpl.id === "tpl-1"
+          ? "linear-gradient(180deg, #ffe4e6 0%, #ffffff 50%)"
+          : tpl.id === "trial-tpl-1"
+          ? "linear-gradient(180deg, #ecfdf5 0%, #ffffff 50%)"
+          : "linear-gradient(180deg, #f8fafc 0%, #ffffff 100%)",
+        position: "relative",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: isBottomSheet ? "flex-end" : "space-between",
+        padding: isBottomSheet ? 0 : 2,
+        boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
+        flexShrink: 0,
+      }}
+    >
+      {isBottomSheet ? (
+        <>
+          <div style={{ position: "absolute", top: 3, left: 0, right: 0, display: "flex", justifyContent: "center", gap: 2 }}>
+            <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#3b82f6", opacity: 0.8 }} />
+            <div style={{ width: 12, height: 4, borderRadius: 2, background: "#93c5fd", marginTop: 2 }} />
+          </div>
+          <div
+            style={{
+              height: 27,
+              background: "#ffffff",
+              borderTopLeftRadius: 4,
+              borderTopRightRadius: 4,
+              borderTop: "1px solid #e2e8f0",
+              boxShadow: "0 -2px 4px rgba(0,0,0,0.06)",
+              padding: 2,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ width: "70%", height: 3, background: "#f59e0b", borderRadius: 1, margin: "1px auto 0" }} />
+            <div style={{ width: "88%", height: 5, background: "#f8fafc", border: "0.5px solid #e2e8f0", borderRadius: 1, margin: "0 auto" }} />
+            <div style={{ width: "90%", height: 6, background: primaryColor || "#f59e0b", borderRadius: 2, margin: "0 auto 1px" }} />
+          </div>
+        </>
+      ) : isModal ? (
+        <>
+          <div style={{ position: "absolute", inset: 0, background: "rgba(15, 23, 42, 0.25)" }} />
+          <div
+            style={{
+              position: "relative",
+              zIndex: 1,
+              width: 25,
+              height: 31,
+              margin: "auto",
+              background: "#ffffff",
+              borderRadius: 3,
+              boxShadow: "0 2px 6px rgba(0,0,0,0.2)",
+              border: "1px solid #fef3c7",
+              padding: 2,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+            }}
+          >
+            <div style={{ width: "75%", height: 3, background: "#f59e0b", borderRadius: 1, margin: "1px auto 0" }} />
+            <div style={{ width: "90%", height: 7, background: "#fef9ee", borderRadius: 1, margin: "0 auto" }} />
+            <div style={{ width: "90%", height: 5, background: primaryColor || "#f59e0b", borderRadius: 1.5, margin: "0 auto 1px" }} />
+          </div>
+        </>
+      ) : (
+        <>
+          <div
+            style={{
+              width: "100%",
+              height: 12,
+              borderRadius: 2,
+              background: isDark ? "#1e293b" : tpl.id === "tpl-1" ? "#ffe4e6" : tpl.id === "trial-tpl-1" ? "#d1fae5" : "#ede9fe",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <div style={{ width: 12, height: 2.5, background: isDark ? "#60a5fa" : primaryColor, borderRadius: 1 }} />
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 1.5, padding: "0 1px" }}>
+            <div style={{ width: "100%", height: 4, background: isDark ? "#334155" : "#f1f5f9", borderRadius: 1 }} />
+            <div style={{ width: "85%", height: 4, background: isDark ? "#334155" : "#f1f5f9", borderRadius: 1 }} />
+          </div>
+          <div style={{ width: "100%", height: 6, background: primaryColor, borderRadius: 1.5 }} />
+        </>
+      )}
+    </div>
+  );
+}
+
+function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate, setModal, markUnknown, builderNodes, setBuilderNodes, updateBuilderNode, removeBuilderNode, activeNode, setActiveNode, builderTab, setBuilderTab, appliedTemplate, templateLinks, setTemplateLinks, notify, applyTemplate }) {
   const [addElementOpen, setAddElementOpen] = useState(false);
   const [productPickerOpen, setProductPickerOpen] = useState(false);
   const [transientProducts, setTransientProducts] = useState([]);
-  const [previewMode, setPreviewMode] = useState("source");
   const [dragState, setDragState] = useState(null);
-  useEffect(() => setPreviewMode("source"), [appliedTemplate]);
-  if (view === "builder") {
-    const active = builderNodes.find((node) => node.id === activeNode);
-    const builderBoundary = missingItems.find((item) => item.id === "B-01");
-    const addElement = (type) => {
-      const next = createComponentNode(type, builderNodes.filter((node) => node.id.startsWith("added-")).length + 1);
-      setBuilderNodes((current) => [...current, next]);
-      setActiveNode(next.id);
-      setBuilderTab("tree");
-      setAddElementOpen(false);
-      notify(`${type} 已添加到构建器，并可在右侧继续编辑。`);
+  const [draggingNodeId, setDraggingNodeId] = useState(null);
+  const [dragOverNodeId, setDragOverNodeId] = useState(null);
+  const [dragOverPosition, setDragOverPosition] = useState("below");
+  const [showRetainModal, setShowRetainModal] = useState(false);
+  const [selectedOnboardingTier, setSelectedOnboardingTier] = useState(0);
+  const [onboardingCarouselSlide, setOnboardingCarouselSlide] = useState(0);
+
+  // HelloTalk Multi-template Presets Map (Both Entry Price & VIP Package)
+  const [templatePresetsMap, setTemplatePresetsMap] = useState(() => ({
+    "ht-entry-aggregation": [
+      {
+        id: "tpl-1",
+        name: "模板 1",
+        title: "全屏平铺版 (粉白 20% 折扣)",
+        displayMode: "fullscreen",
+        desc: "全屏页面 · HelloTalk VIP 额外 20% 优惠",
+        image: "/templates/template1.jpg",
+        theme: {
+          ...DEFAULT_ENTRY_CONFIG,
+          subTemplate: "tpl-1",
+          otherColor: "#DE6876",
+          btnColor: "#C85B6B",
+          mainFontColor: "#2D1832",
+          titleText: "首年额外 20% 优惠！",
+          titleKicker: "HelloTalk VIP 👑",
+          promoText: "仅限今日",
+          priceNow: "折扣价 ¥388/年",
+          priceOriginal: "原价 ¥488/年",
+          priceSub: "",
+          btnText: "继续",
+        },
+        nodes: [
+          { id: "t1-close", type: "Dismiss Button", label: "关闭按钮", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
+          { id: "t1-headline", type: "Header", label: "主标题", content: "首年额外 20% 优惠！", depth: 0, enabled: true, config: { variant: "headline", kicker: "HelloTalk VIP 👑" } },
+          { id: "t1-subhead", type: "Subhead", label: "副标题", content: "仅限今日", depth: 0, enabled: true, config: { variant: "body", color: "#DE6876" } },
+          { id: "t1-products", type: "Products", label: "特惠价格", content: "原价 ¥488/年\n折扣价 ¥388/年", depth: 0, enabled: true, config: { variant: "entry-price-tier", displayMode: "clean-text", priceOriginal: "原价 ¥488/年", priceNow: "折扣价 ¥388/年" } },
+          { id: "t1-benefits", type: "Benefit List", label: "核心特权", content: "搜索附近的人\n解锁谁看了我\n无限翻译&字幕", depth: 0, enabled: true, config: { maxCount: 3, styleVariant: "entry-checks", selectedBenefits: ["搜索附近的人", "解锁谁看了我", "无限翻译&字幕"] } },
+          { id: "t1-timer", type: "Timer", label: "倒计时", content: "优惠截止时间 20:08:08", depth: 0, enabled: true, config: { label: "优惠截止时间", hours: 20, minutes: 8, seconds: 8, variant: "clean-text" } },
+          { id: "t1-purchase", type: "Purchase Button", label: "购买按钮", content: "继续", depth: 0, enabled: true, config: { label: "购买按钮", color: "#C85B6B" } },
+          { id: "t1-links", type: "Legal Footer", label: "免责声明", content: "可随时取消\n如果当前缴费期前24小时没有取消续订，系统会自动续订，费用将从你的 iTunes 账户收取，你可随时前往 iTunes 商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的[服务条款]及[隐私政策]", depth: 0, enabled: true, config: { variant: "entry-legal" } },
+        ],
+      },
+      {
+        id: "tpl-2",
+        name: "模板 2",
+        title: "半屏底窗版 (给新用户专属礼包)",
+        displayMode: "bottom-sheet",
+        desc: "顶部搜附近母语者大图 + 下半屏弹窗卡片",
+        image: "/templates/template2.jpg",
+        theme: {
+          ...DEFAULT_ENTRY_CONFIG,
+          subTemplate: "tpl-2",
+          otherColor: "#F59E0B",
+          titleText: "给新用户的专属礼包",
+          flexibleText: "限时新客专属优惠，解锁全部翻译与口语特权",
+          promoText: "优惠倒计时 23:59:59",
+          priceNow: "特惠价 ¥128/年",
+          priceOriginal: "原价 ¥248/年",
+          priceSub: "仅 ¥0.35/天 · 新客立省 20% · 随时取消",
+          btnText: "立即继续",
+        },
+        nodes: [
+          { id: "t2-hero", type: "Hero Image", label: "背景图", content: "寻找身边母语者", depth: 0, enabled: true, config: { bgMode: "illustration", sloganText: "寻找身边母语者", themeColor: "orange", showCloseBtn: true, bubbleBg: "#2563eb" } },
+          { id: "t2-headline", type: "Header", label: "主标题", content: "给新用户的专属礼包", depth: 0, enabled: true, config: { variant: "headline" } },
+          { id: "t2-products", type: "Products", label: "特惠价格", content: "HelloTalk VIP 新客专属礼包|特惠价 ¥128/年|原价 ¥248/年|限时优惠", depth: 0, enabled: true, config: { variant: "entry-price-tier", promoBadge: "限时优惠", discountTag: "-20% 折扣", priceNow: "特惠价 ¥128/年", priceOriginal: "原价 ¥248/年", priceSub: "仅 ¥0.35/天 · 新客立省 20% · 随时取消" } },
+          { id: "t2-purchase", type: "Purchase Button", label: "购买按钮", content: "立即继续", depth: 0, enabled: true, config: { label: "购买按钮", color: "#F59E0B" } },
+          { id: "t2-links", type: "Legal Footer", label: "免责声明", content: "服务条款 · 隐私政策 · 恢复购买", depth: 0, enabled: true },
+          { id: "t2-benefits", type: "Benefit List", label: "核心特权", content: "搜索附近的人\n解锁谁看了我\n无限翻译&字幕", depth: 0, enabled: false, config: { maxCount: 3, styleVariant: "entry-checks", selectedBenefits: ["搜索附近的人", "解锁谁看了我", "无限翻译&字幕"] } },
+        ],
+      },
+    ],
+    "ht-vip-package": [
+      {
+        id: "pkg-tpl-1",
+        name: "模板 1",
+        title: "全屏版 (蓝色特权轮播)",
+        displayMode: "fullscreen",
+        desc: "经典全屏特权页 · 底部按钮总价",
+        image: "/templates/vip_pkg_tpl1.png",
+        theme: {
+          primaryColor: "#0284C7",
+          btnColor: "#0284C7",
+          btnTextColor: "#FFFFFF",
+          subTemplate: "pkg-tpl-1",
+          otherColor: "#0284C7",
+          titleText: "成为 HelloTalk VIP",
+          btnText: "立即开通",
+          bgGradient: "linear-gradient(180deg, #0F172A 0%, #1E293B 40%, #0F172A 100%)",
+          isDark: true,
+        },
+        nodes: [
+          { id: "pkg-t1-banner", type: "Header", label: "顶部横幅", content: "成为 HelloTalk VIP", depth: 0, enabled: true, config: { variant: "vip-banner", badge: "VIP 特权", subtitle: "畅享 16 项高阶语言学习特权" } },
+          { id: "pkg-t1-carousel", type: "Carousel Cards", label: "特权轮播", content: "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球 150+ 城市母语圈\n👀 解锁谁看了我|查看完整访客记录，开启无痕访问\n🤖 无限翻译&字幕|实时母语级纠错，告别中式表达\n⚡ 匹配不同母语语伴|优先匹配目标语种正统母语者\n🎧 无损原声发音下载|离线随时随地跟读练习", depth: 0, enabled: true, config: { privileges: ALL_HELLOTALK_PRIVILEGES, autoScroll: true } },
+          { id: "pkg-t1-products", type: "Products", label: "横向套餐卡片", content: "3个月|¥37.33/月|¥112\n12个月|¥24.99/月|¥298|省54%|推荐\n终身|¥798|一次性购买", depth: 0, enabled: true, config: { variant: "3-column-tiers", selectedTier: 1, tiers: [
+            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+          ] } },
+          { id: "pkg-t1-purchase", type: "Purchase Button", label: "购买按钮", content: "立即开通", depth: 0, enabled: true, config: { label: "purchase", color: "#0284C7" } },
+          { id: "pkg-t1-links", type: "Legal Footer", label: "免责声明", content: "随时到期，谢谢 · 自动续费说明 · 恢复购买", depth: 0, enabled: true },
+        ],
+      },
+      {
+        id: "pkg-tpl-2",
+        name: "模板 2",
+        title: "弹窗版 (新客轻量浮层)",
+        displayMode: "modal",
+        desc: "居中/半屏弹窗 · 右上角关闭按钮 · 暖橙特惠",
+        image: "/templates/vip_pkg_tpl2.png",
+        theme: {
+          primaryColor: "#F59E0B",
+          btnColor: "#F59E0B",
+          btnTextColor: "#FFFFFF",
+          subTemplate: "pkg-tpl-2",
+          otherColor: "#F59E0B",
+          titleText: "拥有 7 项专属特权",
+          btnText: "免费试用",
+          bgGradient: "linear-gradient(180deg, #FFFDF7 0%, #FEF9EE 40%, #FFFFFF 100%)",
+          isDark: false,
+        },
+        nodes: [
+          { id: "pkg-t2-header", type: "Header", label: "顶部特权卡", content: "拥有 7 项专属特权", depth: 0, enabled: true, config: { variant: "vip-badge-header", badge: "7 项特权已解锁", subtitle: "开启全球无障碍母语交流" } },
+          { id: "pkg-t2-products", type: "Products", label: "横向套餐卡片", content: "1个月|¥28|¥28\n12个月|¥10.83/月|¥128|省60%|热门推荐\n终身|¥518|一次性购买", depth: 0, enabled: true, config: { variant: "3-column-tiers", selectedTier: 1, tiers: [
+            { name: "1个月", monthly: "¥28/月", total: "总价 ¥28", period: "1个月", badge: "", save: "" },
+            { name: "12个月", monthly: "¥10.83/月", total: "总价 ¥128", period: "12个月", badge: "热门推荐", save: "省60%", isRecommended: true },
+            { name: "终身", monthly: "¥518", total: "一次性购买", period: "终身", badge: "", save: "特惠买断" },
+          ] } },
+          { id: "pkg-t2-timer", type: "Timer", label: "倒计时", content: "特惠倒计时", depth: 0, enabled: true, config: { hours: 24, label: "特惠倒计时" } },
+          { id: "pkg-t2-purchase", type: "Purchase Button", label: "购买按钮", content: "免费试用", depth: 0, enabled: true, config: { label: "purchase", color: "#F59E0B" } },
+          { id: "pkg-t2-links", type: "Legal Footer", label: "免责声明", content: "随时取消 · 自动续订说明 · 恢复购买", depth: 0, enabled: true },
+          { id: "pkg-t2-benefits", type: "Benefit List", label: "核心特权", content: "解锁谁看了我|查看访客足迹与无痕浏览\n无广告纯净学习|移除全站商业推荐\n搜索全世界的语伴|一键瞬移至全球母语圈\n搜索附近的人|结识身边母语伙伴\n无限翻译与语法纠错|AI 实时助你地道表达\n优先匹配母语语伴|官方流量优先推荐\n离线语音原声下载|随时随地纯正跟读", depth: 0, enabled: false, config: { maxCount: 7, styleVariant: "checklist" } },
+        ],
+      },
+    ],
+    "ht-onboarding": [
+      {
+        id: "trial-tpl-1",
+        name: "模版四",
+        title: "单张样式新版",
+        displayMode: "fullscreen",
+        desc: "3天会员免费试用 · 阶段时间轴 · 核心特权与双套餐切换",
+        theme: {
+          primaryColor: "#6144E8",
+          btnColor: "#6144E8",
+          btnTextColor: "#FFFFFF",
+          subTemplate: "trial-tpl-1",
+          otherColor: "#6144E8",
+          titleText: "3天会员免费试用",
+          btnText: "开启3天 VIP免费试用",
+          btnTextAlt: "继续",
+          showDismissBtn: false,
+          dismissBtnText: "不，谢谢",
+          retainModal: {
+            title: "提示",
+            prompt: "你确定要放弃免费试用 VIP 的机会吗？关闭后无法再打开此页面。",
+            primaryBtn: "不，我不放弃",
+            cancelBtn: "是，暂时不用",
+          },
+          bgGradient: "linear-gradient(180deg, #6144E8 0%, #5B3FE6 100%)",
+          isDark: false,
+        },
+        nodes: [
+          { id: "trial-t1-hero", type: "Hero Image", label: "背景图", content: "3天会员免费试用", depth: 0, enabled: true, config: { variant: "onboarding-wave-hero", mascot: true, closeBtn: true } },
+          { id: "trial-t1-timeline", type: "Toggle", label: "3天试用时间轴", content: "今天|开始试用\n第2天|即将结束通知\n第3天|试用结束", depth: 0, enabled: true, config: { variant: "trial-timeline" } },
+          { id: "trial-t1-privileges", type: "Benefit List", label: "核心特权", content: "翻译|随聊随翻，提高你的词汇量|刚需\n多语言|150种语言随时添加和切换|热门\n更多曝光|专属身份特权，让更多人看到你|曝光", depth: 0, enabled: true, config: { variant: "onboarding-privilege-card", styleVariant: "cards", showSubtitle: true, showMoreLink: true, moreLinkText: "更多权益等待开启 >", items: [
+            { id: "ht-p-translate", name: "无限翻译&字幕", title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A", tag: "刚需" },
+            { id: "ht-p-world", name: "更多语伴沟通与多语言", title: "多语言", desc: "150种语言随时添加和切换", icon: "🌐", tag: "热门" },
+            { id: "ht-p-boost", name: "动态曝光加速", title: "更多曝光", desc: "专属身份特权，让更多人看到你", icon: "⚡", tag: "曝光" },
+          ] } },
+          { id: "trial-t1-products", type: "Products", label: "产品双套餐", content: "12个月|¥40.67/月|总价 ¥488|48%OFF|免费试用\n月费会员|¥78.00月|||直接购买", depth: 0, enabled: true, config: { variant: "onboarding-dual-tiers", selectedTier: 0, tiers: [
+            { name: "12个月", monthly: "¥40.67/月", total: "¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true, ctaText: "开启3天 VIP免费试用" },
+            { name: "月费会员", monthly: "¥78.00月", total: "", discount: "", badge: "直接购买", hasTrial: false, ctaText: "继续" },
+          ] } },
+          { id: "trial-t1-safenote", type: "Text", label: "安全取消说明", content: "订阅可随时取消，无需支付任何费用", depth: 0, enabled: true, config: { variant: "safety-note" } },
+          { id: "trial-t1-purchase", type: "Purchase Button", label: "购买按钮", content: "开启3天 VIP免费试用", depth: 0, enabled: true, config: { label: "购买按钮", color: "#6144E8" } },
+          { id: "trial-t1-links", type: "Legal Footer", label: "免责声明", content: "免费3天试用后,系统会以¥488自动续订,可随时取消。费用将从你的iTunes账户收取,你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息,请访问我们的[服务条款]及[隐私政策]", depth: 0, enabled: true, config: { itunesDisclaimer: true } },
+        ],
+      },
+      {
+        id: "trial-tpl-2",
+        name: "模版五",
+        title: "多张轮播图新版",
+        displayMode: "fullscreen",
+        desc: "3张轮播卡片 · 垂直到期提醒 · 试用后套餐选择",
+        theme: {
+          primaryColor: "#6144E8",
+          btnColor: "#6144E8",
+          btnTextColor: "#FFFFFF",
+          subTemplate: "trial-tpl-2",
+          otherColor: "#6144E8",
+          titleText: "专享会员\n更好练习外语",
+          btnText: "开启3天 VIP免费试用",
+          btnTextAlt: "开启3天 VIP免费试用",
+          showDismissBtn: true,
+          dismissBtnText: "不，谢谢",
+          retainModal: {
+            title: "提示",
+            prompt: "你确定要放弃免费试用 VIP 的机会吗？关闭后无法再打开此页面。",
+            primaryBtn: "不，我不放弃",
+            cancelBtn: "是，暂时不用",
+          },
+          bgGradient: "linear-gradient(180deg, #6144E8 0%, #5B3FE6 100%)",
+          isDark: false,
+        },
+        nodes: [
+          { id: "trial-t2-hero", type: "Hero Image", label: "背景图", content: "专享会员\n更好练习外语", depth: 0, enabled: true, config: { variant: "onboarding-carousel-hero", mascot: true, closeBtn: true } },
+          { id: "trial-t2-carousel", type: "Carousel Cards", label: "特权轮播", content: "Slide 1: 免费体验HelloTalk会员\nSlide 2: 到期前提醒\nSlide 3: 选择试用结束后的套餐", depth: 0, enabled: true, config: {
+            variant: "onboarding-3slides",
+            currentSlide: 0,
+            slides: [
+              {
+                id: "slide-1",
+                title: "免费体验HelloTalk会员",
+                items: [
+                  { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
+                  { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
+                  { title: "更多曝光", desc: "专属身份特权，让更多人看到你", icon: "bolt" },
+                  { title: "无广告", desc: "更沉浸专心的学语言！", icon: "ad" },
+                ],
+              },
+              {
+                id: "slide-2",
+                title: "到期前提醒",
+                timeline: [
+                  { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
+                  { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
+                  { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
+                ],
+              },
+              {
+                id: "slide-3",
+                title: "选择试用结束后的套餐",
+                tiers: [
+                  { name: "12 个月", monthly: "¥40.67/ 月", total: "¥488", discount: "48% OFF", badge: "免费试用", hasTrial: true },
+                  { name: "1 个月", monthly: "¥78/ 月", total: "", discount: "", badge: "", hasTrial: false },
+                ],
+              },
+            ],
+          } },
+          { id: "trial-t2-safenote", type: "Text", label: "安全取消说明", content: "订阅可随时取消，无需支付任何费用", depth: 0, enabled: true, config: { variant: "safety-pill" } },
+          { id: "trial-t2-purchase", type: "Purchase Button", label: "购买按钮", content: "开启3天 VIP免费试用", depth: 0, enabled: true, config: { label: "购买按钮", color: "#6144E8" } },
+          { id: "trial-t2-dismiss", type: "Dismiss Button", label: "关闭按钮", content: "不，谢谢", depth: 0, enabled: true, config: { variant: "text-dismiss" } },
+          { id: "trial-t2-links", type: "Legal Footer", label: "免责声明", content: "This subscription will automatically renew and be charged 24 hours prior to the end of the current subscription, unless auto-renew is turned off before this 24-hour period. Payment is charged to your Google Play Account. This subscription can be managed in your Account Settings. [Terms of Service] and [Privacy Policy]", depth: 0, enabled: true },
+        ],
+      },
+    ],
+    "ht-content-paywall": [
+      {
+        id: "cp-tpl-1",
+        name: "模板 1",
+        title: "VIP失效样式 (所有变量)",
+        displayMode: "modal",
+        desc: "针对 VIP 失效用户，呈现历史学习进步与续订激励 (图一官方规范)",
+        theme: {
+          subTemplate: "cp-tpl-1",
+          styleType: "VIP失效样式",
+          userName: "Yeah",
+          userFlag: "🇩🇪",
+          themeColor: "#6C3EDE",
+          bgGradient: "linear-gradient(180deg, #EBE4FA 0%, #F5F0FF 25%, #FFFFFF 65%)",
+          subtitle: "你的进步有目共睹！",
+          headlineBold: "VIP现已过期",
+          headlineSub: "立即续订，别让沟通速度慢下来！",
+          highlightWord: "立即续订",
+          mascotType: "crown-gift",
+          btnText: "立即续订",
+          btnColor: "#6C3EDE",
+        },
+        nodes: [
+          { id: "cp1-close", type: "Dismiss Button", label: "关闭按钮", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
+          { id: "cp1-user", type: "User Profile", label: "用户画像", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
+          { id: "cp1-metrics", type: "Dynamic Metrics", label: "动态指标矩阵", content: "972、762、487、673、837、899、116、156、939、446、650、442", depth: 0, enabled: true, config: { styleType: "VIP失效样式", metricValues: [972, 762, 487, 673, 837, 899, 116, 156, 939, 446, 650, 442] } },
+          { id: "cp1-subhead", type: "Subhead", label: "副标题", content: "你的进步有目共睹！", depth: 0, enabled: true, config: { variant: "body" } },
+          { id: "cp1-headline", type: "Header", label: "主标题", content: "VIP现已过期\n立即续订，别让沟通速度慢下来！", depth: 0, enabled: true, config: { variant: "content-headline", highlightWord: "立即续订", highlightColor: "#6C3EDE" } },
+          { id: "cp1-mascot", type: "Mascot Illustration", label: "吉祥物插画", content: "crown-gift", depth: 0, enabled: true, config: { mascotType: "crown-gift" } },
+          { id: "cp1-purchase", type: "Purchase Button", label: "购买按钮", content: "立即续订", depth: 0, enabled: true, config: { label: "购买按钮", color: "#6C3EDE" } },
+        ],
+      },
+      {
+        id: "cp-tpl-2",
+        name: "模板 2",
+        title: "【历史未付费】访客",
+        displayMode: "modal",
+        desc: "针对访客足迹场景，高亮显示 7 天内访客数与解锁权益 (图二官方规范)",
+        theme: {
+          subTemplate: "cp-tpl-2",
+          styleType: "非VIP样式",
+          userName: "Yeah",
+          userFlag: "🇩🇪",
+          themeColor: "#FF6A00",
+          bgGradient: "linear-gradient(180deg, #FFF5EB 0%, #FEF3E2 25%, #FFFFFF 65%)",
+          visitorCount: 21,
+          visitorTitle: "21 new visitors in the past 7 days 👀",
+          subtitle: "Your profile is getting noticed",
+          hook1: "Let more people know you",
+          hook2: "Reach more people",
+          mascotType: "binoculars",
+          disclaimer: "Upgrade to VIP to see who viewed your profile",
+          btnText: "Upgrade Now",
+          btnColor: "#FF6A00",
+        },
+        nodes: [
+          { id: "cp2-close", type: "Dismiss Button", label: "关闭按钮", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
+          { id: "cp2-user", type: "User Profile", label: "用户画像", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
+          { id: "cp2-metrics", type: "Dynamic Metrics", label: "动态指标矩阵", content: "21 new visitors in the past 7 days 👀", depth: 0, enabled: true, config: { styleType: "非VIP样式", visitorCount: 21, visitorTitle: "21 new visitors in the past 7 days 👀" } },
+          { id: "cp2-subhead", type: "Subhead", label: "副标题", content: "Your profile is getting noticed", depth: 0, enabled: true, config: { variant: "body" } },
+          { id: "cp2-headline", type: "Header", label: "主标题", content: "Let more people know you\nReach more people", depth: 0, enabled: true, config: { variant: "content-headline", hook1: "Let more people know you", hook2: "Reach more people" } },
+          { id: "cp2-mascot", type: "Mascot Illustration", label: "吉祥物插画", content: "binoculars", depth: 0, enabled: true, config: { mascotType: "binoculars" } },
+          { id: "cp2-links", type: "Legal Footer", label: "免责说明", content: "Upgrade to VIP to see who viewed your profile", depth: 0, enabled: true, config: { variant: "clean-center" } },
+          { id: "cp2-purchase", type: "Purchase Button", label: "购买按钮", content: "Upgrade Now", depth: 0, enabled: true, config: { label: "购买按钮", color: "#FF6A00", shape: "pill" } },
+        ],
+      },
+      {
+        id: "cp-tpl-3",
+        name: "模板 3",
+        title: "非订阅状态样式 (所有变量)",
+        displayMode: "modal",
+        desc: "针对高频活跃但未曾订阅用户，呈现交友努力指标与关系推进 (图三官方规范)",
+        theme: {
+          subTemplate: "cp-tpl-3",
+          styleType: "非订阅状态样式",
+          userName: "Yeah",
+          userFlag: "🇩🇪",
+          themeColor: "#FF8A00",
+          bgGradient: "linear-gradient(180deg, #FFF9EB 0%, #FEF7E5 25%, #FFFFFF 65%)",
+          subtitle: "你已经在为交朋友认真努力了",
+          headlineBold: "升级VIP",
+          headlineSub: "让关系继续发生。",
+          highlightWord: "升级VIP",
+          mascotType: "translate-coin",
+          btnText: "升级 VIP",
+          btnColor: "#FF8A00",
+        },
+        nodes: [
+          { id: "cp3-close", type: "Dismiss Button", label: "关闭按钮", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
+          { id: "cp3-user", type: "User Profile", label: "用户画像", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
+          { id: "cp3-metrics", type: "Dynamic Metrics", label: "动态指标矩阵", content: "899、164、681、640、367、223、292、164、670、150、169、267", depth: 0, enabled: true, config: { styleType: "非订阅状态样式", metricValues: [899, 164, 681, 640, 367, 223, 292, 164, 670, 150, 169, 267] } },
+          { id: "cp3-subhead", type: "Subhead", label: "副标题", content: "你已经在为交朋友认真努力了", depth: 0, enabled: true, config: { variant: "body" } },
+          { id: "cp3-headline", type: "Header", label: "主标题", content: "升级VIP\n让关系继续发生。", depth: 0, enabled: true, config: { variant: "content-headline", highlightWord: "升级VIP", highlightColor: "#FF8A00" } },
+          { id: "cp3-mascot", type: "Mascot Illustration", label: "吉祥物插画", content: "translate-coin", depth: 0, enabled: true, config: { mascotType: "translate-coin" } },
+          { id: "cp3-purchase", type: "Purchase Button", label: "购买按钮", content: "升级 VIP", depth: 0, enabled: true, config: { label: "购买按钮", color: "#FF8A00" } },
+        ],
+      },
+    ],
+  }));
+
+  const [activeSubTemplateByPage, setActiveSubTemplateByPage] = useState({
+    "ht-entry-aggregation": "tpl-1",
+    "ht-vip-package": "pkg-tpl-1",
+    "ht-onboarding": "trial-tpl-1",
+    "ht-content-paywall": "cp-tpl-1",
+  });
+
+  const currentTemplate = templates[appliedTemplate] ?? templates[0];
+  const [activeCompareTab, setActiveCompareTab] = useState(() => (currentTemplate?.id === "ht-tier-compare" ? 1 : 0));
+
+  useEffect(() => {
+    if (currentTemplate?.id === "ht-tier-compare") {
+      setActiveCompareTab(1);
+    } else if (currentTemplate?.id === "ht-switch-compare") {
+      setActiveCompareTab(0);
+    }
+  }, [currentTemplate?.id]);
+
+  const isEntryPricePage = currentTemplate?.id === "ht-entry-aggregation";
+  const isVipPackagePage = currentTemplate?.id === "ht-vip-package";
+  const isOnboardingPage = currentTemplate?.id === "ht-onboarding";
+  const hasSubTemplates = Boolean(templatePresetsMap[currentTemplate.id]?.length);
+
+  const subTemplates = templatePresetsMap[currentTemplate.id] || [];
+  const activeSubTemplateId = activeSubTemplateByPage[currentTemplate.id] || subTemplates[0]?.id;
+  const activeSubTemplate = hasSubTemplates
+    ? subTemplates.find((t) => t.id === activeSubTemplateId) || subTemplates[0]
+    : null;
+  const currentEffectiveNodes = hasSubTemplates ? (activeSubTemplate?.nodes || []) : builderNodes;
+  const effectiveTheme = hasSubTemplates ? activeSubTemplate?.theme : DEFAULT_ENTRY_CONFIG;
+  const currentDisplayMode = activeSubTemplate?.displayMode || (currentTemplate?.visual === "bottom-sheet" || currentTemplate?.id === "ht-vip-pop" ? "bottom-sheet" : (currentTemplate?.visual === "pop" || currentTemplate?.id === "ht-content-paywall") ? "modal" : "fullscreen");
+  const isBottomSheetMode = !isOnboardingPage && (activeSubTemplate?.displayMode === "bottom-sheet" || currentDisplayMode === "bottom-sheet" || currentTemplate?.id === "ht-vip-pop" || activeSubTemplateId === "tpl-2");
+  const isModalMode = !isBottomSheetMode && (activeSubTemplate?.displayMode === "modal" || currentDisplayMode === "modal" || currentTemplate?.id === "ht-content-paywall");
+  const isModalLikeMode = isBottomSheetMode || isModalMode;
+
+  const toggleDisplayMode = (mode) => {
+    if (hasSubTemplates) {
+      const targetMode = mode === "popup"
+        ? (isEntryPricePage ? "bottom-sheet" : "modal")
+        : mode;
+      setTemplatePresetsMap((prev) => ({
+        ...prev,
+        [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+          if (t.id === activeSubTemplateId) {
+            return {
+              ...t,
+              displayMode: targetMode,
+            };
+          }
+          return t;
+        }),
+      }));
+    }
+  };
+
+  const getTemplateBadge = (tpl) => {
+    if (tpl.displayMode === "bottom-sheet") return "🪟 底部弹窗";
+    if (tpl.displayMode === "modal") return "🪟 居中弹窗";
+    return "📱 全屏模式";
+  };
+
+  useEffect(() => {
+    if (view !== "builder") return;
+    const handleKeyDown = (e) => {
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === "input" || tag === "textarea" || document.activeElement?.isContentEditable) {
+        return;
+      }
+      if ((e.key === "Delete" || e.key === "Backspace") && activeNode) {
+        const nodeToDelete = currentEffectiveNodes.find((n) => n.id === activeNode);
+        if (nodeToDelete) {
+          e.preventDefault();
+          removeEffectiveNode(activeNode);
+          notify?.(`已删除组件: ${nodeToDelete.type}`);
+        }
+      }
     };
-    const addNestedElement = (parentId, type) => {
-      const nextId = `added-${type.toLowerCase().replace(/[^a-z]+/g, "-")}-${builderNodes.filter((node) => node.id.startsWith("added-")).length + 1}`;
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [view, activeNode, currentEffectiveNodes, notify]);
+
+  const updateEffectiveNode = (id, patch) => {
+    if (hasSubTemplates) {
+      setTemplatePresetsMap((prev) => ({
+        ...prev,
+        [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+          if (t.id === activeSubTemplateId) {
+            return {
+              ...t,
+              nodes: t.nodes.map((n) => (n.id === id ? { ...n, ...patch } : n)),
+            };
+          }
+          return t;
+        }),
+      }));
+    } else {
+      updateBuilderNode(id, patch);
+    }
+  };
+
+  const removeEffectiveNode = (id) => {
+    if (hasSubTemplates) {
+      let nextActiveId = null;
+      setTemplatePresetsMap((prev) => ({
+        ...prev,
+        [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+          if (t.id === activeSubTemplateId) {
+            const remaining = t.nodes.filter((n) => n.id !== id);
+            nextActiveId = remaining[0]?.id || null;
+            return {
+              ...t,
+              nodes: remaining,
+            };
+          }
+          return t;
+        }),
+      }));
+      if (activeNode === id) {
+        setActiveNode(nextActiveId);
+      }
+    } else {
+      removeBuilderNode(id);
+      const remaining = builderNodes.filter((n) => n.id !== id);
+      if (activeNode === id) {
+        setActiveNode(remaining[0]?.id || null);
+      }
+    }
+  };
+
+  const moveNodeByOffset = (id, offset) => {
+    if (hasSubTemplates) {
+      setTemplatePresetsMap((prev) => ({
+        ...prev,
+        [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+          if (t.id === activeSubTemplateId) {
+            const idx = t.nodes.findIndex((n) => n.id === id);
+            if (idx < 0) return t;
+            const targetIdx = idx + offset;
+            if (targetIdx < 0 || targetIdx >= t.nodes.length) return t;
+            const nextNodes = [...t.nodes];
+            const [item] = nextNodes.splice(idx, 1);
+            nextNodes.splice(targetIdx, 0, item);
+            return {
+              ...t,
+              nodes: nextNodes,
+            };
+          }
+          return t;
+        }),
+      }));
+      setActiveNode(id);
+      notify("已更新组件排序");
+    } else {
       setBuilderNodes((current) => {
-        const parentIndex = current.findIndex((node) => node.id === parentId);
-        if (parentIndex < 0) return current;
-        const parent = current[parentIndex];
-        const next = { ...createComponentNode(type, current.filter((node) => node.id.startsWith("added-")).length + 1), depth: (parent.depth ?? 0) + 1, parentId };
-        let insertAt = parentIndex + 1;
-        while (insertAt < current.length && (current[insertAt].depth ?? 0) > (parent.depth ?? 0)) insertAt += 1;
-        return [...current.slice(0, insertAt), next, ...current.slice(insertAt)];
+        const idx = current.findIndex((n) => n.id === id);
+        if (idx < 0) return current;
+        const targetIdx = idx + offset;
+        if (targetIdx < 0 || targetIdx >= current.length) return current;
+        const nextNodes = [...current];
+        const [item] = nextNodes.splice(idx, 1);
+        nextNodes.splice(targetIdx, 0, item);
+        return nextNodes;
       });
-      setActiveNode(nextId);
-      setBuilderTab("tree");
-      const parent = builderNodes.find((node) => node.id === parentId);
-      notify(`${type} 已作为 ${parent?.type ?? "容器"} 子元素添加。`);
+      setActiveNode(id);
+      notify("已更新组件排序");
+    }
+  };
+
+  const reorderNode = (sourceId, targetId, position = "below") => {
+    if (!sourceId || !targetId || sourceId === targetId) return;
+    if (hasSubTemplates) {
+      setTemplatePresetsMap((prev) => ({
+        ...prev,
+        [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+          if (t.id === activeSubTemplateId) {
+            const fromIdx = t.nodes.findIndex((n) => n.id === sourceId);
+            if (fromIdx < 0) return t;
+            const nextNodes = [...t.nodes];
+            const [item] = nextNodes.splice(fromIdx, 1);
+            let toIdx = nextNodes.findIndex((n) => n.id === targetId);
+            if (toIdx < 0) toIdx = nextNodes.length;
+            if (position === "below") toIdx += 1;
+            nextNodes.splice(toIdx, 0, item);
+            return {
+              ...t,
+              nodes: nextNodes,
+            };
+          }
+          return t;
+        }),
+      }));
+      setActiveNode(sourceId);
+      notify("已拖拽更新组件顺序");
+    } else {
+      setBuilderNodes((current) => {
+        const fromIdx = current.findIndex((n) => n.id === sourceId);
+        if (fromIdx < 0) return current;
+        const nextNodes = [...current];
+        const [item] = nextNodes.splice(fromIdx, 1);
+        let toIdx = nextNodes.findIndex((n) => n.id === targetId);
+        if (toIdx < 0) toIdx = nextNodes.length;
+        if (position === "below") toIdx += 1;
+        nextNodes.splice(toIdx, 0, item);
+        return nextNodes;
+      });
+      setActiveNode(sourceId);
+      notify("已拖拽更新组件顺序");
+    }
+  };
+
+  const toggleNodeEnabled = (id, isEnabled) => {
+    if (hasSubTemplates) {
+      setTemplatePresetsMap((prev) => ({
+        ...prev,
+        [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+          if (t.id === activeSubTemplateId) {
+            return {
+              ...t,
+              nodes: t.nodes.map((n) => (n.id === id ? { ...n, enabled: isEnabled } : n)),
+            };
+          }
+          return t;
+        }),
+      }));
+      notify(isEnabled ? "已在当前模版开启展示该组件" : "已在当前模版隐藏该组件");
+    }
+  };
+
+  const updateSubTemplateTheme = (patch) => {
+    if (hasSubTemplates) {
+      setTemplatePresetsMap((prev) => ({
+        ...prev,
+        [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+          if (t.id === activeSubTemplateId) {
+            return {
+              ...t,
+              theme: { ...t.theme, ...patch },
+            };
+          }
+          return t;
+        }),
+      }));
+    }
+  };
+
+  const handleAddSubTemplate = () => {
+    const list = templatePresetsMap[currentTemplate.id] || [];
+    const nextNum = list.length + 1;
+    const newId = `${currentTemplate.id}-tpl-${Date.now()}`;
+    let newTemplate;
+
+    if (isVipPackagePage) {
+      newTemplate = {
+        id: newId,
+        name: `模板 ${nextNum}`,
+        title: `翡翠尊享版 ${nextNum}`,
+        desc: `第 ${nextNum} 套独立会员套餐方案`,
+        image: nextNum % 2 === 0 ? "/templates/vip_pkg_tpl2.png" : "/templates/vip_pkg_tpl1.png",
+        theme: {
+          primaryColor: "#10B981",
+          btnColor: "#10B981",
+          btnTextColor: "#FFFFFF",
+          subTemplate: newId,
+          otherColor: "#10B981",
+          titleText: `HelloTalk VIP 尊享方案 ${nextNum}`,
+          btnText: "立即开通 VIP",
+          bgGradient: "linear-gradient(180deg, #ECFDF5 0%, #D1FAE5 40%, #FFFFFF 100%)",
+          isDark: false,
+        },
+        nodes: [
+          { id: `${newId}-banner`, type: "Header", label: "顶部 VIP Banner", content: `HelloTalk VIP 尊享方案 ${nextNum}`, depth: 0, enabled: true, config: { variant: "vip-badge-header", badge: "VIP 进阶特权", subtitle: "尊享全球语伴交流与 AI 纠错" } },
+          { id: `${newId}-carousel`, type: "Carousel Cards", label: "特权轮播卡片", content: "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球母语圈\n👀 解锁谁看了我|查看访客足迹", depth: 0, enabled: true, config: { privileges: ALL_HELLOTALK_PRIVILEGES, autoScroll: true } },
+          { id: `${newId}-products`, type: "Products", label: "横向套餐卡片", content: "1个月|¥28|¥28\n12个月|¥19.99/月|¥238|省50%|推荐\n终身|¥698|一次性购买", depth: 0, enabled: true, config: { variant: "3-column-tiers", selectedTier: 1, tiers: [
+            { name: "1个月", monthly: "¥28/月", total: "总价 ¥28", period: "1个月", badge: "", save: "" },
+            { name: "12个月", monthly: "¥19.99/月", total: "总价 ¥238", period: "12个月", badge: "推荐", save: "省50%", isRecommended: true },
+            { name: "终身", monthly: "¥698", total: "一次性购买", period: "终身", badge: "", save: "终身买断" },
+          ] } },
+          { id: `${newId}-purchase`, type: "Purchase Button", label: "购买按钮", content: "立即开通 VIP", depth: 0, enabled: true, config: { label: "purchase", color: "#10B981" } },
+          { id: `${newId}-links`, type: "Legal Footer", label: "免责声明", content: "随时取消 · 自动续订说明 · 恢复购买", depth: 0, enabled: true },
+        ],
+      };
+    } else {
+      newTemplate = {
+        id: newId,
+        name: `模板 ${nextNum}`,
+        title: `自定义新客模版 ${nextNum}`,
+        desc: `第 ${nextNum} 套独立搭配组件`,
+        image: nextNum % 2 === 0 ? "/templates/template2.jpg" : "/templates/template1.jpg",
+        theme: {
+          ...DEFAULT_ENTRY_CONFIG,
+          subTemplate: newId,
+          otherColor: nextNum % 2 === 0 ? "#F59E0B" : "#7C3AED",
+          titleText: `HelloTalk VIP 专属新礼遇 ${nextNum}`,
+          flexibleText: "新客专享限时破冰特惠 · 自定义配置",
+          promoText: "限时专享礼遇",
+          btnText: "立即领取特惠",
+        },
+        nodes: [
+          { id: `${newId}-hero`, type: "Hero Image", label: "背景图", content: "寻找身边母语者", depth: 0, enabled: true, config: { bgMode: "illustration", sloganText: "寻找身边母语者", themeColor: "orange", showCloseBtn: true, bubbleBg: "#2563eb" } },
+          { id: `${newId}-headline`, type: "Header", label: "标题", content: `HelloTalk VIP 专属新礼遇 ${nextNum}`, depth: 0, enabled: true, config: { variant: "headline" } },
+          { id: `${newId}-subhead`, type: "Subhead", label: "副标题", content: "新客特惠 · 额外立省 20% · 仅此一次机会", depth: 0, enabled: true, config: { variant: "body" } },
+          { id: `${newId}-timer`, type: "Timer", label: "倒计时", content: "限时优惠结束倒计时", depth: 0, enabled: true, config: { hours: 24, label: "限时优惠结束倒计时" } },
+          { id: `${newId}-products`, type: "Products", label: "产品套餐", content: "VIP 超值会员|$19.99/year|$24.99/year|限时专享礼遇", depth: 0, enabled: true, config: { variant: "entry-price-tier", promoBadge: "限时专享礼遇", discountTag: "-20% OFF", priceNow: "$19.99/year", priceOriginal: "$24.99/year", priceSub: "仅 $0.05/天 · 随时取消" } },
+          { id: `${newId}-benefits`, type: "Benefit List", label: "核心特权", content: "搜索附近的人|与附近母语者直接交流\n无限翻译与纠错|AI 语法实时纠正\n专属母语者推荐|优先匹配高活跃母语伙伴", depth: 0, enabled: true, config: { maxCount: 3, styleVariant: "entry-checks" } },
+          { id: `${newId}-purchase`, type: "Purchase Button", label: "购买按钮", content: "立即领取特惠", depth: 0, enabled: true, config: { label: "purchase" } },
+          { id: `${newId}-links`, type: "Legal Footer", label: "免责声明", content: "服务条款 · 隐私政策 · 恢复购买", depth: 0, enabled: true },
+        ],
+      };
+    }
+
+    setTemplatePresetsMap((prev) => ({
+      ...prev,
+      [currentTemplate.id]: [...(prev[currentTemplate.id] || []), newTemplate],
+    }));
+    setActiveSubTemplateByPage((prev) => ({
+      ...prev,
+      [currentTemplate.id]: newId,
+    }));
+    setActiveNode(newTemplate.nodes[0]?.id || null);
+    notify(`✅ 成功添加「模板 ${nextNum}」！已在左侧模版那一列展示，可自由搭配组件。`);
+  };
+
+  const handleDeleteSubTemplate = (id, name, e) => {
+    e.stopPropagation();
+    const list = templatePresetsMap[currentTemplate.id] || [];
+    if (list.length <= 1) {
+      notify("⚠️ 至少需要保留一个模版预设");
+      return;
+    }
+    const remaining = list.filter((t) => t.id !== id);
+    setTemplatePresetsMap((prev) => ({
+      ...prev,
+      [currentTemplate.id]: remaining,
+    }));
+    if (activeSubTemplateId === id) {
+      setActiveSubTemplateByPage((prev) => ({
+        ...prev,
+        [currentTemplate.id]: remaining[0].id,
+      }));
+      setActiveNode(remaining[0].nodes[0]?.id || null);
+    }
+    notify(`已移除模版预设: ${name}`);
+  };
+
+  if (view === "builder") {
+    const active = currentEffectiveNodes.find((node) => node.id === activeNode) ?? currentEffectiveNodes[1] ?? currentEffectiveNodes[0];
+    const builderBoundary = missingItems.find((item) => item.id === "B-01");
+
+    const addElement = (type) => {
+      const enType = zhToTypeMap[type] || type;
+      const cleanEnKey = enType.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const nextId = `added-${cleanEnKey}-${Date.now()}`;
+      if (hasSubTemplates) {
+        const nextNode = {
+          ...createComponentNode(type, currentEffectiveNodes.length + 1),
+          id: nextId,
+          enabled: true,
+        };
+        setTemplatePresetsMap((prev) => ({
+          ...prev,
+          [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+            if (t.id === activeSubTemplateId) {
+              return {
+                ...t,
+                nodes: [...t.nodes, nextNode],
+              };
+            }
+            return t;
+          }),
+        }));
+        setActiveNode(nextId);
+        setBuilderTab("tree");
+        setAddElementOpen(false);
+        notify(`已将「${type}」添加到【${activeSubTemplate.name}】搭配组件中！`);
+      } else {
+        const next = {
+          ...createComponentNode(type, builderNodes.filter((node) => node.id.startsWith("added-")).length + 1),
+          id: nextId,
+          enabled: true,
+        };
+        setBuilderNodes((current) => [...current, next]);
+        setActiveNode(next.id);
+        setBuilderTab("tree");
+        setAddElementOpen(false);
+        notify(`已将「${type}」添加到图层列表中！`);
+      }
     };
+
+    const addNestedElement = (parentId, type) => {
+      const enType = zhToTypeMap[type] || type;
+      const cleanEnKey = enType.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+      const nextId = `added-${cleanEnKey}-${Date.now()}`;
+      if (hasSubTemplates) {
+        setTemplatePresetsMap((prev) => ({
+          ...prev,
+          [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+            if (t.id === activeSubTemplateId) {
+              const parentIndex = t.nodes.findIndex((node) => node.id === parentId);
+              if (parentIndex < 0) return t;
+              const parent = t.nodes[parentIndex];
+              const next = {
+                ...createComponentNode(type, t.nodes.length + 1),
+                id: nextId,
+                depth: (parent.depth ?? 0) + 1,
+                parentId,
+                enabled: true,
+              };
+              let insertAt = parentIndex + 1;
+              while (insertAt < t.nodes.length && (t.nodes[insertAt].depth ?? 0) > (parent.depth ?? 0)) insertAt += 1;
+              return { ...t, nodes: [...t.nodes.slice(0, insertAt), next, ...t.nodes.slice(insertAt)] };
+            }
+            return t;
+          }),
+        }));
+        setActiveNode(nextId);
+        setBuilderTab("tree");
+        notify(`${type} 已添加。`);
+      } else {
+        const nextId = `added-${type.toLowerCase().replace(/[^a-z]+/g, "-")}-${builderNodes.filter((node) => node.id.startsWith("added-")).length + 1}`;
+        setBuilderNodes((current) => {
+          const parentIndex = current.findIndex((node) => node.id === parentId);
+          if (parentIndex < 0) return current;
+          const parent = current[parentIndex];
+          const next = { ...createComponentNode(type, current.filter((node) => node.id.startsWith("added-")).length + 1), depth: (parent.depth ?? 0) + 1, parentId };
+          let insertAt = parentIndex + 1;
+          while (insertAt < current.length && (current[insertAt].depth ?? 0) > (parent.depth ?? 0)) insertAt += 1;
+          return [...current.slice(0, insertAt), next, ...current.slice(insertAt)];
+        });
+        setActiveNode(nextId);
+        setBuilderTab("tree");
+        notify(`${type} 已添加。`);
+      }
+    };
+
     const getNodeDropTarget = (clientX, clientY, sourceId) => {
       const target = document.elementFromPoint(clientX, clientY)?.closest("[data-node-id]");
       const targetId = target?.dataset.nodeId;
-      if (!targetId || !canMoveBuilderNode(builderNodes, sourceId, targetId)) return null;
+      if (!targetId || !canMoveBuilderNode(currentEffectiveNodes, sourceId, targetId)) return null;
       const { top, height } = target.getBoundingClientRect();
       return { targetId, position: clientY < top + height / 2 ? "before" : "after" };
     };
+
     const beginNodeDrag = (event, id) => {
       if (event.button !== 0) return;
       event.currentTarget.setPointerCapture(event.pointerId);
       setDragState({ id, targetId: null, position: null });
       setActiveNode(id);
       setBuilderTab("tree");
-      if (appliedTemplate !== null && sourceTreeObserved.has(templates[appliedTemplate].id)) setPreviewMode("editable");
     };
+
     const updateNodeDropTarget = (event) => {
       const sourceId = dragState?.id;
       if (!sourceId) return;
@@ -1293,495 +2394,4700 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
       event.preventDefault();
       setDragState({ id: sourceId, ...nextTarget });
     };
+
     const dropNode = (event) => {
       const sourceId = dragState?.id;
       const nextTarget = sourceId ? getNodeDropTarget(event.clientX, event.clientY, sourceId) : null;
       if (sourceId && nextTarget) {
-        setBuilderNodes((current) => moveBuilderNode(current, sourceId, nextTarget.targetId, nextTarget.position));
+        if (hasSubTemplates) {
+          setTemplatePresetsMap((prev) => ({
+            ...prev,
+            [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+              if (t.id === activeSubTemplateId) {
+                return {
+                  ...t,
+                  nodes: moveBuilderNode(t.nodes, sourceId, nextTarget.targetId, nextTarget.position),
+                };
+              }
+              return t;
+            }),
+          }));
+        } else {
+          setBuilderNodes((current) => moveBuilderNode(current, sourceId, nextTarget.targetId, nextTarget.position));
+        }
         setActiveNode(sourceId);
       }
       setDragState(null);
     };
+
     return (
       <section className="builder-page">
-        <WorkspaceHeader selected={selected} setView={setView} duplicate={duplicate} setModal={setModal} markUnknown={markUnknown} />
-        <div className="detail-tabs"><button onClick={() => setView("general")}>General</button><button className="active">Builder & Generator</button></div>
-        {appliedTemplate !== null && <div className={`template-context ${sourceTreeObserved.has(templates[appliedTemplate].id) ? "observed-tree" : "preview-only"}`}><span>Template</span><strong>{templates[appliedTemplate].title}</strong><small>{sourceTreeObserved.has(templates[appliedTemplate].id) ? "源端已观察核心结构；本地可编辑复现" : "源端已采集预览内容；精确节点树待采集"}</small><button className="secondary" onClick={() => setModal({ kind: "templates" })}><LayoutTemplate size={15} /> Change template</button></div>}
-        <div className="builder">
-          <aside className="node-panel">
-            <label className="device-toggle"><input type="checkbox" defaultChecked /> <span>On</span> Show on device</label>
-            <div className="panel-tabs"><button className={builderTab === "settings" ? "active" : ""} onClick={() => setBuilderTab("settings")}>Layout settings</button><button className={builderTab === "tree" ? "active" : ""} onClick={() => setBuilderTab("tree")}>Elements</button></div>
-            <div className="add-element-wrap"><button className="add-element" onClick={() => setAddElementOpen((open) => !open)}><Plus size={17} /> Add element</button>{addElementOpen && <div className="add-element-menu">{componentCatalog.map((item) => <button key={item} onClick={() => addElement(item)}>{item}</button>)}</div>}</div>
-            <div className="node-list">{builderNodes.map((node) => {
-              const isDragging = dragState?.id === node.id;
-              const dropClass = dragState?.targetId === node.id ? `drop-${dragState.position}` : "";
-              return <button type="button" data-node-id={node.id} style={{ paddingLeft: `${7 + (node.depth ?? 0) * 15}px` }} className={`node ${activeNode === node.id ? "selected" : ""} ${isDragging ? "dragging" : ""} ${dropClass}`} onPointerDown={(event) => beginNodeDrag(event, node.id)} onPointerMove={updateNodeDropTarget} onPointerUp={dropNode} onPointerCancel={() => setDragState(null)} onClick={() => { setBuilderTab("tree"); setActiveNode(node.id); }} key={node.id} aria-grabbed={isDragging}><span className="drag-handle" aria-hidden="true"><GripVertical size={14} /></span><i>{node.type[0]}</i><strong>{node.type}</strong><small>{node.label}</small></button>;
-            })}</div>
-            <div className="builder-locales"><div><strong>Localization</strong><button className="icon tiny unknown-action" onClick={() => markUnknown(builderBoundary)}><Plus size={15} /></button></div><button className="locale-row">English <i /></button><button className="locale-row selected">French <i /></button><button className="locale-row">Simplified Chinese <i /></button><button className="add-locale unknown-action" onClick={() => markUnknown(builderBoundary)}>Add locale</button></div>
-          </aside>
-          <div className="canvas-area"><div className="device-controls"><button><Smartphone size={16} /> iPhone 15 Pro <ChevronDown size={14} /></button>{appliedTemplate !== null && <div className="preview-mode" aria-label="Preview mode"><button className={previewMode === "source" ? "active" : ""} onClick={() => setPreviewMode("source")}>Source visual</button><button className={previewMode === "editable" ? "active" : ""} disabled={!sourceTreeObserved.has(templates[appliedTemplate].id)} onClick={() => setPreviewMode("editable")}>Editable structure</button></div>}<button className="icon" title="Preview orientation"><RotateCw size={15} /></button><button className="icon" title="Preview visibility"><Eye size={15} /></button></div><PaywallPreview nodes={builderNodes} template={appliedTemplate !== null ? templates[appliedTemplate] : null} mode={previewMode} activeNode={activeNode} onSelect={(id) => { setActiveNode(id); setBuilderTab("tree"); }} />{appliedTemplate !== null && previewMode === "source" && <p className="source-preview-note">源端模板画面，与模板库卡片一一对应。</p>}{appliedTemplate !== null && previewMode === "editable" && <p className="source-preview-note">源端已观察核心结构的本地可编辑复现。</p>}<p className="preview-disclaimer">All prices, titles, and offers displayed are placeholders. The actual data from App Store and Google Play will be shown in the app.</p></div>
-          <aside className="property-panel">{builderTab === "settings" ? <LayoutSettings markUnknown={markUnknown} boundary={builderBoundary} setModal={setModal} appliedTemplate={appliedTemplate} /> : <BuilderProperties active={active} setBuilderTab={setBuilderTab} markUnknown={markUnknown} boundary={builderBoundary} templateLinks={templateLinks} setTemplateLinks={setTemplateLinks} updateNode={updateBuilderNode} removeNode={removeBuilderNode} addNestedNode={addNestedElement} />}</aside>
+        <WorkspaceHeader selected={selected} setView={setView} duplicate={duplicate} setModal={setModal} markUnknown={markUnknown} notify={notify} />
+        <div className="detail-tabs">
+          <button onClick={() => setView("general")}>基础设置</button>
+          <button className="active">构建器</button>
         </div>
-        <div className="builder-footer"><button className="secondary unknown-action" onClick={() => markUnknown(builderBoundary)}>Discard</button><button className="primary" onClick={() => setModal({ kind: appliedTemplate !== null ? "template-requirements" : "builder-save" })}>Save</button></div>
+
+        {/* Compact Horizontal Multi-Template Bar (Saves 160px+ vertical height) */}
+        {hasSubTemplates && (
+          <div className="entry-template-shelf-compact">
+            <div className="shelf-compact-title">
+              <span className="shelf-required-star">*</span>
+              <span>模板选择:</span>
+            </div>
+            <div className="shelf-compact-list">
+              {subTemplates.map((tpl) => {
+                const isActive = activeSubTemplateId === tpl.id;
+                const canDelete = !["tpl-1", "tpl-2", "pkg-tpl-1", "pkg-tpl-2", "trial-tpl-1", "trial-tpl-2"].includes(tpl.id);
+
+                return (
+                  <button
+                    key={tpl.id}
+                    type="button"
+                    className={`shelf-pill-btn ${isActive ? "active" : ""}`}
+                    onClick={() => {
+                      setActiveSubTemplateByPage((prev) => ({
+                        ...prev,
+                        [currentTemplate.id]: tpl.id,
+                      }));
+                      setActiveNode(tpl.nodes[0]?.id || null);
+                      notify(`已切换至「${tpl.name}」搭配组件`);
+                    }}
+                  >
+                    <MiniTemplateVisual tpl={tpl} />
+                    <div className="shelf-pill-info">
+                      <div className="shelf-pill-top">
+                        <div className="shelf-pill-radio">
+                          {isActive && <div className="shelf-pill-radio-dot" />}
+                        </div>
+                        <strong>{tpl.name.replace(/[-·].*$/, "").trim()}</strong>
+                        <span className="shelf-pill-mode-tag">
+                          {tpl.displayMode === "bottom-sheet" ? "底部弹窗" : tpl.displayMode === "modal" ? "浮层弹窗" : "全屏"}
+                        </span>
+                      </div>
+                      <span className="shelf-pill-sub">
+                        {tpl.title || (tpl.name.includes("-") ? tpl.name.split("-")[1] : tpl.name.includes("·") ? tpl.name.split("·")[1] : tpl.desc)}
+                      </span>
+                    </div>
+                    {canDelete && (
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        className="shelf-pill-del"
+                        title={`删除 ${tpl.name}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDeleteSubTemplate(tpl.id, tpl.name, e);
+                        }}
+                      >
+                        <X size={12} />
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+
+              <button
+                type="button"
+                className="shelf-pill-add"
+                onClick={handleAddSubTemplate}
+                title="添加新模版"
+              >
+                <Plus size={14} />
+                <span>添加模版</span>
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Builder Layout: Standard Spacious 3 Columns */}
+        <div className="builder">
+          {/* Column 1: Matching Components / Node Tree Panel */}
+          <aside className="node-panel">
+            {hasSubTemplates ? (
+              <div className="matching-components-header">
+                <div className="matching-components-title">
+                  <Sliders size={13} color="#6366f1" />
+                  <span>【{activeSubTemplate.name}】搭配组件</span>
+                </div>
+                <span className="matching-badge">{currentEffectiveNodes.filter((n) => n.enabled !== false).length} 项启用</span>
+              </div>
+            ) : (
+              <>
+                <label className="device-toggle"><input type="checkbox" defaultChecked /> <span>开启</span> 在设备上展示</label>
+                <div className="panel-tabs">
+                  <button className={builderTab === "tree" ? "active" : ""} onClick={() => setBuilderTab("tree")}>元素图层</button>
+                  <button className={builderTab === "settings" ? "active" : ""} onClick={() => setBuilderTab("settings")}>全局布局</button>
+                </div>
+              </>
+            )}
+
+            <div className="add-element-wrap">
+              <button className="add-element" onClick={() => setAddElementOpen((open) => !open)}>
+                <Plus size={15} /> 添加组件
+              </button>
+              {addElementOpen && (
+                <div className="add-element-menu">
+                  {componentCatalog.map((item) => (
+                    <button key={item} onClick={() => addElement(item)}>+ {item}</button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="node-list">
+              <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "2px 8px 6px", fontSize: 10, color: "#64748b" }}>
+                <GripVertical size={12} color="#6366f1" />
+                <span>按住手柄可上下拖动排序</span>
+              </div>
+              {currentEffectiveNodes.map((node, index) => {
+                const isDragging = draggingNodeId === node.id;
+                const isOver = dragOverNodeId === node.id;
+                const dropClass = isOver ? (dragOverPosition === "above" ? "drop-target-above" : "drop-target-below") : "";
+                const isEnabled = node.enabled !== false;
+                const titleText = getNodeLabel(node);
+                return (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    data-node-id={node.id}
+                    draggable={true}
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("text/plain", node.id);
+                      e.dataTransfer.effectAllowed = "move";
+                      setDraggingNodeId(node.id);
+                    }}
+                    onDragOver={(e) => {
+                      e.preventDefault();
+                      e.dataTransfer.dropEffect = "move";
+                      const rect = e.currentTarget.getBoundingClientRect();
+                      const isTopHalf = e.clientY < rect.top + rect.height / 2;
+                      const pos = isTopHalf ? "above" : "below";
+                      if (dragOverNodeId !== node.id || dragOverPosition !== pos) {
+                        setDragOverNodeId(node.id);
+                        setDragOverPosition(pos);
+                      }
+                    }}
+                    onDragLeave={(e) => {
+                      if (dragOverNodeId === node.id && !e.currentTarget.contains(e.relatedTarget)) {
+                        setDragOverNodeId(null);
+                      }
+                    }}
+                    onDrop={(e) => {
+                      e.preventDefault();
+                      if (draggingNodeId && draggingNodeId !== node.id) {
+                        reorderNode(draggingNodeId, node.id, dragOverPosition);
+                      }
+                      setDraggingNodeId(null);
+                      setDragOverNodeId(null);
+                    }}
+                    onDragEnd={() => {
+                      setDraggingNodeId(null);
+                      setDragOverNodeId(null);
+                    }}
+                    style={{ paddingLeft: `${6 + (node.depth ?? 0) * 10}px` }}
+                    className={`node ${activeNode === node.id ? "selected" : ""} ${isDragging ? "dragging" : ""} ${!isEnabled ? "node-disabled" : ""} ${dropClass}`}
+                    onClick={() => { setBuilderTab("tree"); setActiveNode(node.id); }}
+                    key={node.id}
+                  >
+                    {hasSubTemplates && (
+                      <div
+                        className="node-checkbox-wrap"
+                        onPointerDown={(e) => e.stopPropagation()}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isEnabled}
+                          onChange={(e) => toggleNodeEnabled(node.id, e.target.checked)}
+                          title={isEnabled ? "点击在当前模版中隐藏" : "点击在当前模版中展示"}
+                        />
+                      </div>
+                    )}
+                    <span className="node-title">
+                      <strong>{titleText}</strong>
+                    </span>
+
+                    <div className="node-actions" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
+                      <div
+                        className="node-drag-handle"
+                        title="按住上下拖拽排序"
+                        draggable={true}
+                        onDragStart={(e) => {
+                          e.stopPropagation();
+                          e.dataTransfer.setData("text/plain", node.id);
+                          e.dataTransfer.effectAllowed = "move";
+                          setDraggingNodeId(node.id);
+                        }}
+                      >
+                        <GripVertical size={14} />
+                      </div>
+                      <button
+                        type="button"
+                        className="node-action-btn delete"
+                        title={`删除 ${titleText} 组件`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeEffectiveNode(node.id);
+                          notify?.(`已删除组件: ${titleText}`);
+                        }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="builder-locales">
+              <div><strong>多语言本地化</strong><button className="icon tiny"><Plus size={14} /></button></div>
+              <button className="locale-row selected">简体中文 (zh-CN) <i /></button>
+              <button className="locale-row">English (en) <i /></button>
+              <button className="locale-row">日本語 (ja) <i /></button>
+              <button className="locale-row">한국어 (ko) <i /></button>
+            </div>
+          </aside>
+
+          {/* Column 3: Centered iPhone 15 Pro Canvas */}
+          <div className="canvas-area">
+            {/* Authentic iPhone Frame */}
+            <div className="iphone-frame-wrapper">
+              <div className={`iphone-inner-screen ${isModalMode ? "modal-view-mode" : isBottomSheetMode ? "bottom-sheet-mode" : ""}`}>
+                {/* Simulated App Background (When in Modal Mode only) */}
+                {isModalMode && (
+                  <div className="iphone-app-backdrop">
+                    <div className="iphone-app-backdrop-header">
+                      <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                        <ChevronLeft size={16} />
+                        <span>HelloTalk 会员</span>
+                      </div>
+                      <MoreVertical size={15} />
+                    </div>
+                    <div className="iphone-app-backdrop-feed">
+                      <div className="backdrop-feed-item">
+                        <div className="backdrop-avatar" />
+                        <div className="backdrop-lines">
+                          <div className="backdrop-line" />
+                          <div className="backdrop-line short" />
+                        </div>
+                      </div>
+                      <div className="backdrop-feed-item">
+                        <div className="backdrop-avatar" />
+                        <div className="backdrop-lines">
+                          <div className="backdrop-line" />
+                          <div className="backdrop-line short" />
+                        </div>
+                      </div>
+                      <div className="backdrop-feed-item">
+                        <div className="backdrop-avatar" />
+                        <div className="backdrop-lines">
+                          <div className="backdrop-line" />
+                          <div className="backdrop-line short" />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="iphone-modal-dim-overlay" />
+                  </div>
+                )}
+
+                {/* iPhone Status Bar */}
+                <div className={`iphone-notch-bar ${isOnboardingPage ? "onboarding-theme" : isModalMode || isBottomSheetMode || ((currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare") && activeCompareTab === 1) ? "dark-theme" : ""}`}>
+                  <span>9:41</span>
+                  <div className="iphone-dynamic-island" />
+                  <div style={{ display: "flex", gap: 4, alignItems: "center", fontSize: 10 }}>
+                    <span>5G</span>
+                    <span>100%</span>
+                  </div>
+                </div>
+
+                {/* Main Content Area: Bottom Sheet vs Modal Dialog vs Fullscreen Scroll */}
+                {isBottomSheetMode ? (
+                  <div className="iphone-bottom-sheet-screen">
+                    {currentTemplate?.id === "ht-vip-pop" ? (
+                      <div className="ht-pop-app-backdrop" style={{ height: "28%", minHeight: 165, position: "relative", background: "#f8fafc", overflow: "hidden" }}>
+                        {/* HelloTalk In-App Top Navbar & Content matching Figure 2 */}
+                        <div style={{ padding: "8px 14px 4px", display: "flex", flexDirection: "column", gap: 8 }}>
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                            <ChevronLeft size={20} color="#1e293b" style={{ cursor: "pointer" }} />
+                            <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                              <span style={{ fontSize: 13, fontWeight: 800, color: "#1e293b" }}>HelloTalk VIP</span>
+                              <span style={{ fontSize: 9, fontWeight: 900, background: "#10b981", color: "#fff", padding: "1px 4px", borderRadius: 3 }}>HT</span>
+                            </div>
+                            <Settings size={18} color="#1e293b" style={{ cursor: "pointer" }} />
+                          </div>
+                          <button
+                            type="button"
+                            style={{
+                              background: "#4F46E5",
+                              color: "#fff",
+                              border: "none",
+                              borderRadius: 16,
+                              padding: "6px 14px",
+                              fontSize: 12,
+                              fontWeight: 700,
+                              alignSelf: "center",
+                              width: "75%",
+                              cursor: "pointer",
+                            }}
+                          >
+                            Discover now
+                          </button>
+                          <div style={{ textAlign: "center", fontSize: 10, color: "#64748b" }}>昨天 21:40</div>
+                          <div style={{ background: "#e2e8f0", borderRadius: 10, padding: "8px 12px" }}>
+                            <div style={{ fontSize: 11.5, fontWeight: 800, color: "#1e293b" }}>VIP Day: 20% OFF Now</div>
+                            <div style={{ fontSize: 9.5, color: "#64748b" }}>Exclusive Badge</div>
+                          </div>
+                        </div>
+                        {/* Dark Mask Overlay */}
+                        <div style={{ position: "absolute", inset: 0, background: "rgba(0, 0, 0, 0.45)", pointerEvents: "none" }} />
+                      </div>
+                    ) : (
+                      /* Top 38% Hero Area: 背景图 */
+                      (() => {
+                        const heroNode = currentEffectiveNodes.find((n) => n.id === "t2-hero" || n.type === "Hero Image");
+                        const bgMode = heroNode?.config?.bgMode || "illustration";
+                        const sloganText = heroNode?.config?.sloganText || heroNode?.content || "寻找身边母语者";
+                        const bubbleBg = heroNode?.config?.bubbleBg || "#2563eb";
+                        const themeColor = heroNode?.config?.themeColor || "orange";
+                        const showClose = heroNode?.config?.showCloseBtn !== false;
+                        const customImageUrl = heroNode?.config?.imageUrl;
+                        const customGradient = heroNode?.config?.gradientBg || "linear-gradient(180deg, #ea580c 0%, #f97316 100%)";
+
+                        const themeGradients = {
+                          orange: "linear-gradient(180deg, #ea580c 0%, #f97316 100%)",
+                          gold: "linear-gradient(180deg, #1e1b4b 0%, #312e81 100%)",
+                          blue: "linear-gradient(180deg, #1e3a8a 0%, #3b82f6 100%)",
+                          purple: "linear-gradient(180deg, #831843 0%, #ec4899 100%)",
+                        };
+                        const computedBg = bgMode === "image" && customImageUrl
+                          ? `url("${customImageUrl}") center/cover no-repeat`
+                          : bgMode === "gradient"
+                          ? customGradient
+                          : (themeGradients[themeColor] || themeGradients.orange);
+
+                        return (
+                          <div
+                            className={`entry-sheet-hero-area ${activeNode === (heroNode?.id || "t2-hero") ? "selected" : ""}`}
+                            style={{ background: computedBg }}
+                            onClick={() => {
+                              setActiveNode(heroNode?.id || "t2-hero");
+                              setBuilderTab("tree");
+                            }}
+                          >
+                            {showClose && (
+                              <button
+                                type="button"
+                                className="iphone-modal-close-icon-btn"
+                                style={{ top: 8, right: 8, background: "rgba(0,0,0,0.3)", color: "#fff", border: "1px solid rgba(255,255,255,0.4)" }}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  notify("已触发关闭动作 (Dismiss Page)");
+                                }}
+                                title="关闭页面"
+                              >
+                                <X size={14} />
+                              </button>
+                            )}
+
+                            {isOnboardingPage ? (
+                              <div style={{ textAlign: "center", color: "#fff", padding: "30px 16px 12px", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", height: "100%" }}>
+                                <div style={{ fontSize: 36, marginBottom: 4 }}>👋 🌍</div>
+                                <div style={{ fontSize: 13, fontWeight: 800, textShadow: "0 1px 3px rgba(0,0,0,0.5)" }}>注册新客专属体验礼包</div>
+                                <div style={{ fontSize: 10, opacity: 0.9, marginTop: 4 }}>与全球 5000 万母语者即刻开启交流</div>
+                              </div>
+                            ) : bgMode === "image" && customImageUrl ? null : (
+                              <div className="nearby-globe-illustration">
+                                <div className="nearby-speech-bubble" style={{ background: bubbleBg }}>
+                                  {sloganText}
+                                </div>
+                                <div className="nearby-globe-circle-wrap">
+                                  <div className="nearby-earth-globe">
+                                    <div className="earth-continent earth-continent-1" />
+                                    <div className="earth-continent earth-continent-2" />
+                                    <div className="earth-continent earth-continent-3" />
+                                  </div>
+                                  <div className="nearby-avatar-node top-left">
+                                    <div className="nearby-avatar-circle">👩🏻</div>
+                                    <span className="nearby-name-label">Sarah (US) 🇺🇸</span>
+                                  </div>
+                                  <div className="nearby-avatar-node top-right">
+                                    <div className="nearby-avatar-circle">👱🏻‍♂️</div>
+                                    <span className="nearby-name-label">Kenji (JP) 🇯🇵</span>
+                                  </div>
+                                  <div className="nearby-avatar-node bottom-left">
+                                    <div className="nearby-avatar-circle">🧑🏽</div>
+                                    <span className="nearby-name-label">Maria (ES) 🇪🇸</span>
+                                  </div>
+                                  <div className="nearby-avatar-node bottom-right">
+                                    <div className="nearby-avatar-circle">👦🏻</div>
+                                    <span className="nearby-name-label">Li (CN) 🇨🇳</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })()
+                    )}
+
+                    {/* Bottom Sheet Dialog docked at bottom */}
+                    <div className="entry-bottom-sheet-dialog" style={currentTemplate?.id === "ht-vip-pop" ? { position: "relative", borderRadius: "22px 22px 0 0" } : {}}>
+                      {currentTemplate?.id !== "ht-vip-pop" && <div className="entry-sheet-handle-bar" />}
+                      <div className="entry-sheet-content-scroll" style={currentTemplate?.id === "ht-vip-pop" ? { padding: "14px 14px 16px", position: "relative" } : {}}>
+                        {currentEffectiveNodes
+                          .filter((node) => {
+                            if (node.enabled === false) return false;
+                            if (currentTemplate?.id === "ht-vip-pop") return true;
+                            return node.id !== "t2-hero" && node.type !== "Hero Image";
+                          })
+                          .map((node) => (
+                            <PreviewElement
+                              key={node.id}
+                              node={node}
+                              active={node.id === activeNode}
+                              onSelect={(id) => {
+                                setActiveNode(id);
+                                setBuilderTab("tree");
+                              }}
+                              updateNode={updateEffectiveNode}
+                              themeConfig={hasSubTemplates ? effectiveTheme : null}
+                              currentTemplate={currentTemplate}
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : isModalMode ? (
+                  <div className="iphone-modal-container">
+                    <div
+                      className="iphone-modal-dialog"
+                      style={
+                        currentTemplate?.id === "ht-content-paywall"
+                          ? {
+                              background: effectiveTheme.bgGradient || "linear-gradient(180deg, #EBE4FA 0%, #F5F0FF 25%, #FFFFFF 65%)",
+                              padding: "10px 14px 14px",
+                            }
+                          : {}
+                      }
+                    >
+                      {currentTemplate?.id !== "ht-content-paywall" && (
+                        <button
+                          type="button"
+                          className="iphone-modal-close-icon-btn"
+                          title="关闭弹窗 (Dismiss)"
+                          onClick={() => notify("已触发弹窗关闭动作 (Dismiss Dialog)")}
+                        >
+                          <X size={14} />
+                        </button>
+                      )}
+
+                      <div className="iphone-modal-scroll-body">
+                        {currentEffectiveNodes
+                          .filter((node) => node.enabled !== false)
+                          .map((node) => (
+                            <PreviewElement
+                              key={node.id}
+                              node={node}
+                              active={node.id === activeNode}
+                              onSelect={(id) => {
+                                setActiveNode(id);
+                                setBuilderTab("tree");
+                              }}
+                              updateNode={updateEffectiveNode}
+                              themeConfig={hasSubTemplates ? effectiveTheme : null}
+                              currentTemplate={currentTemplate}
+                            />
+                          ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    className="iphone-scroll-content"
+                    style={
+                      isOnboardingPage
+                        ? { background: "#ffffff", padding: "0 0 20px" }
+                        : hasSubTemplates
+                        ? {
+                            background: effectiveTheme.bgImage
+                              ? `url(${effectiveTheme.bgImage}) center / cover no-repeat`
+                              : effectiveTheme.bgGradient
+                              ? effectiveTheme.bgGradient
+                              : activeSubTemplateId === "tpl-2"
+                              ? "linear-gradient(180deg, #FFF7ED 0%, #FFEDD5 28%, #FFFFFF 60%)"
+                              : "linear-gradient(180deg, #FFF1F2 0%, #FFE4E6 24%, #FFFFFF 52%)",
+                          }
+                        : (currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare")
+                        ? {
+                            background: activeCompareTab === 1
+                              ? "linear-gradient(180deg, #1C0F38 0%, #29154E 20%, #150C28 60%, #0C0616 100%)"
+                              : "linear-gradient(180deg, #FBF6EE 0%, #FFFDF9 28%, #FFFFFF 65%)",
+                            color: activeCompareTab === 1 ? "#FFFFFF" : "#111827",
+                            padding: "6px 12px 16px",
+                          }
+                        : {}
+                    }
+                  >
+                    {currentEffectiveNodes
+                      .filter((node) => node.enabled !== false)
+                      .map((node) => (
+                        <PreviewElement
+                          key={node.id}
+                          node={node}
+                          active={node.id === activeNode}
+                          onSelect={(id) => {
+                            setActiveNode(id);
+                            setBuilderTab("tree");
+                          }}
+                          updateNode={updateEffectiveNode}
+                          themeConfig={hasSubTemplates ? effectiveTheme : null}
+                          currentTemplate={currentTemplate}
+                          onTriggerRetainModal={() => setShowRetainModal(true)}
+                          selectedOnboardingTier={selectedOnboardingTier}
+                          onSelectOnboardingTier={(t) => setSelectedOnboardingTier(t)}
+                          isOnboardingPage={isOnboardingPage}
+                          onboardingCarouselSlide={onboardingCarouselSlide}
+                          setOnboardingCarouselSlide={setOnboardingCarouselSlide}
+                          activeCompareTab={activeCompareTab}
+                          setActiveCompareTab={setActiveCompareTab}
+                        />
+                      ))}
+                  </div>
+                )}
+
+                {/* HelloTalk 挽留弹窗交互浮层 (Exit Retain Modal) */}
+                {showRetainModal && (
+                  <div className="ht-retain-modal-overlay" onClick={() => setShowRetainModal(false)}>
+                    <div className="ht-retain-modal-card" onClick={(e) => e.stopPropagation()}>
+                      <div className="ht-retain-modal-badge">
+                        <span>🎁 限时新客特权挽留</span>
+                      </div>
+                      <h3 className="ht-retain-modal-title">
+                        {effectiveTheme?.retainModal?.title || "确定要放弃 3 天免费试用吗？"}
+                      </h3>
+                      <p className="ht-retain-modal-subtitle">
+                        {effectiveTheme?.retainModal?.subtitle || "现在开通免费试用，首年可享限时折上折，随时可取消且不扣费！"}
+                      </p>
+                      <div className="ht-retain-modal-actions">
+                        <button
+                          type="button"
+                          className="ht-retain-btn-primary"
+                          onClick={() => {
+                            setShowRetainModal(false);
+                            notify("已取消放弃，继续体验 3 天 VIP 免费试用！");
+                          }}
+                        >
+                          {effectiveTheme?.retainModal?.primaryBtn || "不，我不放弃"}
+                        </button>
+                        <button
+                          type="button"
+                          className="ht-retain-btn-cancel"
+                          onClick={() => {
+                            setShowRetainModal(false);
+                            notify("已退出免费试用页面");
+                          }}
+                        >
+                          {effectiveTheme?.retainModal?.cancelBtn || "是，暂时不用"}
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* iPhone Home Indicator */}
+                <div className={`iphone-home-indicator ${isModalMode || isBottomSheetMode || ((currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare") && activeCompareTab === 1) ? "dark-theme" : ""}`}>
+                  <span style={(currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare") && activeCompareTab === 1 ? { background: "#ffffff" } : {}} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Column 4: Property Inspector */}
+          <aside className="property-panel">
+            {builderTab === "settings" ? (
+              <LayoutSettings
+                markUnknown={markUnknown}
+                boundary={builderBoundary}
+                setModal={setModal}
+                appliedTemplate={appliedTemplate}
+                isOnboardingPage={isOnboardingPage}
+                activeSubTemplate={activeSubTemplate}
+                updateSubTemplateTheme={updateSubTemplateTheme}
+                onTriggerRetainModal={() => setShowRetainModal(true)}
+                onSwitchSubTemplate={(id) => {
+                  setActiveSubTemplateByPage((prev) => ({ ...prev, [currentTemplate.id]: id }));
+                  setActiveNode(null);
+                }}
+                activeCompareTab={activeCompareTab}
+                setActiveCompareTab={setActiveCompareTab}
+              />
+            ) : (
+              <BuilderProperties
+                active={active}
+                setBuilderTab={setBuilderTab}
+                markUnknown={markUnknown}
+                boundary={builderBoundary}
+                templateLinks={templateLinks}
+                setTemplateLinks={setTemplateLinks}
+                updateNode={updateEffectiveNode}
+                removeNode={removeEffectiveNode}
+                addNestedNode={addNestedElement}
+                notify={notify}
+                isOnboardingPage={isOnboardingPage}
+                activeSubTemplate={activeSubTemplate}
+                updateSubTemplateTheme={updateSubTemplateTheme}
+                onTriggerRetainModal={() => setShowRetainModal(true)}
+                onSwitchSubTemplate={(id) => {
+                  setActiveSubTemplateByPage((prev) => ({ ...prev, [currentTemplate.id]: id }));
+                  setActiveNode(null);
+                }}
+              />
+            )}
+          </aside>
+        </div>
+
+        {/* Builder Footer */}
+        <div className="builder-footer">
+          <button className="secondary" onClick={() => notify("已放弃未保存的本地修改。")}>放弃更改</button>
+          <button className="primary" onClick={() => setModal({ kind: "builder-save" })}>保存配置</button>
+        </div>
       </section>
     );
   }
 
+  // General View
   return (
     <section>
-      <WorkspaceHeader selected={selected} setView={setView} duplicate={duplicate} setModal={setModal} markUnknown={markUnknown} />
-      <div className="detail-tabs"><button className="active">General</button><button onClick={() => setView("builder")}>Builder & Generator</button></div>
-      <div className="detail-layout">
-        <div className="form-card detail-form"><h2>General</h2><Field label="Paywall name"><input defaultValue={selected.name} /></Field><Field label="Products">{observedProductRows.slice(0, selected.products).map((row, index) => <ProductRow key={row.product} product={`${row.product} / ${row.period}`} offer={row.offer} index={index} markUnknown={markUnknown} readOnly />)}{transientProducts.map((row) => <ProductRow key={row.product} product={`${row.product} / ${row.period}`} offer={row.offer} markUnknown={markUnknown} readOnly />)}{selected.state === "Draft" && <div className="product-add-wrap"><button className="secondary" onClick={() => setProductPickerOpen((open) => !open)}><Plus size={16} /> Add product</button>{productPickerOpen && <div className="product-add-menu"><button onClick={() => { setTransientProducts((items) => [...items, { product: "月度会员", period: "Monthly", offer: "springsale" }]); setProductPickerOpen(false); }}>月度会员</button><button onClick={() => { setTransientProducts((items) => [...items, { product: "Japanese ai", period: "3 months", offer: "No offers for this product" }]); setProductPickerOpen(false); }}>Japanese ai</button></div>}</div>}{selected.state === "Live" && <><button className="secondary" disabled><Plus size={16} /> Add product</button><p className="locked">Products are locked after the first transaction. Duplicate to change products.</p></>}</Field><Field label="Paywall screenshot"><button className="upload unknown-action" onClick={() => markUnknown({ id: "U-01", feature: "Screenshot upload", known: "PNG / WEBP / JPG, maximum 10 MB and recommended 320x568 were observed.", unknown: "This reconstruction intentionally does not simulate file validation or the exact backend upload response." })}><Upload size={18} /> Upload screenshot</button></Field></div>
-        <aside className="detail-aside"><div><span className="eyebrow">State</span><StateBadge state={selected.state} /></div><div><span className="eyebrow">Products</span><strong>{selected.products}</strong></div><div><span className="eyebrow">Started at</span><strong>{selected.startedAt}</strong></div><button className="secondary full" onClick={() => setView("builder")}><Blocks size={16} /> Open Builder</button></aside>
+      <WorkspaceHeader selected={selected} setView={setView} duplicate={duplicate} setModal={setModal} markUnknown={markUnknown} notify={notify} />
+      <div className="detail-tabs">
+        <button className="active">基础设置</button>
+        <button onClick={() => setView("builder")}>构建器</button>
       </div>
-      <div className="builder-footer"><button className="secondary unknown-action" onClick={() => markUnknown(missingItems.find((item) => item.id === "M-01"))}>Discard</button>{selected.state === "Live" ? <button className="primary" onClick={() => setModal({ kind: "builder-save" })}>Save & publish</button> : <button className={transientProducts.length ? "primary unknown-action" : "primary"} onClick={() => transientProducts.length ? markUnknown({ id: "P-01", feature: "Draft product Save persistence", known: "当前页新增产品后可立即出现 Japanese ai / 3 months / No offers for this product。点击 Save 后仍为 Draft；本次账户试验重载后该新增项没有保留。", unknown: "保存未保留的服务端原因及可复现条件未实测。" }) : notify("Draft remains Draft; no publishing confirmation was observed.")}>Save</button>}</div>
+      <div className="detail-layout">
+        <div className="form-card detail-form">
+          <h2>基础信息</h2>
+          <Field label="付费墙名称"><input defaultValue={selected.name} /></Field>
+          <Field label="触发业务场景"><input defaultValue={selected.scene || "常规商业化"} /></Field>
+          <Field label="关联套餐产品">
+            {observedProductRows.slice(0, selected.products).map((row, index) => (
+              <ProductRow key={row.product} product={`${row.product} / ${row.period}`} offer={row.offer} index={index} markUnknown={markUnknown} readOnly />
+            ))}
+            <div className="product-add-wrap">
+              <button className="secondary" onClick={() => setProductPickerOpen((open) => !open)}>
+                <Plus size={16} /> 添加产品
+              </button>
+              {productPickerOpen && (
+                <div className="product-add-menu">
+                  <button onClick={() => { setTransientProducts((items) => [...items, { product: "HelloTalk VIP 季度卡", period: "3 months", offer: "限时特惠" }]); setProductPickerOpen(false); }}>
+                    HelloTalk VIP 季度卡
+                  </button>
+                </div>
+              )}
+            </div>
+          </Field>
+          <Field label="付费墙截图">
+            <button className="upload unknown-action" onClick={() => markUnknown({ id: "U-01", feature: "Screenshot upload", known: "PNG / JPG 10MB", unknown: "本地暂不模拟存储桶上传。" })}>
+              <Upload size={18} /> 点击上传预览图 <small>PNG、JPG 最大 10 MB</small>
+            </button>
+          </Field>
+        </div>
+        <aside className="detail-aside">
+          <div><span className="eyebrow">状态</span><StateBadge state={selected.state} /></div>
+          <div><span className="eyebrow">产品套餐数</span><strong>{selected.products} 个</strong></div>
+          <div><span className="eyebrow">创建时间</span><strong>{selected.startedAt}</strong></div>
+          <button className="primary full" onClick={() => setView("builder")}><Blocks size={16} /> 打开无代码构建器</button>
+        </aside>
+      </div>
+      <div className="builder-footer">
+        <button className="secondary" onClick={() => setView("list")}>返回列表</button>
+        <button className="primary" onClick={() => notify("基础信息已保存。")}>保存基础设置</button>
+      </div>
     </section>
   );
 }
 
-function BuilderProperties({ active, setBuilderTab, markUnknown, boundary, templateLinks, setTemplateLinks, updateNode, removeNode, addNestedNode }) {
-  const [tab, setTab] = useState("content");
-  const type = active?.type ?? "Elements";
-  const componentBoundary = {
-    ...boundary,
-    feature: `${type} detailed behavior`,
-    known: `The visible ${type} inspector fields are reconstructed from the observed Builder panel.`,
-    unknown: "Live preview propagation, validation, persistence, and any field not captured verbatim remain unverified.",
-  };
+function TimerPreview({ node, themeConfig, isDarkTheme = false }) {
+  const hours = Number(themeConfig?.countdownHours || node.config?.hours || 24);
+  const [secondsRemaining, setSecondsRemaining] = useState(() => Math.max(60, hours * 3600 - 35));
 
-  const tabBar = <div className="property-tabs"><button className={tab === "content" ? "active" : ""} onClick={() => setTab("content")}>Content</button><button className={tab === "style" ? "active" : ""} onClick={() => setTab("style")}>Style</button><button className={tab === "layout" ? "active" : ""} onClick={() => setTab("layout")}>Layout</button></div>;
-  const nodeEditor = <EditableNodeControls active={active} updateNode={updateNode} removeNode={removeNode} />;
+  useEffect(() => {
+    setSecondsRemaining(Math.max(60, hours * 3600 - 35));
+  }, [hours]);
 
-  if (type === "Links") {
-    return <div className="property-scroll"><h3>Links</h3>{nodeEditor}{tabBar}{tab === "content" ? <><LinkOption title="Terms of service" checked fields={[["Link text", "Terms"], ["Link URL", templateLinks.terms, (value) => setTemplateLinks((current) => ({ ...current, terms: value }))]]} /><LinkOption title="Privacy policy" checked fields={[["Link text", "Privacy"], ["Link URL", templateLinks.privacy, (value) => setTemplateLinks((current) => ({ ...current, privacy: value }))]]} /><LinkOption title="Restore button" checked fields={[["Button text", "Restore"], ["Action ID", "Restore"]]} /><LinkOption title="Login button" fields={[]} /></> : <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}</div>;
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setSecondsRemaining((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const h = String(Math.floor(secondsRemaining / 3600)).padStart(2, "0");
+  const m = String(Math.floor((secondsRemaining % 3600) / 60)).padStart(2, "0");
+  const s = String(secondsRemaining % 60).padStart(2, "0");
+
+  const isDark = isDarkTheme || themeConfig?.isDark;
+  const otherColor = themeConfig?.otherColor || (themeConfig?.subTemplate === "tpl-2" ? "#F59E0B" : (isDark ? "#F59E0B" : "#DE6876"));
+  const btnTextColor = themeConfig?.btnTextColor || "#FFFFFF";
+  const mainFontColor = isDark ? "#FFFFFF" : (themeConfig?.mainFontColor || "#2D1832");
+  const isTpl2 = themeConfig?.subTemplate === "tpl-2";
+  const rawLabel = node.config?.timerLabel || node.config?.label || node.content || (isTpl2 ? "礼包倒计时" : "优惠截止时间");
+  const label = rawLabel.replace(/[：:]/g, "").trim();
+
+  // 1. 极简纯文本 (原版) - clean-text
+  if (node.config?.variant === "clean-text" || (themeConfig?.subTemplate === "tpl-1" && !node.config?.variant) || node.id === "t1-timer") {
+    return (
+      <div style={{ textAlign: "center", padding: "8px 0 6px" }}>
+        <span style={{ fontSize: 15, fontWeight: 700, color: mainFontColor, letterSpacing: "0.02em" }}>
+          {label} {h}:{m}:{s}
+        </span>
+      </div>
+    );
   }
 
-  if (active?.id === "hero-image") {
-    return <div className="property-scroll"><h3>Hero Image</h3>{nodeEditor}{tabBar}{tab === "content" && <HeroMediaContent active={active} updateNode={updateNode} />}{tab === "style" && <HeroMediaStyle />}{tab === "layout" && <HeroMediaLayout />}</div>;
+  // 2. 胶囊提示条 - badge-pill
+  if (node.config?.variant === "badge-pill" || (themeConfig && node.config?.variant !== "card" && node.config?.variant !== "digit-cards")) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 6,
+          background: isDark ? "rgba(255, 255, 255, 0.12)" : (isTpl2 ? "rgba(254, 243, 199, 0.9)" : "rgba(255, 241, 242, 0.9)"),
+          border: `1px dashed ${otherColor}80`,
+          borderRadius: 10,
+          padding: "7px 12px",
+          margin: "4px 0 10px",
+        }}
+      >
+        <Clock size={13} color={otherColor} />
+        <span style={{ fontSize: 11, fontWeight: 700, color: mainFontColor }}>{label}：</span>
+        <div style={{ display: "flex", alignItems: "center", gap: 3 }}>
+          <span style={{ background: otherColor, color: btnTextColor, fontSize: 11, fontWeight: 800, padding: "1px 5px", borderRadius: 4, fontFamily: "monospace" }}>{h}</span>
+          <span style={{ color: otherColor, fontWeight: 800, fontSize: 11 }}>:</span>
+          <span style={{ background: otherColor, color: btnTextColor, fontSize: 11, fontWeight: 800, padding: "1px 5px", borderRadius: 4, fontFamily: "monospace" }}>{m}</span>
+          <span style={{ color: otherColor, fontWeight: 800, fontSize: 11 }}>:</span>
+          <span style={{ background: otherColor, color: btnTextColor, fontSize: 11, fontWeight: 800, padding: "1px 5px", borderRadius: 4, fontFamily: "monospace" }}>{s}</span>
+        </div>
+      </div>
+    );
   }
 
-  if (type === "List item" || type === "Today" || /^Item \d+$/.test(type) || /^Day \d+$/.test(type)) {
-    return <div className="property-scroll"><h3>List item</h3>{nodeEditor}{tabBar}{tab === "content" && <ListItemContent active={active} updateNode={updateNode} />}{tab === "style" && <ListItemStyle />}{tab === "layout" && <ListItemLayout />}</div>;
-  }
-
-  if (["Text", "Header", "Headline", "Subhead", "Caption", "Legal", "Top Text"].includes(type) || /^(HEADER|Header|Caption|Title|Repeats|Subheader) \d+$/.test(type)) {
-    return <div className="property-scroll"><h3>Text</h3>{nodeEditor}{tabBar}{tab === "content" && <TextContent active={active} updateNode={updateNode} />}{tab === "style" && <TextStyle />}{tab === "layout" && <TextLayout />}</div>;
-  }
-
-  if (["Image", "Black Friday Image"].includes(type) || /^Image \d+$/.test(type)) {
-    return <div className="property-scroll"><h3>Image</h3>{nodeEditor}{tabBar}{tab === "content" && <ImageContent active={active} updateNode={updateNode} />}{tab === "style" && <ImageStyle />}{tab === "layout" && <ImageLayout />}</div>;
-  }
-
-  if (["Button", "Purchase Button"].includes(type)) {
-    return <div className="property-scroll"><h3>Button</h3>{nodeEditor}{tabBar}{tab === "content" && <ButtonContent type={type} active={active} updateNode={updateNode} />}{tab === "style" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}{tab === "layout" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}</div>;
-  }
-
-  if (type === "Web Paywall Button") {
-    return <div className="property-scroll"><h3>Web Paywall Button</h3>{nodeEditor}{tabBar}{tab === "content" && <WebButtonContent active={active} updateNode={updateNode} />}{tab === "style" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}{tab === "layout" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}</div>;
-  }
-
-  if (type === "List" || /^List \d+$/.test(type) || ["Feature list", "Features"].includes(type)) {
-    return <div className="property-scroll"><h3>List</h3>{nodeEditor}{tabBar}{tab === "content" && <ListContent active={active} addNestedNode={addNestedNode} />}{tab === "style" && <ListStyle />}{tab === "layout" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}</div>;
-  }
-
-  if (type === "Carousel") {
-    return <div className="property-scroll"><h3>Carousel</h3>{nodeEditor}{tabBar}{tab === "content" && <CarouselContent active={active} addNestedNode={addNestedNode} />}{tab === "style" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}{tab === "layout" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}</div>;
-  }
-
-  if (type === "Card") {
-    return <div className="property-scroll"><h3>Card</h3>{nodeEditor}{tabBar}{tab === "content" && <CardContent active={active} addNestedNode={addNestedNode} />}{tab === "style" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} message="Card has a Style tab, but its exact field labels were not retained in the inspection notes." />}{tab === "layout" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} message="Card has a Layout tab, but its exact field labels were not retained in the inspection notes." />}</div>;
-  }
-
-  if (type === "Timer") {
-    return <div className="property-scroll"><h3>Timer</h3>{nodeEditor}{tabBar}{tab === "content" && <TimerContent active={active} updateNode={updateNode} />}{tab === "style" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}{tab === "layout" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}</div>;
-  }
-
-  if (type === "Products") {
-    return <div className="property-scroll"><h3>Products</h3>{nodeEditor}{tabBar}{tab === "content" && <ProductsContent active={active} boundary={componentBoundary} markUnknown={markUnknown} />}{tab === "style" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}{tab === "layout" && <InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} />}</div>;
-  }
-
-  if (type === "Toggle") {
-    return <div className="property-scroll"><h3>Toggle</h3><ToggleContent node={active} updateNode={updateNode} boundary={componentBoundary} markUnknown={markUnknown} /></div>;
-  }
-
-  if (["Toggle On", "Toggle Off"].includes(type)) {
-    return <div className="property-scroll"><h3>{type}</h3><p className="property-copy">This is a source-observed toggle state layer.</p><InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} message="The state layer exists in the source tree. Its detailed fields have not been opened, so this demo does not invent them." /></div>;
-  }
-
-  if (type === "Source reference") {
-    return <div className="property-scroll"><h3>Source reference</h3><p className="property-copy">This template has a captured source visual, but its exact Builder layer tree has not been verified. Editing is intentionally unavailable until the source structure is collected.</p><InspectorBoundary boundary={boundary} markUnknown={markUnknown} message="The matching source visual is shown in the device preview. No generic editable nodes are substituted for this template." /></div>;
-  }
-
-  return <div className="property-scroll"><h3>{type}</h3>{nodeEditor}{tabBar}<InspectorBoundary boundary={componentBoundary} markUnknown={markUnknown} message="This source-observed template layer can be edited as content and a layer label. Its dedicated inspector fields were not captured, so the demo does not substitute a generic configuration panel." /></div>;
-}
-
-function EditableNodeControls({ active, updateNode, removeNode }) {
-  if (!active) return null;
-  return <section className="node-editor"><Field label="Element content"><textarea value={active.content ?? ""} onChange={(event) => updateNode(active.id, { content: event.target.value })} /></Field><Field label="Layer label"><input value={active.label ?? ""} onChange={(event) => updateNode(active.id, { label: event.target.value })} /></Field><button className="danger" onClick={() => removeNode(active.id)}>Delete element</button></section>;
-}
-
-function InspectorBoundary({ boundary, markUnknown, message = "The visible entry is retained, but the next detailed behavior has not been verified." }) {
-  return <div className="unknown-rule"><CircleHelp size={17} /><span>{message}<button className="text-action unknown-action" onClick={() => markUnknown(boundary)}>View evidence</button></span></div>;
-}
-
-function HeroMediaContent({ active, updateNode }) {
-  const kind = active.config?.mediaType ?? "Image";
-  const updateConfig = (patch) => updateNode(active.id, { config: { ...active.config, ...patch } });
-  return <><Field label="Media"><div className="segmented"><button className={kind === "Image" ? "active" : ""} onClick={() => updateConfig({ mediaType: "Image" })}>Image</button><button className={kind === "Video" ? "active" : ""} onClick={() => updateConfig({ mediaType: "Video" })}>Video</button></div></Field><Field label={`${kind} file`}><button className="upload"><Upload size={18} /> Click here or drag the file to this area to upload<small>PNG, JPG, max size 10MB.</small></button></Field><Field label="Custom media ID"><input value={active.config?.customMediaId ?? ""} placeholder="Enter custom media ID" onChange={(event) => updateConfig({ customMediaId: event.target.value })} /></Field></>;
-}
-
-function TextContent({ active, updateNode }) {
-  return <><Field label="Text Required"><textarea value={active.content ?? ""} onChange={(event) => updateNode(active.id, { content: event.target.value })} /></Field><Field label="Max lines"><ConfigInput active={active} updateNode={updateNode} name="maxLines" fallback="2" /></Field><Field label="Overflow"><div className="select-like">Scale text <ChevronDown size={14} /></div></Field></>;
-}
-
-function ImageContent({ active, updateNode }) {
-  const useCustomMediaId = Boolean(active.config?.useCustomMediaId);
-  const updateConfig = (patch) => updateNode(active.id, { config: { ...active.config, ...patch } });
-  return <><Field label="Image file"><button className="upload"><Upload size={18} /> Click here or drag the file to this area to upload<small>PNG, JPG, max size 10MB.</small></button></Field><label className="switch-row"><input type="checkbox" checked={useCustomMediaId} onChange={(event) => updateConfig({ useCustomMediaId: event.target.checked })} /><span>{useCustomMediaId ? "On" : "Off"}</span><strong>Use custom media ID</strong></label>{useCustomMediaId && <Field label="Custom media ID"><input value={active.config?.customMediaId ?? ""} placeholder="Enter custom media ID" onChange={(event) => updateConfig({ customMediaId: event.target.value })} /></Field>}</>;
-}
-
-function ImageStyle() {
-  return <Field label="Aspect"><div className="select-like">Fill <ChevronDown size={14} /></div></Field>;
-}
-
-function HeroMediaStyle() {
-  const [mode, setMode] = useState("Overlay");
-  return <><Field label="Display"><div className="segmented">{["Overlay", "Transparent", "Flat"].map((item) => <button className={mode === item ? "active" : ""} onClick={() => setMode(item)} key={item}>{item}</button>)}</div></Field><Field label="Tint"><ColorOpacity color="#212121" opacity="0" /></Field></>;
-}
-
-function HeroMediaLayout() {
-  return <><Field label="Image height"><input placeholder="Not captured" /></Field><label className="switch-row"><input type="checkbox" /><span>Not captured</span><strong>Rounded rectangle</strong></label><Field label="Corner radius"><input placeholder="Not captured" /></Field><Field label="Padding"><PaddingInputs /></Field><Field label="Vertical offset"><input defaultValue="0" /></Field><div className="unknown-rule"><CircleHelp size={17} /><span>Hero Image 的这些字段入口已见，但本轮没有保留它们的源端默认值。</span></div></>;
-}
-
-function ImageLayout() {
-  return <Field label="Image height"><input defaultValue="100" /></Field>;
-}
-
-function CardContent({ active, addNestedNode }) {
-  const [open, setOpen] = useState(false);
-  const allowed = ["List", "Button", "Image", "Text", "Timer"];
-  return <><h4>Card items</h4><div className="nested-add-wrap"><button className="text-action" onClick={() => setOpen((value) => !value)}><Plus size={15} /> Add element</button>{open && <div className="nested-add-menu">{allowed.map((type) => <button key={type} onClick={() => { addNestedNode(active.id, type); setOpen(false); }}>{type}</button>)}</div>}</div></>;
-}
-
-function TimerContent({ active, updateNode }) {
-  return <><h4>Time format</h4><div className="split-fields"><Field label="Format"><div className="select-like">hh:mm:ss <ChevronDown size={14} /></div></Field><Field label="Time separator"><div className="select-like">Colon <ChevronDown size={14} /></div></Field></div><h4>Timer text</h4><Field label="Start value"><input value={active.content ?? "04:59:59"} onChange={(event) => updateNode(active.id, { content: event.target.value })} /></Field><div className="split-fields"><Field label="Text before"><ConfigInput active={active} updateNode={updateNode} name="textBefore" fallback="" placeholder="Enter text here" /></Field><Field label="Text after"><ConfigInput active={active} updateNode={updateNode} name="textAfter" fallback="" placeholder="Enter text here" /></Field></div><h4>Timer mode</h4><Field label=""><div className="select-like">Reset timer on every paywall view <ChevronDown size={14} /></div></Field></>;
-}
-
-function ToggleContent({ node, updateNode, boundary, markUnknown }) {
-  const [title = "", secondary = ""] = (node.content ?? "").split("|");
-  const defaultState = node.defaultState ?? "Off";
-  const updateCopy = (nextTitle, nextSecondary) => updateNode(node.id, { content: `${nextTitle}|${nextSecondary}` });
-  return <>
-    <Field label="Default toggle state"><div className="segmented"><button className={defaultState === "Off" ? "active" : ""} onClick={() => updateNode(node.id, { defaultState: "Off" })}>Off</button><button className={defaultState === "On" ? "active" : ""} onClick={() => updateNode(node.id, { defaultState: "On" })}>On</button></div></Field>
-    <h4 className="inspector-heading">Style</h4><Field label="Fill color"><ColorOpacity color="#ffffff" opacity="100" /></Field><Field label="Border color"><ColorOpacity color="#efeef4" opacity="100" /></Field><Field label="Border thickness"><input defaultValue="1" /></Field><Field label="Corner radius"><input defaultValue="19" /></Field>
-    <h4 className="inspector-heading">Toggle color</h4><Field label="Active color"><ColorOpacity color="#c2f01e" opacity="100" /></Field>
-    <h4 className="inspector-heading">Text</h4><div className="toggle-state-tabs"><button className="active">Inactive</button><button className="unknown-action" onClick={() => markUnknown(boundary)}>Active</button></div><Field label="Title text"><textarea value={title} onChange={(event) => updateCopy(event.target.value, secondary)} /></Field><Field label="Secondary text"><textarea value={secondary} onChange={(event) => updateCopy(title, event.target.value)} /></Field>
-    <h4 className="inspector-heading">Layout</h4><Field label="Padding"><PaddingInputs /></Field><Field label="Vertical offset"><input defaultValue="0" /></Field><h4 className="inspector-heading">Content layout</h4><Field label="Padding"><PaddingInputs values={[16, 16, 16, 16]} /></Field><Field label="Text spacing"><input defaultValue="0" /></Field>
-  </>;
-}
-
-function TextStyle() {
-  return <><Field label="Font"><div className="select-like">System (SF Pro, Roboto) Regular <ChevronDown size={14} /></div></Field><div className="split-fields"><Field label="Size"><input defaultValue="28" /></Field><Field label="Align"><div className="select-like">Center <ChevronDown size={14} /></div></Field></div><Field label="Color"><ColorOpacity color="#000000" opacity="100" /></Field></>;
-}
-
-function TextLayout() {
-  return <><Field label="Margin"><PaddingInputs /></Field><Field label="Vertical offset"><input defaultValue="0" /></Field></>;
-}
-
-function ButtonContent({ type, active, updateNode }) {
-  const purchase = type === "Purchase Button";
-  return <><Field label="Button action"><div className="select-like">{purchase ? "Purchase" : "Custom"} <ChevronDown size={14} /></div></Field><Field label="Button action ID"><ConfigInput active={active} updateNode={updateNode} name="actionId" fallback={purchase ? "purchase" : ""} /></Field><Field label="Text"><input value={active.content ?? ""} onChange={(event) => updateNode(active.id, { content: event.target.value })} /></Field></>;
-}
-
-function WebButtonContent({ active, updateNode }) {
-  return <><Field label="Open paywall in"><div className="select-like">External browser <ChevronDown size={14} /></div></Field><Field label="Offer"><div className="select-like">Default <ChevronDown size={14} /></div></Field><Field label="Button text"><input value={active.content ?? ""} onChange={(event) => updateNode(active.id, { content: event.target.value })} /></Field><Field label="Secondary text"><ConfigInput active={active} updateNode={updateNode} name="secondaryText" fallback="" placeholder="Enter text here" /></Field></>;
-}
-
-function ListContent({ active, addNestedNode }) {
-  return <><h4>List items</h4><button className="text-action" onClick={() => addNestedNode(active.id, "List item")}><Plus size={15} /> Add element</button></>;
-}
-
-function ListItemContent({ active, updateNode }) {
-  const [title = "", caption = ""] = (active.content ?? "").split("|");
-  const updateCopy = (nextTitle, nextCaption) => updateNode(active.id, { content: `${nextTitle}|${nextCaption}` });
-  return <><Field label="Custom icon"><button className="upload"><Upload size={18} /> Click here or drag the file to this area to upload<small>PNG, JPG, max size 0.5MB.</small></button></Field><h4>Connector</h4><Field label="Thickness"><input defaultValue="0" /></Field><Field label="Color"><ColorOpacity color="#000000" opacity="100" /></Field><h4>Text</h4><Field label="Title"><textarea value={title} onChange={(event) => updateCopy(event.target.value, caption)} /></Field><Field label="Caption"><textarea value={caption} onChange={(event) => updateCopy(title, event.target.value)} /></Field></>;
-}
-
-function ListItemStyle() {
-  return <><Field label="Title font"><div className="select-like">Nunito Extrabold <ChevronDown size={14} /></div></Field><Field label="Title size"><input defaultValue="17" /></Field><Field label="Caption font"><div className="select-like">Nunito Medium <ChevronDown size={14} /></div></Field><Field label="Caption size"><input defaultValue="15" /></Field><Field label="Icon placement"><div className="select-like">Left <ChevronDown size={14} /></div></Field></>;
-}
-
-function ListItemLayout() {
-  return <><Field label="Margin"><PaddingInputs /></Field><Field label="Vertical offset"><input defaultValue="0" /></Field></>;
-}
-
-function ListStyle() {
-  return <><Field label="Default icon"><div className="select-like">Default icon <ChevronDown size={14} /></div></Field><Field label="Icon placement"><div className="select-like">Left <ChevronDown size={14} /></div></Field><Field label="Icon color"><ColorOpacity color="#000000" opacity="100" /></Field><h4>Connector</h4><Field label="Thickness"><input defaultValue="0" /></Field><Field label="Color"><ColorOpacity color="#000000" opacity="100" /></Field><Field label="Icon size"><input placeholder="Not captured" /></Field><h4>Title</h4><Field label="Font"><div className="select-like">Nunito Extrabold <ChevronDown size={14} /></div></Field><Field label="Size"><input defaultValue="17" /></Field><h4>Caption</h4><Field label="Font"><div className="select-like">Nunito Medium <ChevronDown size={14} /></div></Field><Field label="Size"><input defaultValue="15" /></Field></>;
-}
-
-function CarouselContent({ active, addNestedNode }) {
-  return <><h4>Carousel items</h4><button className="text-action" onClick={() => addNestedNode(active.id, "Card")}><Plus size={15} /> Add element</button></>;
-}
-
-function ProductsContent({ active, boundary, markUnknown }) {
-  return <><Field label="Products grouping"><div className="select-like muted-select">No switch (all products are visible) <ChevronDown size={14} /></div></Field><Field label="Selected product"><div className="select-like">Japanese Ai - 1 Year <ChevronDown size={14} /></div></Field><h4>Products</h4>{active.content ? <p className="property-copy">This template's product content is represented by its Builder layer.</p> : <p className="property-copy">No products added.</p>}<button className="secondary full unknown-action" onClick={() => markUnknown(boundary)}>Add product</button></>;
-}
-
-function ConfigInput({ active, updateNode, name, fallback, ...props }) {
-  const value = active.config?.[name] ?? fallback;
-  return <input value={value} onChange={(event) => updateNode(active.id, { config: { ...active.config, [name]: event.target.value } })} {...props} />;
-}
-
-function ColorOpacity({ color, opacity }) {
-  return <div className="color-with-opacity"><div className="color-line"><i style={{ background: color }} /> {color}</div><input defaultValue={opacity} aria-label="Opacity" /></div>;
-}
-
-function PaddingInputs({ values = [0, 0, 0, 0] }) {
-  return <div className="four-inputs"><input aria-label="Top padding" defaultValue={values[0]} /><input aria-label="Right padding" defaultValue={values[1]} /><input aria-label="Bottom padding" defaultValue={values[2]} /><input aria-label="Left padding" defaultValue={values[3]} /></div>;
-}
-
-function LinkOption({ title, checked = false, fields }) {
-  return <section className="link-option"><label className="switch-row"><input type="checkbox" defaultChecked={checked} /><span>{checked ? "On" : "Off"}</span><strong>{title}</strong></label>{checked && fields.map(([label, value, onValueChange]) => <Field label={label} key={label}><input {...(onValueChange ? { value, onChange: (event) => onValueChange(event.target.value) } : { defaultValue: value })} /></Field>)}</section>;
-}
-
-function LayoutSettings({ markUnknown, boundary, setModal, appliedTemplate }) {
-  return <div className="property-scroll layout-settings"><h3>Layout settings</h3><Field label="Template"><div className="inline-select"><span>{appliedTemplate !== null ? templates[appliedTemplate].title : "X template #19"}</span><button className="secondary" onClick={() => setModal({ kind: "templates" })}>Change template</button></div></Field><Field label="Purchase flow"><div className="select-like">Products as list + purchase button <ChevronDown size={14} /></div></Field><Field label="Background color"><div className="color-with-opacity"><div className="color-line"><i /> #212121</div><input defaultValue="100" aria-label="Background opacity" /></div></Field><label className="switch-row"><input type="checkbox" /><span>Off</span><strong>Enable Dark mode</strong></label><Field label="Default font"><div className="select-like">System (SF Pro, Roboto) Regular <ChevronDown size={14} /></div></Field><h4>Content layout</h4><Field label="Default child margin"><div className="four-inputs"><input defaultValue="16" /><input defaultValue="16" /><input defaultValue="0" /><input defaultValue="16" /></div></Field><Field label="Spacing"><input defaultValue="0" /></Field><button className="secondary unknown-action" onClick={() => markUnknown(boundary)}>Add max width</button><section className="top-button"><label className="switch-row"><input type="checkbox" defaultChecked /><span>On</span><strong>Top button 1</strong></label><Field label="Action"><div className="select-like">Close <ChevronDown size={14} /></div></Field><Field label="Action ID"><input disabled defaultValue="Close" /></Field><div className="split-fields"><Field label="Style"><div className="select-like">Icon <ChevronDown size={14} /></div></Field><Field label="Align"><div className="select-like">Left <ChevronDown size={14} /></div></Field></div><Field label="Show after delay"><input type="range" min="0" max="3000" defaultValue="0" /><small>0 ms</small></Field><h4>Style</h4><Field label="Fill color"><div className="color-with-opacity"><div className="color-line"><i /> #121212</div><input defaultValue="50" /></div></Field><Field label="Border color"><div className="color-with-opacity"><div className="color-line"><i /> #121212</div><input defaultValue="100" /></div></Field><Field label="Border thickness"><input defaultValue="0" /></Field><h4>Icon</h4><Field label="Icon"><div className="select-like">Close <ChevronDown size={14} /></div></Field><Field label="Icon color"><div className="color-with-opacity"><div className="color-line light"><i /> #fcffe0</div><input defaultValue="80" /></div></Field></section><label className="switch-row"><input type="checkbox" /><span>Off</span><strong>Top button 2</strong></label></div>;
-}
-
-function WorkspaceHeader({ selected, setView, duplicate, setModal, markUnknown }) {
+  // 3. 色块数字框 (黑五/活动版) - card / digit-cards
   return (
-    <><button className="back" onClick={() => setView("list")}><ArrowLeft size={18} /> Paywalls</button><div className="workspace-heading"><div><span className="eyebrow">Paywall</span><h1>{selected.name}</h1></div><div className="workspace-actions"><button className="secondary" onClick={() => setView("metrics")}><BarChart3 size={16} /> Metrics</button><button className="secondary unknown-action" onClick={() => markUnknown({ id: "A-01", feature: "View in analytics", known: "The action opens Analytics with paywall_id in the URL.", unknown: "The complete Analytics destination state is outside this reconstruction." })}>View in analytics</button><button className="secondary" onClick={duplicate}><Copy size={16} /> Duplicate</button>{selected.state === "Draft" && <button className="secondary" onClick={() => setModal({ kind: "device-test" })}><Smartphone size={16} /> Test on Device</button>}<button className="secondary danger-outline" onClick={() => setModal({ kind: "archive" })}><Archive size={16} /> Archive</button></div></div></>
+    <div className="preview-timer-container" style={{ margin: "4px 0 10px" }}>
+      <div className="preview-timer-badge">
+        ⚡ <span>{label}</span>
+      </div>
+      <div className="preview-timer-digits">
+        <div className="digit-box"><span>{h}</span><small>时</small></div>
+        <span className="colon">:</span>
+        <div className="digit-box"><span>{m}</span><small>分</small></div>
+        <span className="colon">:</span>
+        <div className="digit-box"><span>{s}</span><small>秒</small></div>
+      </div>
+    </div>
   );
 }
 
-function DeviceTestModal({ onClose }) {
-  const previewUrl = "https://mobile-app.adapty.io/paywall-preview?app_id=4044295d-a03a-4c32-9b41-d057fe635445&paywall_id=research-paywall&current_locale=en&locales=en&cluster=us";
-  return <Modal title="Test on Device" onClose={onClose}><div className="device-test"><div className="device-qr">▦</div><p className="modal-copy">Open the preview with your device camera or copy this test link.</p><div className="test-link"><input value={previewUrl} readOnly /><button className="icon" title="Copy"><Copy size={16} /></button></div><div className="modal-actions"><button className="primary" onClick={onClose}>Done</button></div></div></Modal>;
+function HelloTalkStarMascot({ size = 68 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="htMascotBodyGrad" x1="25" y1="15" x2="80" y2="85" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFDE43" />
+          <stop offset="0.6" stopColor="#FFB800" />
+          <stop offset="1" stopColor="#FF9500" />
+        </linearGradient>
+      </defs>
+
+      {/* Little Red-Orange Legs at bottom */}
+      <path d="M42 74 Q39 84 36 86" stroke="#E64A19" strokeWidth="3.5" strokeLinecap="round" />
+      <path d="M56 74 Q58 84 62 86" stroke="#E64A19" strokeWidth="3.5" strokeLinecap="round" />
+
+      {/* Main Yellow Mascot Body with Waving Left Hand */}
+      <path
+        d="M32 20 C36 12 46 16 46 25 C46 27 48 29 50 29 C53 29 55 24 58 18 C64 12 73 17 71 27 C70 30 72 33 76 34 C84 37 87 47 80 54 C77 56 77 60 79 63 C83 71 76 80 67 77 C64 76 60 78 58 81 C53 87 43 86 40 79 C38 76 35 75 32 76 C23 79 17 69 22 61 C24 58 23 54 20 52 C12 47 13 36 22 34 C26 33 28 29 28 26 C28 22 30 20 32 20 Z"
+        fill="url(#htMascotBodyGrad)"
+      />
+
+      {/* Left Heart Eye (Pink #FF2D55) */}
+      <path
+        d="M37 43 C37 39.5 34 37 31 37 C27.5 37 25.5 40 25.5 43 C25.5 47.5 30.5 51 31 51.5 C31.5 51 36.5 47.5 36.5 43 Z"
+        fill="#FF2D55"
+      />
+      <circle cx="29.5" cy="41" r="1.3" fill="#FFFFFF" />
+
+      {/* Right Heart Eye (Pink #FF2D55) */}
+      <path
+        d="M57 43 C57 39.5 54 37 51 37 C47.5 37 45.5 40 45.5 43 C45.5 47.5 50.5 51 51 51.5 C51.5 51 56.5 47.5 56.5 43 Z"
+        fill="#FF2D55"
+      />
+      <circle cx="49.5" cy="41" r="1.3" fill="#FFFFFF" />
+
+      {/* Blushing Cheeks */}
+      <ellipse cx="24" cy="49" rx="3.5" ry="2" fill="#FF5252" opacity="0.6" />
+      <ellipse cx="60" cy="49" rx="3.5" ry="2" fill="#FF5252" opacity="0.6" />
+
+      {/* Open Smiling Mouth with Tongue */}
+      <path d="M37 53 Q42 60 46 53 Z" fill="#880E4F" />
+      <path d="M39 55 Q42 59 44 55" fill="#FF4081" />
+
+      {/* Yellow Sparkle 4-point Star at right */}
+      <path
+        d="M86 52 L88.5 46 L91 52 L97 54.5 L91 57 L88.5 63 L86 57 L80 54.5 Z"
+        fill="#FFD54F"
+      />
+    </svg>
+  );
+}
+
+function PreviewElement({
+  node,
+  active,
+  onSelect,
+  updateNode,
+  themeConfig,
+  onTriggerRetainModal,
+  selectedOnboardingTier,
+  onSelectOnboardingTier,
+  isOnboardingPage,
+  onboardingCarouselSlide,
+  setOnboardingCarouselSlide,
+  currentTemplate,
+  activeCompareTab = 0,
+  setActiveCompareTab,
+}) {
+
+  const [selectedTier, setSelectedTier] = useState(0);
+  const [toggleOn, setToggleOn] = useState(node.config?.defaultState === "On" || true);
+  const [activeTab, setActiveTab] = useState(1);
+  const [carouselIndex, setCarouselIndex] = useState(0);
+
+  const select = () => onSelect(node.id);
+  const wrap = (content, className = "") => (
+    <div className={`preview-node ${active ? "selected" : ""} ${className}`} onClick={select}>
+      {content}
+    </div>
+  );
+
+  const renderInterpolated = (text) => {
+    if (!text) return "";
+    return text
+      .replace(/\{\{\s*nick_name\s*\}\}/g, "林凡")
+      .replace(/\{\{\s*vip_expired_days\s*\}\}/g, "3")
+      .replace(/\{\{\s*vip_expire_time\s*\}\}/g, "2026-05-18")
+      .replace(/\{\{\s*vip_privilege_model_v2_max\s*\}\}/g, "无限制")
+      .replace(/\{\{\s*visitor_count\s*\}\}/g, "12")
+      .replace(/\{\{\s*vip_chat_translate_count\s*\}\}/g, "28");
+  };
+
+  if (node.type === "User Profile" || node.id?.includes("user")) {
+    const parts = (node.content || "Yeah|🇩🇪").split("|");
+    const name = node.config?.userName || parts[0] || "Yeah";
+    const flag = node.config?.userFlag || parts[1] || "🇩🇪";
+    return wrap(
+      <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "4px 0 12px", padding: "0 2px" }}>
+        <div style={{ position: "relative" }}>
+          <div
+            style={{
+              width: 38,
+              height: 38,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, #60A5FA, #3B82F6)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "#FFFFFF",
+              fontWeight: 700,
+              fontSize: 16,
+              border: "2px solid #FFFFFF",
+              boxShadow: "0 2px 8px rgba(0,0,0,0.12)",
+            }}
+          >
+            {name[0] || "Y"}
+          </div>
+          <div
+            style={{
+              position: "absolute",
+              bottom: -2,
+              right: -2,
+              width: 15,
+              height: 15,
+              borderRadius: "50%",
+              border: "1.5px solid #FFFFFF",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 10,
+              background: "#000000",
+              overflow: "hidden",
+            }}
+            title="User Country"
+          >
+            {flag}
+          </div>
+        </div>
+        <span style={{ fontSize: 16, fontWeight: 700, color: "#111827" }}>
+          {name}
+        </span>
+      </div>
+    );
+  }
+
+  if (node.type === "Dynamic Metrics" || node.id?.includes("metrics")) {
+    const styleType = node.config?.styleType || themeConfig?.styleType || "VIP失效样式";
+    if (styleType === "非VIP样式" || node.config?.visitorCount || node.content?.includes("visitors")) {
+      const count = node.config?.visitorCount || 21;
+      return wrap(
+        <div style={{ padding: "0 2px", margin: "4px 0 10px", textAlign: "left" }}>
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#111827", lineHeight: 1.25 }}>
+            <span style={{ color: "#FF6A00", fontSize: 26, marginRight: 6 }}>{count}</span>
+            new visitors in
+          </div>
+          <div style={{ fontSize: 20, fontWeight: 900, color: "#111827" }}>
+            the past 7 days 👀
+          </div>
+        </div>
+      );
+    }
+    // Number matrix (for VIP失效样式 or 非订阅状态样式)
+    const rawNumbers = node.content || "972、762、487、673、837、899、116、156、939、446、650、442";
+    const numbers = rawNumbers.split(/[、,，\s]+/).filter(Boolean);
+    const color = styleType === "非订阅状态样式" ? "#FF8A00" : "#6C3EDE";
+    return wrap(
+      <div style={{ padding: "0 2px", margin: "4px 0 10px", textAlign: "left" }}>
+        <div
+          style={{
+            color,
+            fontSize: 14.5,
+            fontWeight: 800,
+            lineHeight: 1.55,
+            letterSpacing: "0.02em",
+          }}
+        >
+          {numbers.length > 0 ? (
+            <div>
+              {numbers.map((num, idx) => (
+                <span key={idx}>
+                  {num}
+                  {idx < numbers.length - 1 ? "、" : ""}
+                  {(idx + 1) % 4 === 0 && <br />}
+                </span>
+              ))}
+            </div>
+          ) : (
+            <div>{rawNumbers}</div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  if (node.type === "Mascot Illustration" || node.id?.includes("mascot")) {
+    const mascotType = node.config?.mascotType || node.content || "crown-gift";
+    return wrap(
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "10px 0 6px" }}>
+        {mascotType === "binoculars" ? (
+          <ContentBinocularsMascot size={105} />
+        ) : mascotType === "translate-coin" ? (
+          <ContentTranslateCoinMascot size={105} />
+        ) : (
+          <ContentCrownMascot size={110} />
+        )}
+      </div>
+    );
+  }
+
+  if (node.type === "Badge Tag") {
+    const color = node.config?.color || "#1ECA92";
+    return wrap(
+      <div className="preview-badge-pill" style={{ background: `${color}18`, color, border: `1px solid ${color}40` }}>
+        <Sparkles size={11} />
+        <span>{node.content}</span>
+      </div>
+    );
+  }
+
+  if (node.config?.variant === "onboarding-wave-hero" || node.id === "trial-t1-hero") {
+    const title = renderInterpolated(node.content || themeConfig?.titleText || "3天会员免费试用");
+    return wrap(
+      <div className="ht-wave-hero-container">
+        <div className="ht-hero-nav-bar">
+          <button
+            type="button"
+            className="ht-hero-close-btn"
+            title="关闭 (触发挽留弹窗)"
+            onClick={(e) => {
+              e.stopPropagation();
+              onTriggerRetainModal?.();
+            }}
+          >
+            <X size={18} strokeWidth={2.4} />
+          </button>
+          <div className="ht-mascot-star-wrap">
+            <HelloTalkStarMascot size={72} />
+          </div>
+        </div>
+        <div style={{ padding: "8px 0 10px" }}>
+          <h2 className="ht-hero-title-text">
+            {title}
+          </h2>
+        </div>
+        <svg className="ht-scallop-wave" viewBox="0 0 375 24" preserveAspectRatio="none" fill="none">
+          <path d="M0,24 C15,24 25,12 45,12 C65,12 75,22 95,22 C115,22 125,8 150,8 C175,8 185,20 210,20 C235,20 245,10 270,10 C295,10 305,22 330,22 C350,22 365,14 375,18 L375,24 L0,24 Z" fill="#FFFFFF"/>
+        </svg>
+      </div>
+    );
+  }
+
+  if (node.config?.variant === "onboarding-carousel-hero" || node.id === "trial-t2-hero") {
+    const raw = node.content || themeConfig?.titleText || "专享会员\n更好练习外语";
+    const lines = raw.split("\n");
+    return wrap(
+      <div className="ht-wave-hero-container">
+        <div className="ht-hero-nav-bar">
+          <button
+            type="button"
+            className="ht-hero-close-btn"
+            title="关闭 (触发挽留弹窗)"
+            onClick={(e) => {
+              e.stopPropagation();
+              onTriggerRetainModal?.();
+            }}
+          >
+            <X size={18} strokeWidth={2.4} />
+          </button>
+          <div className="ht-mascot-star-wrap">
+            <HelloTalkStarMascot size={72} />
+          </div>
+        </div>
+        <div style={{ padding: "4px 0 8px" }}>
+          <h2 className="ht-hero-title-text" style={{ lineHeight: 1.25 }}>
+            {lines.map((l, i) => <div key={i}>{l}</div>)}
+          </h2>
+        </div>
+        <svg className="ht-scallop-wave" viewBox="0 0 375 24" preserveAspectRatio="none" fill="none">
+          <path d="M0,24 C15,24 25,12 45,12 C65,12 75,22 95,22 C115,22 125,8 150,8 C175,8 185,20 210,20 C235,20 245,10 270,10 C295,10 305,22 330,22 C350,22 365,14 375,18 L375,24 L0,24 Z" fill="#FFFFFF"/>
+        </svg>
+      </div>
+    );
+  }
+
+  if (node.type === "Header") {
+    const isComparePage = currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare" || node.id === "headline";
+    if (isComparePage && (currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare" || node.config?.variant === "brand-hero")) {
+      const isPlus = activeCompareTab === 1;
+      const defaultBullets = isPlus
+        ? ["无限翻译", "查看谁喜欢了你", "结识全球母语者"]
+        : ["无限翻译", "查看谁喜欢了你", "搜索全世界的语伴"];
+      const bullets = (Array.isArray(node.config?.bullets) && node.config.bullets.length > 0)
+        ? node.config.bullets
+        : defaultBullets;
+
+      if (!isPlus) {
+        return wrap(
+          <div className="ht-brand-hero-vip">
+            <div className="ht-brand-hero-vip-left">
+              <div className="ht-brand-vip-title">
+                HelloTalk<span className="ht-brand-vip-gradient-text">VIP</span>
+              </div>
+              <div className="ht-brand-bullets-list">
+                {bullets.map((b, i) => (
+                  <div key={i} className="ht-brand-bullet-item">{b}</div>
+                ))}
+              </div>
+            </div>
+            <div className="ht-brand-hero-vip-right">
+              <HelloTalkMascot size={94} />
+            </div>
+          </div>
+        );
+      } else {
+        return wrap(
+          <div className="ht-brand-hero-plus">
+            <div className="ht-brand-plus-brand">HelloTalk</div>
+            <div className="ht-brand-plus-huge-title">VIP PLUS +</div>
+            <div className="ht-brand-bullets-list" style={{ marginTop: 6 }}>
+              {bullets.map((b, i) => (
+                <div key={i} className="ht-brand-bullet-item dark">{b}</div>
+              ))}
+            </div>
+          </div>
+        );
+      }
+    }
+
+    if (node.config?.variant === "content-headline" || node.id?.includes("cp") || currentTemplate?.id === "ht-content-paywall") {
+      const rawText = node.content || "VIP现已过期\n立即续订，别让沟通速度慢下来！";
+      const lines = rawText.split("\n");
+      const highlight = node.config?.highlightWord || (node.content?.includes("升级VIP") ? "升级VIP" : "立即续订");
+      const highlightColor = node.config?.highlightColor || (node.content?.includes("升级VIP") ? "#FF8A00" : "#6C3EDE");
+      return wrap(
+        <div style={{ padding: "0 2px", margin: "6px 0 10px", textAlign: "left" }}>
+          {lines.map((line, idx) => {
+            if (line.includes(highlight)) {
+              const parts = line.split(highlight);
+              return (
+                <div key={idx} style={{ fontSize: 18, fontWeight: 900, color: "#111827", lineHeight: 1.35 }}>
+                  {parts[0]}
+                  <span style={{ color: highlightColor }}>{highlight}</span>
+                  {parts[1]}
+                </div>
+              );
+            }
+            if (node.config?.hook1 && idx === 0) {
+              return (
+                <div key={idx} style={{ fontSize: 15, fontWeight: 800, color: "#6C3EDE", lineHeight: 1.35 }}>
+                  {line}
+                </div>
+              );
+            }
+            return (
+              <div key={idx} style={{ fontSize: 18, fontWeight: 900, color: "#111827", lineHeight: 1.35 }}>
+                {line}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (node.config?.variant === "vip-banner") {
+      return wrap(
+        <div
+          style={{
+            background: "linear-gradient(135deg, #1E1B4B 0%, #312E81 50%, #1E3A8A 100%)",
+            borderRadius: 14,
+            padding: "16px 14px",
+            textAlign: "center",
+            color: "#FFFFFF",
+            margin: "4px 0 10px",
+            boxShadow: "0 6px 18px rgba(30, 27, 75, 0.25)",
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              background: "rgba(255, 255, 255, 0.15)",
+              backdropFilter: "blur(4px)",
+              padding: "2px 8px",
+              borderRadius: 12,
+              fontSize: 9.5,
+              fontWeight: 800,
+              color: "#FDE047",
+              marginBottom: 6,
+            }}
+          >
+            <Crown size={12} />
+            <span>{node.config?.badge || "VIP PRIVILEGE"}</span>
+          </div>
+          <h2 style={{ fontSize: 17, fontWeight: 800, margin: "2px 0 4px", letterSpacing: "-0.02em", color: "#FFFFFF" }}>
+            {renderInterpolated(node.content)}
+          </h2>
+          <p style={{ fontSize: 10.5, color: "#CBD5E1", margin: 0 }}>
+            {node.config?.subtitle || "畅享 16 项高阶语言学习特权"}
+          </p>
+        </div>
+      );
+    }
+
+    if (node.config?.variant === "vip-badge-header") {
+      return wrap(
+        <div
+          style={{
+            background: "linear-gradient(135deg, #FFFBEB 0%, #FEF3C7 50%, #FDE68A 100%)",
+            borderRadius: 14,
+            padding: "12px 14px 10px",
+            textAlign: "center",
+            color: "#78350F",
+            margin: "2px 0 8px",
+            border: "1px solid #FCD34D",
+            boxShadow: "0 4px 12px rgba(245, 158, 11, 0.12)",
+          }}
+        >
+          {/* Mini Phone Illustration from HelloTalk Template 2 */}
+          <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
+            <div
+              style={{
+                width: 140,
+                background: "#ffffff",
+                borderRadius: 10,
+                padding: "6px 8px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+                border: "1px solid #fed7aa",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9", paddingBottom: 3 }}>
+                <span style={{ fontSize: 8.5, fontWeight: 700, color: "#475569" }}>访客记录 (Visitor)</span>
+                <span style={{ fontSize: 7.5, background: "#fef3c7", color: "#d97706", padding: "1px 4px", borderRadius: 4, fontWeight: 800 }}>VIP 独享</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#f8fafc", padding: "2px 4px", borderRadius: 4 }}>
+                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#60a5fa", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#fff" }}>🇺🇸</div>
+                <div style={{ flex: 1, height: 4, background: "#cbd5e1", borderRadius: 2 }} />
+                <span style={{ fontSize: 7, color: "#94a3b8" }}>刚刚</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 5, background: "#f8fafc", padding: "2px 4px", borderRadius: 4 }}>
+                <div style={{ width: 14, height: 14, borderRadius: "50%", background: "#f472b6", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 8, color: "#fff" }}>🇯🇵</div>
+                <div style={{ flex: 1, height: 4, background: "#cbd5e1", borderRadius: 2 }} />
+                <span style={{ fontSize: 7, color: "#94a3b8" }}>10m前</span>
+              </div>
+            </div>
+          </div>
+
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              background: "#F59E0B",
+              color: "#FFFFFF",
+              padding: "2px 8px",
+              borderRadius: 12,
+              fontSize: 9.5,
+              fontWeight: 800,
+              marginBottom: 4,
+            }}
+          >
+            <Sparkles size={11} />
+            <span>{node.config?.badge || "7 项特权已解锁"}</span>
+          </div>
+          <h2 style={{ fontSize: 15, fontWeight: 800, margin: "2px 0 2px", color: "#78350F" }}>
+            {renderInterpolated(node.content)}
+          </h2>
+          <p style={{ fontSize: 10, color: "#92400E", margin: 0 }}>
+            {node.config?.subtitle || "开启全球无障碍母语交流"}
+          </p>
+        </div>
+      );
+    }
+
+    const mainFontColor = themeConfig?.mainFontColor || "#2D1832";
+    // 模板 1 (全屏平铺版 / 真实 App 原版): 左对齐排版 + VIP 皇冠前缀
+    if (themeConfig?.subTemplate === "tpl-1" || node.id === "t1-headline" || node.config?.kicker) {
+      const kicker = node.config?.kicker || themeConfig?.titleKicker || "HelloTalk VIP 👑";
+      return wrap(
+        <div style={{ textAlign: "left", padding: "4px 0 2px" }}>
+          {kicker && (
+            <div style={{ fontSize: 26, fontWeight: 800, color: mainFontColor, display: "flex", alignItems: "center", gap: 6, letterSpacing: "-0.01em" }}>
+              <span>{kicker.replace("👑", "").trim()}</span>
+              <span style={{ fontSize: 23 }}>👑</span>
+            </div>
+          )}
+          <h2
+            style={{
+              fontSize: 28,
+              fontWeight: 900,
+              color: mainFontColor,
+              margin: "6px 0 2px",
+              lineHeight: 1.22,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            {renderInterpolated(node.content)}
+          </h2>
+        </div>
+      );
+    }
+
+    if (currentTemplate?.id === "ht-vip-pop" || node.config?.variant === "pop-headline" || node.config?.align === "left") {
+      return wrap(
+        <div style={{ textAlign: "left", padding: "2px 36px 2px 0" }}>
+          <h2
+            style={{
+              fontSize: 18,
+              fontWeight: 800,
+              color: "#0f172a",
+              margin: 0,
+              lineHeight: 1.3,
+              letterSpacing: "-0.01em",
+            }}
+          >
+            {renderInterpolated(node.content)}
+          </h2>
+        </div>
+      );
+    }
+
+    return wrap(
+      <h2
+        className="preview-ht-headline"
+        style={mainFontColor ? { color: mainFontColor, textAlign: "center", margin: "4px 0 2px" } : {}}
+      >
+        {renderInterpolated(node.content)}
+      </h2>
+    );
+  }
+
+  if (node.type === "Subhead") {
+    if (node.id?.includes("cp") || currentTemplate?.id === "ht-content-paywall") {
+      return wrap(
+        <div style={{ textAlign: "left", margin: "2px 0 8px", padding: "0 2px" }}>
+          <p style={{ fontSize: 13, color: "#475569", fontWeight: 500, margin: 0 }}>
+            {renderInterpolated(node.content)}
+          </p>
+        </div>
+      );
+    }
+
+    // 模板 1 (全屏平铺版 / 真实 App 原版): "仅限今日" 醒目左对齐珊瑚红
+    if (themeConfig?.subTemplate === "tpl-1" || node.id === "t1-subhead") {
+      const subColor = node.config?.color || themeConfig?.otherColor || "#DE6876";
+      return wrap(
+        <div style={{ textAlign: "left", margin: "2px 0 14px" }}>
+          <span style={{ fontSize: 21, fontWeight: 800, color: subColor, letterSpacing: "0.01em" }}>
+            {renderInterpolated(node.content)}
+          </span>
+        </div>
+      );
+    }
+
+    if (currentTemplate?.id === "ht-vip-pop" || node.config?.align === "left") {
+      return wrap(
+        <div style={{ textAlign: "left", margin: "3px 0 8px" }}>
+          <p
+            style={{
+              fontSize: 12,
+              fontWeight: 600,
+              color: node.config?.color || "#0f172a",
+              margin: 0,
+              lineHeight: 1.35,
+            }}
+          >
+            {renderInterpolated(node.content)}
+          </p>
+        </div>
+      );
+    }
+
+    return wrap(
+      <p className="preview-ht-subhead" style={{ textAlign: "center", margin: "2px 0 8px", color: "#64748b" }}>
+        {renderInterpolated(node.content)}
+      </p>
+    );
+  }
+
+  if (node.type === "Switch Tabs") {
+    const isComparePage = currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare" || node.id === "switch-tabs";
+    if (isComparePage) {
+      const isPlus = activeCompareTab === 1;
+      return wrap(
+        <div className="ht-compare-switch-container">
+          <div className={`ht-compare-switch-pill ${isPlus ? "dark-theme" : "light-theme"}`}>
+            <button
+              type="button"
+              className={`ht-switch-tab-item ${!isPlus ? "vip-active-light" : "vip-inactive-dark"}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveCompareTab?.(0);
+              }}
+            >
+              VIP
+            </button>
+            <button
+              type="button"
+              className={`ht-switch-tab-item ${isPlus ? "plus-active-dark" : "plus-inactive-light"}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveCompareTab?.(1);
+              }}
+            >
+              VIP+
+            </button>
+          </div>
+        </div>
+      );
+    }
+    const tabs = (node.content || "VIP 进阶版|VIP+ 旗舰版").split("|");
+    return wrap(
+      <div className="preview-switch-tabs">
+        {tabs.map((tab, idx) => (
+          <button
+            key={idx}
+            type="button"
+            className={`switch-tab-btn ${activeTab === idx ? "active" : ""}`}
+            onClick={(e) => { e.stopPropagation(); setActiveTab(idx); }}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+    );
+  }
+
+
+  if (node.type === "Language Chips") {
+    const chips = (node.content || "").split("|").filter(Boolean);
+    return wrap(
+      <div className="preview-lang-chips">
+        {chips.map((chip, idx) => (
+          <span key={idx} className="lang-chip">{chip}</span>
+        ))}
+      </div>
+    );
+  }
+
+  if (node.type === "Carousel Cards") {
+    if (node.config?.variant === "onboarding-3slides" || node.id === "trial-t2-carousel") {
+      const curSlide = (onboardingCarouselSlide ?? carouselIndex) % 3;
+      const setCurSlide = (idx) => {
+        setOnboardingCarouselSlide?.(idx);
+        setCarouselIndex(idx);
+      };
+
+      return wrap(
+        <div style={{ margin: "2px 0 6px" }}>
+          <div className="ht-carousel-slide-card">
+            {curSlide === 0 && (
+              <>
+                <h4 className="ht-carousel-title">
+                  免费体验HelloTalk会员
+                </h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "2px 2px 4px" }}>
+                  {[
+                    {
+                      title: "翻译",
+                      desc: "随聊随翻，提高你的词汇量",
+                      icon: <span style={{ fontSize: 13, fontWeight: 800 }}>文A</span>,
+                    },
+                    {
+                      title: "多语言",
+                      desc: "150种语言随时添加和切换",
+                      icon: <Globe size={18} />,
+                    },
+                    {
+                      title: "更多曝光",
+                      desc: "专属身份特权，让更多人看到你",
+                      icon: <Zap size={18} fill="#6144e8" />,
+                    },
+                    {
+                      title: "无广告",
+                      desc: "更沉浸专心的学语言！",
+                      icon: (
+                        <div style={{ border: "1.5px solid #6144e8", borderRadius: 4, padding: "1px 2px", fontSize: 9.5, fontWeight: 900, lineHeight: 1 }}>
+                          Ad
+                        </div>
+                      ),
+                    },
+                  ].map((it, i) => (
+                    <div key={i} className="ht-privilege-item" style={{ padding: "6px 2px" }}>
+                      <div className="ht-privilege-icon-box">
+                        {it.icon}
+                      </div>
+                      <div className="ht-privilege-info">
+                        <strong>{it.title}</strong>
+                        <span>{it.desc}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {curSlide === 1 && (
+              <>
+                <h4 className="ht-carousel-title">
+                  到期前提醒
+                </h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: "8px 4px 6px" }}>
+                  {[
+                    {
+                      day: "Day 1",
+                      desc: "成为HelloTalk会员，享受学习与交流的乐趣",
+                      icon: (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
+                          <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V17H19V19Z" />
+                        </svg>
+                      ),
+                    },
+                    {
+                      day: "Day 2",
+                      desc: "收到体验即将结束的通知",
+                      icon: (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
+                          <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" />
+                        </svg>
+                      ),
+                    },
+                    {
+                      day: "Day 3",
+                      desc: "24小时前取消则无需支付任何费用，否则当日扣款",
+                      icon: (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
+                          <path d="M11.99 2C6.47 2 2 6.48 2 12C2 17.52 6.47 22 11.99 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 11.99 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" />
+                        </svg>
+                      ),
+                    },
+                  ].map((step, idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                      <div className="ht-privilege-icon-box">
+                        {step.icon}
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: 14.5, fontWeight: 800, color: "#1f2937", lineHeight: 1.3 }}>
+                          {step.day}
+                        </div>
+                        <div style={{ fontSize: 11.5, color: "#9ca3af", marginTop: 2, lineHeight: 1.4 }}>
+                          {step.desc}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {curSlide === 2 && (
+              <>
+                <h4 className="ht-carousel-title">
+                  选择试用结束后的套餐
+                </h4>
+                <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: "8px 2px 4px" }}>
+                  {/* Option 1: 12 个月 */}
+                  <div
+                    className={`ht-tier-card ${selectedOnboardingTier === 0 ? "selected" : "unselected"}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectOnboardingTier?.(0);
+                    }}
+                  >
+                    <div className="ht-tier-badge-pill">免费试用</div>
+                    <div className="ht-tier-content-row">
+                      <div className="ht-tier-col-left">
+                        <span className="ht-tier-title-main">12 个月</span>
+                        <span className="ht-tier-price-sub">¥488</span>
+                      </div>
+                      <div className="ht-tier-col-right">
+                        <span className="ht-tier-price-main">¥40.67/ 月</span>
+                        <span className="ht-tier-discount-pill">48% OFF</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Option 2: 1 个月 */}
+                  <div
+                    className={`ht-tier-card ${selectedOnboardingTier === 1 ? "selected" : "unselected-gray"}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onSelectOnboardingTier?.(1);
+                    }}
+                  >
+                    <div className="ht-tier-content-row">
+                      <div className="ht-tier-col-left">
+                        <span className="ht-tier-title-main">1 个月</span>
+                      </div>
+                      <div className="ht-tier-col-right">
+                        <span className="ht-tier-price-main">¥78/ 月</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* 3 Dash Capsules Pagination */}
+            <div className="ht-carousel-pagination">
+              {[0, 1, 2].map((idx) => (
+                <span
+                  key={idx}
+                  className={`ht-carousel-dash ${curSlide === idx ? "active" : ""}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurSlide(idx);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    const activePrivileges = node.config?.privileges
+      ? node.config.privileges.filter((p) => p.show && p.carousel)
+      : [];
+    const cards = activePrivileges.length > 0
+      ? activePrivileges.map((p) => ({ title: p.name, desc: p.desc, icon: p.icon }))
+      : (node.content || "").split("\n").filter(Boolean).map((line) => {
+          const [title, desc] = line.split("|");
+          return { title, desc, icon: "✨" };
+        });
+
+    const safeIndex = cards.length > 0 ? carouselIndex % cards.length : 0;
+    const currentCard = cards[safeIndex] || { title: "暂无轮播特权", desc: "请在右侧属性面板勾选开启特权轮播", icon: "✨" };
+
+    return wrap(
+      <div className="preview-carousel-cards">
+        <div className="carousel-card-slide">
+          <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+            <span style={{ fontSize: 16 }}>{currentCard?.icon}</span>
+            <strong style={{ fontSize: 13, color: "#1e293b" }}>{currentCard?.title}</strong>
+          </div>
+          <p style={{ margin: 0, fontSize: 11, color: "#64748b", lineHeight: 1.4 }}>{currentCard?.desc}</p>
+        </div>
+        <div className="carousel-dots">
+          {cards.map((_, idx) => (
+            <span
+              key={idx}
+              className={`carousel-dot ${idx === safeIndex ? "active" : ""}`}
+              onClick={(e) => { e.stopPropagation(); setCarouselIndex(idx); }}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (node.type === "Timer") {
+    const isComparePage = currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare";
+    const variant = node.config?.variant;
+    const isPlus = activeCompareTab === 1;
+
+    // 如果用户明确切换到 极简纯文本 (clean-text) 或 色块数字框 (card / digit-cards)，响应切换
+    if (variant === "clean-text" || variant === "card" || variant === "digit-cards") {
+      return wrap(<TimerPreview node={node} themeConfig={themeConfig} isDarkTheme={isPlus} />);
+    }
+
+    // 胶囊提示条 (badge-pill / pill-capsule) 或对比页面默认形态
+    if (isComparePage || variant === "pill-capsule" || variant === "badge-pill") {
+      const discountText = node.config?.discount || "20% OFF";
+      const timeText = node.config?.time || "14:43:23";
+      const labelText = node.config?.timerLabel || node.config?.label;
+      return wrap(
+        <div style={{ display: "flex", justifyContent: "center", margin: "2px 0 8px" }}>
+          <div className={`ht-compare-timer-capsule ${isPlus ? "dark-theme" : "light-theme"}`}>
+            {labelText ? <span style={{ fontWeight: 700, marginRight: 4 }}>{labelText}</span> : null}
+            <span>{discountText}</span>
+            <span style={{ margin: "0 6px" }}>{timeText}</span>
+          </div>
+        </div>
+      );
+    }
+    return wrap(<TimerPreview node={node} themeConfig={themeConfig} isDarkTheme={isPlus} />);
+  }
+
+
+  if (node.type === "Benefit List") {
+    // 优先从 node.config.items 获取结构化特权，否则从 content 解析
+    let items = [];
+    if (Array.isArray(node.config?.items) && node.config.items.length > 0) {
+      items = node.config.items;
+    } else {
+      const lines = (node.content || "").split("\n").filter(Boolean);
+      items = lines.map((l, i) => {
+        const parts = l.split("|");
+        const rawTitle = (parts[0] || ("特权 " + (i + 1))).trim();
+        let desc = (parts[1] || "").trim();
+        let tag = (parts[2] || "").trim();
+        let icon = "💎";
+        if (rawTitle.includes("翻译")) icon = "文A";
+        else if (rawTitle.includes("多语言") || rawTitle.includes("语伴")) icon = "🌐";
+        else if (rawTitle.includes("曝光")) icon = "⚡";
+        else if (rawTitle.includes("访客") || rawTitle.includes("看")) icon = "👀";
+        else if (rawTitle.includes("广告")) icon = "🚫";
+        return {
+          id: `item-${i}`,
+          title: rawTitle,
+          name: rawTitle,
+          desc,
+          tag,
+          icon,
+        };
+      });
+    }
+
+    const styleVariant = node.config?.styleVariant || (
+      node.config?.variant === "onboarding-privilege-card" || node.id === "trial-t1-privileges"
+        ? "cards"
+        : node.config?.variant === "grid-matrix"
+        ? "grid"
+        : "checklist"
+    );
+
+    // 1. 圆角权益大卡流 (注册引导与试用页规范)
+    if (styleVariant === "cards") {
+      return wrap(
+        <div className="ht-privilege-card">
+          {items.map((item, idx) => (
+            <div key={item.id || idx} className="ht-privilege-item">
+              <div className="ht-privilege-icon-box">
+                {item.icon === "文A" || (item.title && item.title.includes("翻译")) ? (
+                  <span style={{ fontSize: 13, fontWeight: 800 }}>文A</span>
+                ) : item.icon === "🌐" || (item.title && (item.title.includes("多语言") || item.title.includes("语言"))) ? (
+                  <Globe size={18} />
+                ) : item.icon === "⚡" || (item.title && item.title.includes("曝光")) ? (
+                  <Zap size={18} fill="#6144e8" />
+                ) : (
+                  <span style={{ fontSize: 15 }}>{item.icon || "✨"}</span>
+                )}
+              </div>
+              <div className="ht-privilege-info">
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <strong>{item.title || item.name}</strong>
+                  {item.tag && <span className="ht-privilege-tag">{item.tag}</span>}
+                </div>
+                {node.config?.showSubtitle !== false && (
+                  <span>{item.desc || "HelloTalk VIP 核心专享特权"}</span>
+                )}
+              </div>
+            </div>
+          ))}
+          {node.config?.showMoreLink !== false && (
+            <div className="ht-privilege-more">
+              {node.config?.moreLinkText || "更多权益等待开启 >"}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 2. 双列网格矩阵 (蓝色特权主页规范)
+    if (styleVariant === "grid") {
+      return wrap(
+        <div style={{ margin: "6px 0 14px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {items.map((item, idx) => (
+              <div
+                key={item.id || idx}
+                style={{
+                  background: "rgba(255,255,255,0.92)",
+                  borderRadius: 10,
+                  padding: "9px 10px",
+                  border: "1px solid rgba(0,0,0,0.06)",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <div
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 8,
+                    background: "#EEF2FF",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 16,
+                    flexShrink: 0,
+                  }}
+                >
+                  {item.icon || "💎"}
+                </div>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12, fontWeight: 700, color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    {item.title}
+                  </div>
+                  {item.tag ? (
+                    <span style={{ fontSize: 9, background: "#fee2e2", color: "#b91c1c", padding: "0 3px", borderRadius: 3, fontWeight: 700 }}>
+                      {item.tag}
+                    </span>
+                  ) : item.desc ? (
+                    <div style={{ fontSize: 9.5, color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {item.desc}
+                    </div>
+                  ) : null}
+                </div>
+              </div>
+            ))}
+          </div>
+          {node.config?.showMoreLink !== false && (
+            <div style={{ textAlign: "center", fontSize: 12, color: "#6366f1", fontWeight: 600, padding: "8px 0 2px", cursor: "pointer" }}>
+              {node.config?.moreLinkText || "查看全部 16 项特权 >"}
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    // 3. 单列打勾列表 (入门价格页等规范，如 图一/图三)
+    const checkColor = node.config?.checkColor || themeConfig?.otherColor || (themeConfig?.subTemplate === "tpl-2" ? "#F59E0B" : "#DE6876");
+    const privilegeColor = themeConfig?.privilegeColor || "#2D1832";
+    const showSubtitle = node.config?.showSubtitle === true;
+
+    return wrap(
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 14,
+          margin: "8px 0 20px",
+          textAlign: "left",
+        }}
+      >
+        {items.map((item, idx) => (
+          <div key={item.id || idx} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div
+              style={{
+                color: checkColor,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                flexShrink: 0,
+              }}
+            >
+              <Check size={19} strokeWidth={3.2} />
+            </div>
+            <div>
+              <div style={{ fontSize: 16.5, fontWeight: 700, color: privilegeColor, lineHeight: 1.3 }}>
+                {item.title}
+              </div>
+              {showSubtitle && item.desc && (
+                <div style={{ fontSize: 11, color: "#64748b", marginTop: 2 }}>
+                  {item.desc}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+        {node.config?.showMoreLink && (
+          <div style={{ textAlign: "left", fontSize: 12, color: checkColor, fontWeight: 600, padding: "2px 0", cursor: "pointer" }}>
+            {node.config?.moreLinkText || "更多权益等待开启 >"}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (node.type === "Comparison Table") {
+    const isComparePage = currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare" || node.id === "compare-table";
+    const isPlus = node.config?.compareMode === "vip-vs-plus" || (isComparePage && activeCompareTab === 1);
+    const items = Array.isArray(node.config?.items) && node.config.items.length > 0
+      ? node.config.items
+      : (isPlus ? DEFAULT_VIP_VS_PLUS_ITEMS : DEFAULT_FREE_VS_VIP_ITEMS);
+    const featureColTitle = (node.config?.featureColTitle && node.config.featureColTitle !== "Features")
+      ? node.config.featureColTitle
+      : "特权功能";
+    const col1Title = (node.config?.col1Title && node.config.col1Title !== "Free" && node.config.col1Title !== "VIP")
+      ? node.config.col1Title
+      : (isPlus ? "VIP会员" : "普通会员");
+    const col2Title = (node.config?.col2Title && node.config.col2Title !== "VIP" && node.config.col2Title !== "VIP+")
+      ? node.config.col2Title
+      : (isPlus ? "VIP+会员" : "VIP会员");
+    const showExpandCaret = node.config?.showExpandCaret !== false;
+
+    return wrap(
+      <div className="ht-compare-table-wrapper">
+        {/* Column 3 Continuous Rounded Vertical Highlight Pill */}
+        <div className={`ht-col-highlight-backdrop ${isPlus ? "dark-purple" : "light-gold"}`} />
+
+        <div className="ht-compare-table-grid">
+          {/* Header Row */}
+          <div className="ht-table-header-row">
+            <div className={`ht-th-feature ${isPlus ? "dark" : "light"}`}>
+              {featureColTitle}
+            </div>
+            <div className={`ht-th-col1 ${isPlus ? "dark" : "light"}`}>
+              {col1Title}
+            </div>
+            <div className={`ht-th-col2 ${isPlus ? "plus-text" : "gold-text"}`}>
+              {col2Title}
+            </div>
+          </div>
+
+          {/* Data Rows */}
+          <div className="ht-table-body">
+            {items.map((item, idx) => (
+              <div key={item.id || idx} className="ht-table-row">
+                {/* Feature Name Col */}
+                <div className={`ht-td-feature ${isPlus ? "dark" : "light"}`}>
+                  <span>{item.name}</span>
+                  {showExpandCaret && <ChevronDown size={11} style={{ opacity: 0.6, flexShrink: 0 }} />}
+                </div>
+
+                {/* Col 1 */}
+                <div className={`ht-td-col1 ${isPlus ? "dark" : "light"}`}>
+                  {item.col1Type === "lock" || item.col1Val === "🔒" ? (
+                    <Lock size={12} color="#94A3B8" />
+                  ) : (
+                    <span>{item.col1Val}</span>
+                  )}
+                </div>
+
+                {/* Col 2 (Highlighted Pill) */}
+                <div className={`ht-td-col2 ${isPlus ? "dark" : "light"}`}>
+                  {item.col2Type === "check" || item.col2Val === "✓" ? (
+                    <div className={isPlus ? "ht-check-badge-purple" : "ht-check-badge-orange"}>
+                      <Check size={11} strokeWidth={3.5} />
+                    </div>
+                  ) : (
+                    <span>{item.col2Val}</span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
+  if (node.type === "Products") {
+    const isComparePage = currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare" || node.id === "products";
+    if (isComparePage && (currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare")) {
+      const isPlus = activeCompareTab === 1;
+      const defaultTiers = [
+        { name: "1个月", price: "¥78", sub: "¥78/月", isRecommended: false },
+        { name: "12个月", price: "¥488", sub: "¥40.6/月", badge: "最受欢迎", isRecommended: true },
+        { name: "终身", price: "¥998", sub: "原价 ¥1698", isRecommended: false },
+      ];
+      const tiers = Array.isArray(node.config?.tiers) && node.config.tiers.length > 0
+        ? node.config.tiers.map((t) => ({
+            name: t.name || "",
+            price: t.monthly || t.price || "",
+            sub: (t.total || t.sub || "").replace("$", "¥"),
+            badge: t.badge || "",
+          }))
+        : defaultTiers;
+      const curSelected = selectedTier !== undefined ? selectedTier : 1;
+
+      return wrap(
+        <div className="ht-compare-products-row">
+          {tiers.map((t, idx) => {
+            const isSel = idx === curSelected;
+            return (
+              <div
+                key={idx}
+                className={`ht-product-card-col ${
+                  isSel
+                    ? (isPlus ? "dark-selected" : "light-selected")
+                    : (isPlus ? "dark-unselected" : "light-unselected")
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedTier(idx);
+                }}
+              >
+                {isSel && (
+                  <div className={`ht-card-attached-badge ${isPlus ? "dark-neon" : "light-orange"}`}>
+                    {t.badge || "最受欢迎"}
+                  </div>
+                )}
+                <div className="ht-card-duration-title">{t.name}</div>
+                <div className="ht-card-main-price">{t.price}</div>
+                <div className="ht-card-sub-price">{t.sub}</div>
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+    if (node.config?.variant === "onboarding-dual-tiers" || node.id === "trial-t1-products") {
+      const curSelected = selectedOnboardingTier ?? 0;
+      return wrap(
+        <div className="ht-dual-tiers-container">
+          {/* Tier 0: 12个月 */}
+          <div
+            className={`ht-tier-card ${curSelected === 0 ? "selected" : "unselected"}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectOnboardingTier?.(0);
+            }}
+          >
+            <div className="ht-tier-badge-pill">免费试用</div>
+            <div className="ht-tier-content-row">
+              <div className="ht-tier-col-left">
+                <span className="ht-tier-title-main">12个月</span>
+                <span className="ht-tier-price-sub">¥488</span>
+              </div>
+              <div className="ht-tier-col-right">
+                <span className="ht-tier-price-main">¥40.67/月</span>
+                <span className="ht-tier-discount-pill">48%OFF</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Tier 1: 月费会员 */}
+          <div
+            className={`ht-tier-card ${curSelected === 1 ? "selected" : "unselected-gray"}`}
+            onClick={(e) => {
+              e.stopPropagation();
+              onSelectOnboardingTier?.(1);
+            }}
+          >
+            {curSelected === 1 && <div className="ht-tier-badge-pill">直接购买</div>}
+            <div className="ht-tier-content-row">
+              <div className="ht-tier-col-left">
+                <span className="ht-tier-title-main">月费会员</span>
+              </div>
+              <div className="ht-tier-col-right">
+                <span className="ht-tier-price-main">¥78.00月</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (node.config?.variant === "3-column-tiers" || node.config?.tiers) {
+      const tiers = node.config?.tiers || [
+        { name: "1 个月", monthly: "¥78", total: "¥78/ 月", badge: "", save: "", isRecommended: false },
+        { name: "12 个月", monthly: "¥388", originalPrice: "¥488", total: "¥388", badge: "🔥 8折", save: "节省 59%", isRecommended: true },
+        { name: "终身", monthly: "¥798", originalPrice: "¥1698", total: "¥798", badge: "🔥 4.8折", save: "永久会员权益", isRecommended: false },
+      ];
+      const curSelected = selectedTier < tiers.length ? selectedTier : (tiers.findIndex(t => t.isRecommended) >= 0 ? tiers.findIndex(t => t.isRecommended) : 1);
+      const isPurpleTheme = currentTemplate?.id === "ht-vip-pop" || node.config?.themeColor === "purple" || (!themeConfig?.primaryColor && !themeConfig?.subTemplate);
+      const themePrimary = isPurpleTheme ? "#7C5CFC" : (themeConfig?.primaryColor || (themeConfig?.subTemplate === "pkg-tpl-2" ? "#F59E0B" : "#0284C7"));
+      const isWarm = !isPurpleTheme && (themeConfig?.subTemplate === "pkg-tpl-2" || themePrimary === "#F59E0B");
+
+      return wrap(
+        <div className="preview-products-3col">
+          {tiers.map((t, idx) => {
+            const isSel = idx === curSelected;
+            return (
+              <div
+                key={idx}
+                className={`tier-col-card ${isSel ? (isPurpleTheme ? "purple-selected" : isWarm ? "warm-selected" : "selected") : ""}`}
+                style={isPurpleTheme && isSel ? { borderColor: "#7C5CFC", background: "#F5F3FF" } : {}}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedTier(idx);
+                }}
+              >
+                {t.badge && (
+                  <div
+                    className={`tier-col-badge ${isPurpleTheme ? "purple" : isWarm ? "warm" : ""}`}
+                    style={isPurpleTheme ? { background: isSel ? "#7C5CFC" : "rgba(124, 92, 252, 0.12)", color: isSel ? "#fff" : "#7C5CFC" } : {}}
+                  >
+                    {t.badge}
+                  </div>
+                )}
+                <div className="tier-col-name">{t.name}</div>
+                {t.originalPrice && (
+                  <div style={{ fontSize: 11, color: "#94a3b8", textDecoration: "line-through", margin: "1px 0" }}>
+                    {t.originalPrice}
+                  </div>
+                )}
+                {t.save && (
+                  <div
+                    className={`tier-col-save ${isPurpleTheme ? "purple" : isWarm ? "warm" : ""}`}
+                    style={isPurpleTheme ? { color: "#7C5CFC", fontWeight: 700, fontSize: 11 } : {}}
+                  >
+                    {t.save}
+                  </div>
+                )}
+                <div
+                  className={`tier-col-monthly ${isPurpleTheme ? "purple" : isWarm ? "warm" : ""}`}
+                  style={isPurpleTheme ? { color: isSel ? "#7C5CFC" : "#1e293b", fontSize: 16, fontWeight: 800 } : {}}
+                >
+                  {t.monthly}
+                </div>
+                {t.total && !t.originalPrice && (
+                  <div className="tier-col-total">{t.total}</div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      );
+    }
+
+    if (
+      (node.config?.variant === "entry-price-tier" ||
+        ((node.id === "t1-products" || node.id === "t2-products" || node.label === "特惠价格") &&
+          node.config?.variant !== "vertical-list-tiers" &&
+          node.config?.variant !== "onboarding-dual-tiers" &&
+          node.config?.variant !== "3-column-tiers")) &&
+      node.config?.variant !== "vertical-list-tiers" &&
+      node.label !== "纵向套餐列表" &&
+      !node.config?.listTiers
+    ) {
+      const otherColor = themeConfig?.otherColor || (themeConfig?.subTemplate === "tpl-2" ? "#F59E0B" : "#DE6876");
+      const mainFontColor = themeConfig?.mainFontColor || "#2D1832";
+      const priceNow = node.config?.priceNow || themeConfig?.priceNow || "折扣价 ¥388/年";
+      const priceOriginal = node.config?.priceOriginal || themeConfig?.priceOriginal || "原价 ¥488/年";
+
+      // 模板 1 (全屏平铺版 / 极简纯文本): 极简纯文本，左对齐，无外框卡片
+      if (node.config?.displayMode === "clean-text" || (themeConfig?.subTemplate === "tpl-1" && node.config?.displayMode !== "card") || node.id === "t1-products") {
+        return wrap(
+          <div style={{ textAlign: "left", margin: "6px 0 16px" }}>
+            <div style={{ fontSize: 17, fontWeight: 700, color: "#3D2E3F", marginBottom: 3, letterSpacing: "-0.01em" }}>
+              {priceOriginal}
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 900, color: otherColor, letterSpacing: "-0.02em" }}>
+              {priceNow}
+            </div>
+          </div>
+        );
+      }
+
+      const promoBadge = themeConfig?.promoText || node.config?.promoBadge || "限时特惠";
+      const priceSub = themeConfig?.priceSub || node.config?.priceSub || "仅 ¥0.35/天 · 新客立省 20% · 随时取消";
+      const discountTag = node.config?.discountTag || "-20% 折扣";
+
+      return wrap(
+        <div
+          style={{
+            position: "relative",
+            background: "#FFFFFF",
+            borderRadius: 14,
+            padding: "16px 14px 14px",
+            border: `2px solid ${otherColor}50`,
+            boxShadow: "0 6px 18px rgba(0,0,0,0.06)",
+            margin: "4px 0 10px",
+          }}
+        >
+          {promoBadge && (
+            <div
+              style={{
+                position: "absolute",
+                top: -11,
+                right: 14,
+                background: otherColor,
+                color: "#FFFFFF",
+                fontSize: 10,
+                fontWeight: 800,
+                padding: "2px 10px",
+                borderRadius: 12,
+                boxShadow: `0 2px 8px ${otherColor}50`,
+                display: "flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <Flame size={11} />
+              <span>{promoBadge}</span>
+            </div>
+          )}
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 4 }}>
+            <div>
+              <div style={{ fontSize: 10, fontWeight: 700, color: "#64748b", letterSpacing: "0.02em", marginBottom: 2 }}>
+                限时专属特惠
+              </div>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+                <span style={{ fontSize: 24, fontWeight: 900, color: otherColor, letterSpacing: "-0.03em" }}>
+                  {priceNow}
+                </span>
+                <span style={{ fontSize: 13, textDecoration: "line-through", color: mainFontColor, opacity: 0.45 }}>
+                  {priceOriginal}
+                </span>
+              </div>
+            </div>
+            <div
+              style={{
+                background: `${otherColor}15`,
+                color: otherColor,
+                padding: "4px 8px",
+                borderRadius: 8,
+                fontSize: 11,
+                fontWeight: 800,
+              }}
+            >
+              {discountTag}
+            </div>
+          </div>
+          <div style={{ fontSize: 11, color: "#64748b", marginTop: 2, fontWeight: 500 }}>
+            {priceSub}
+          </div>
+        </div>
+      );
+    }
+
+    const tiers = getVerticalListTiers(node);
+    return wrap(
+      <div className="preview-products-tiered">
+        {tiers.map((tier, idx) => (
+          <div
+            key={idx}
+            className={`tier-card ${idx === selectedTier ? "selected" : ""}`}
+            onClick={(e) => { e.stopPropagation(); setSelectedTier(idx); }}
+          >
+            <div className="tier-radio">
+              <div className={`radio-circle ${idx === selectedTier ? "checked" : ""}`} />
+            </div>
+            <div className="tier-info">
+              <div className="tier-name-row">
+                <strong className="tier-title">{tier.name}</strong>
+                {tier.tag && <span className="tier-pill">{tier.tag}</span>}
+              </div>
+              {tier.daily && <span className="tier-daily">{tier.daily}</span>}
+            </div>
+            <div className="tier-price-box">
+              <span className="tier-price">{tier.price}</span>
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (node.type === "Toggle") {
+    if (node.config?.variant === "trial-timeline" || node.id === "trial-t1-timeline") {
+      const steps = [
+        {
+          title: "开始试用",
+          day: "今天",
+          icon: (
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
+              <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V17H19V19Z" />
+            </svg>
+          ),
+        },
+        {
+          title: "即将结束通知",
+          day: "第2天",
+          icon: (
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
+              <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" />
+            </svg>
+          ),
+        },
+        {
+          title: "试用结束",
+          day: "第3天",
+          icon: (
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
+              <path d="M11.99 2C6.47 2 2 6.48 2 12C2 17.52 6.47 22 11.99 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 11.99 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" />
+            </svg>
+          ),
+        },
+      ];
+      return wrap(
+        <div className="ht-trial-timeline">
+          {steps.map((step, idx) => (
+            <React.Fragment key={idx}>
+              <div className="ht-timeline-step">
+                <div className="ht-timeline-step-icon">{step.icon}</div>
+                <div className="ht-timeline-step-title">{step.title}</div>
+                <div className="ht-timeline-step-day">{step.day}</div>
+              </div>
+              {idx < steps.length - 1 && <div className="ht-timeline-divider" />}
+            </React.Fragment>
+          ))}
+        </div>
+      );
+    }
+
+    const [title = "免费试用 7 天", sub = "到期前随时可取消"] = (node.content || "").split("|");
+    return wrap(
+      <div className="preview-trial-toggle" onClick={(e) => { e.stopPropagation(); setToggleOn(!toggleOn); }}>
+        <div className="toggle-text">
+          <strong>{title}</strong>
+          <small>{sub}</small>
+        </div>
+        <div className={`toggle-track ${toggleOn ? "active" : ""}`}>
+          <div className="toggle-thumb" />
+        </div>
+      </div>
+    );
+  }
+
+  if (node.type === "Purchase Button") {
+    const isComparePage = currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare" || node.id === "purchase";
+    if (isComparePage && (currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare")) {
+      const isPlus = activeCompareTab === 1;
+      return wrap(
+        <button
+          type="button"
+          className={`ht-compare-purchase-btn ${isPlus ? "dark-theme" : "light-theme"}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            notify?.(isPlus ? "已触发 VIP+ 旗舰会员订阅结账流程" : "已触发 VIP 会员订阅结账流程");
+          }}
+        >
+          {node.content || "升级 VIP"}
+        </button>
+      );
+    }
+    if (node.id?.includes("cp") || currentTemplate?.id === "ht-content-paywall") {
+      const color = node.config?.color || themeConfig?.btnColor || "#6C3EDE";
+      const text = node.content || themeConfig?.btnText || "立即续订";
+      return wrap(
+        <div style={{ margin: "14px 0 4px", padding: "0 2px" }}>
+          <button
+            type="button"
+            style={{
+              width: "100%",
+              padding: "11px 0",
+              background: color,
+              color: "#FFFFFF",
+              border: "none",
+              borderRadius: 24,
+              fontSize: 15,
+              fontWeight: 800,
+              cursor: "pointer",
+              boxShadow: `0 4px 14px ${color}40`,
+            }}
+          >
+            {text}
+          </button>
+        </div>
+      );
+    }
+    if (isOnboardingPage) {
+      const isTrialTier = selectedOnboardingTier === 0;
+      const btnText = isTrialTier
+        ? (node.content || themeConfig?.btnText || "开启3天 VIP免费试用")
+        : (themeConfig?.btnTextAlt || "继续");
+      const btnColor = themeConfig?.btnColor || "#6144e8";
+      const btnTextColor = themeConfig?.btnTextColor || "#FFFFFF";
+
+      return wrap(
+        <div className="preview-cta-wrap" style={{ margin: "10px 0 4px" }}>
+          <button
+            type="button"
+            className="preview-cta-button"
+            style={{
+              width: "100%",
+              minHeight: 50,
+              padding: "10px 16px",
+              background: btnColor,
+              color: btnTextColor,
+              border: "none",
+              borderRadius: 26,
+              fontSize: 16,
+              fontWeight: 800,
+              boxShadow: `0 6px 18px rgba(97, 68, 232, 0.32)`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <span>{btnText}</span>
+          </button>
+        </div>
+      );
+    }
+
+    if (themeConfig) {
+      const isTpl1 = themeConfig.subTemplate === "tpl-1" || node.id === "t1-purchase";
+      const otherColor =
+        node.config?.color ||
+        themeConfig.btnColor ||
+        (isTpl1 ? "#C85B6B" : themeConfig.otherColor) ||
+        (themeConfig.subTemplate === "tpl-2" || themeConfig.subTemplate === "pkg-tpl-2"
+          ? "#F59E0B"
+          : themeConfig.subTemplate === "pkg-tpl-1"
+          ? "#0284C7"
+          : "#DE6876");
+      const btnTextColor = themeConfig.btnTextColor || "#FFFFFF";
+      const btnText = node.content || themeConfig.btnText || "继续";
+      const showArrow = node.config?.showArrow === true && !isTpl1;
+
+      return wrap(
+        <div className="preview-cta-wrap" style={{ margin: "6px 0 10px" }}>
+          <button
+            className="preview-cta-button"
+            style={{
+              width: "100%",
+              minHeight: 48,
+              padding: "8px 16px",
+              background: otherColor,
+              color: btnTextColor,
+              border: "none",
+              borderRadius: 24,
+              fontSize: 17,
+              fontWeight: 800,
+              boxShadow: `0 4px 14px ${otherColor}40`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+              <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <span>{btnText}</span>
+                {showArrow && <ArrowRight size={16} strokeWidth={2.5} />}
+              </span>
+              {node.config?.subtitle && (
+                <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.9 }}>
+                  {node.config.subtitle}
+                </span>
+              )}
+            </div>
+          </button>
+        </div>
+      );
+    }
+
+    const customBtnColor = node.config?.color || (currentTemplate?.id === "ht-vip-pop" ? "#7C5CFC" : null);
+    if (customBtnColor) {
+      return wrap(
+        <div className="preview-cta-wrap" style={{ margin: "10px 0 6px" }}>
+          <button
+            type="button"
+            className="preview-cta-button"
+            style={{
+              width: "100%",
+              minHeight: 48,
+              padding: "10px 16px",
+              background: customBtnColor,
+              color: "#FFFFFF",
+              border: "none",
+              borderRadius: 24,
+              fontSize: 16.5,
+              fontWeight: 800,
+              boxShadow: `0 6px 18px ${customBtnColor}40`,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+            }}
+          >
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+              <span className="cta-main-title">{node.content || "领取 8折优惠"}</span>
+              {node.config?.subtitle && <span className="cta-sub-title" style={{ fontSize: 10, opacity: 0.9 }}>{node.config.subtitle}</span>}
+            </div>
+          </button>
+        </div>
+      );
+    }
+
+    return wrap(
+      <div className="preview-cta-wrap">
+        <button className="preview-cta-button">
+          <span className="cta-main-title">{node.content || "立即开启试用"}</span>
+          {node.config?.subtitle && <span className="cta-sub-title">{node.config.subtitle}</span>}
+        </button>
+      </div>
+    );
+  }
+
+  if (node.type === "Dismiss Button") {
+    if (currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare") {
+      return null;
+    }
+    if (isOnboardingPage && themeConfig?.showDismissBtn === false) {
+      return null;
+    }
+    if (node.config?.position === "top-left" || node.id?.includes("cp")) {
+      return (
+        <div
+          className={`preview-node ${active ? "selected" : ""}`}
+          onClick={select}
+          style={{
+            display: "flex",
+            justifyContent: "flex-start",
+            margin: "0 0 6px",
+            padding: "0 2px",
+          }}
+        >
+          <button
+            type="button"
+            style={{
+              background: "transparent",
+              border: "none",
+              padding: 2,
+              cursor: "pointer",
+              color: "#1E293B",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            title="关闭弹窗"
+          >
+            <X size={18} strokeWidth={2.4} />
+          </button>
+        </div>
+      );
+    }
+    if (node.config?.variant === "circle-close") {
+      return (
+        <div
+          className={`preview-node ${active ? "selected" : ""}`}
+          onClick={select}
+          style={{
+            position: "absolute",
+            top: 14,
+            right: 14,
+            zIndex: 20,
+          }}
+        >
+          <button
+            type="button"
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: "50%",
+              background: "#F1F5F9",
+              color: "#64748B",
+              border: "none",
+              padding: 0,
+              cursor: "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            title="关闭页面"
+          >
+            <X size={15} strokeWidth={2.4} />
+          </button>
+        </div>
+      );
+    }
+    const isCloseIcon = node.config?.variant === "close-icon" || node.content === "✕" || node.id === "t1-close" || node.id?.includes("close");
+    if (isCloseIcon) {
+      const pos = node.config?.position || "top-left";
+      const justify = pos === "top-right" ? "flex-end" : pos === "center" ? "center" : "flex-start";
+      return wrap(
+        <div style={{ display: "flex", justifyContent: justify, padding: "2px 2px 8px" }}>
+          <button
+            type="button"
+            style={{
+              background: "transparent",
+              border: "none",
+              padding: 4,
+              cursor: "pointer",
+              color: node.config?.color || themeConfig?.mainFontColor || ((currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare") ? (activeCompareTab === 1 ? "#FFFFFF" : "#111827") : "#2D1832"),
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+            title="关闭页面"
+          >
+            <X size={22} strokeWidth={2.4} />
+          </button>
+        </div>
+      );
+    }
+    return wrap(
+      <div style={{ textAlign: "center", padding: "4px 0 8px" }}>
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (isOnboardingPage) {
+              onTriggerRetainModal?.();
+            }
+          }}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: node.config?.color || "#94a3b8",
+            fontSize: 13,
+            cursor: "pointer",
+            fontWeight: 500,
+            textDecoration: isOnboardingPage ? "none" : "underline",
+            textUnderlineOffset: "3px",
+            textDecorationColor: "#cbd5e1",
+          }}
+        >
+          {node.content || themeConfig?.dismissBtnText || "不，谢谢"}
+        </button>
+      </div>
+    );
+  }
+
+  if (node.type === "Legal Footer" || node.type === "Links") {
+    const isComparePage = currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare" || node.id === "links";
+    if (isComparePage && (currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare")) {
+      const isPlus = activeCompareTab === 1;
+      return wrap(
+        <div className={`ht-compare-legal-footer ${isPlus ? "dark-theme" : "light-theme"}`}>
+          如果当前缴费期限24小时没有取消续订，系统会自动续订，费用将从你的iTunes账户收取，你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的<strong>服务条款</strong>及<strong>隐私政策</strong>
+        </div>
+      );
+    }
+    if (isOnboardingPage) {
+      const legalText = node.content || "免费3天试用后,系统会以¥488自动续订,可随时取消。费用将从你的iTunes账户收取,你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息,请访问我们的[服务条款]及[隐私政策]";
+      return wrap(
+        <div className="preview-legal-footer" style={{ textAlign: "center", padding: "4px 10px 16px" }}>
+          <p className="legal-disclaimer" style={{ color: "#9ca3af", fontSize: 9.5, lineHeight: 1.45, margin: 0 }}>
+            {legalText}
+          </p>
+        </div>
+      );
+    }
+
+    // 模板 1 (全屏平铺版 / 真实 App 原版图三): "可随时取消" + 完整 iTunes 扣费协议
+    if (themeConfig?.subTemplate === "tpl-1" || node.id === "t1-links" || node.config?.variant === "entry-legal") {
+      const parts = (node.content || "").split("\n");
+      const title = parts[0] || "可随时取消";
+      const desc = parts.slice(1).join("\n") || "如果当前缴费期前24小时没有取消续订，系统会自动续订，费用将从你的 iTunes 账户收取，你可随时前往 iTunes 商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的 [服务条款] 及 [隐私政策]";
+      return wrap(
+        <div className="preview-legal-footer" style={{ textAlign: "center", padding: "8px 4px 18px" }}>
+          <div style={{ fontSize: 13.5, fontWeight: 600, color: "#9E8E96", marginBottom: 5 }}>
+            {title}
+          </div>
+          <p style={{ color: "#B5A8AF", fontSize: 9.5, lineHeight: 1.45, margin: 0 }}>
+            {desc}
+          </p>
+        </div>
+      );
+    }
+
+    if (themeConfig) {
+      const disclaimerColor = themeConfig.disclaimerColor || "#94a3b8";
+      return wrap(
+        <div className="preview-legal-footer" style={{ textAlign: "center", padding: "4px 8px 12px" }}>
+          <p className="legal-disclaimer" style={{ color: disclaimerColor, fontSize: 10, lineHeight: 1.4, margin: "0 0 4px" }}>
+            {node.content || "确认购买即表示同意服务协议。订阅将自动续订，可随时在 iTunes 设置中取消。"}
+          </p>
+          <div className="legal-links" style={{ color: disclaimerColor, fontSize: 10, display: "flex", justifyContent: "center", gap: 6 }}>
+            <span>服务条款</span>
+            <span>·</span>
+            <span>隐私政策</span>
+            <span>·</span>
+            <span>恢复购买</span>
+          </div>
+        </div>
+      );
+    }
+
+    return wrap(
+      <div className="preview-legal-footer" style={{ textAlign: "center", padding: "4px 8px 12px" }}>
+        <p className="legal-disclaimer" style={{ color: "#94a3b8", fontSize: 9.5, lineHeight: 1.45, margin: "0 0 4px" }}>
+          {node.content || "试用期结束前可随时在 App Store 取消，不收取任何费用"}
+        </p>
+        {node.config?.showLinks !== false && !node.content?.includes("服务条款") && (
+          <div className="legal-links" style={{ color: "#94a3b8", fontSize: 10, display: "flex", justifyContent: "center", gap: 6 }}>
+            <span>服务条款</span>
+            <span>·</span>
+            <span>隐私政策</span>
+            <span>·</span>
+            <span>恢复购买</span>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  if (node.type === "Hero Image") {
+    if (currentTemplate?.id === "ht-vip-pop" || node.config?.variant === "media-placeholder" || node.id === "pop-hero") {
+      const customImg = node.config?.imageUrl;
+      return wrap(
+        <div
+          style={{
+            width: "100%",
+            height: 145,
+            borderRadius: 12,
+            background: customImg ? `url("${customImg}") center/cover no-repeat` : "#E2E8F0",
+            margin: "4px 0 10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#94A3B8",
+            fontSize: 12,
+            fontWeight: 600,
+            border: customImg ? "none" : "1px solid #CBD5E1",
+            overflow: "hidden",
+          }}
+        >
+          {!customImg && <span>媒体 / 背景图展示区</span>}
+        </div>
+      );
+    }
+    if (themeConfig) {
+      const isTpl2 = themeConfig.subTemplate === "tpl-2";
+      const otherColor = themeConfig.otherColor || (isTpl2 ? "#F59E0B" : "#FF4D6D");
+      return wrap(
+        <div style={{ textAlign: "center", padding: "8px 0 4px" }}>
+          {isTpl2 ? (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                padding: "8px 14px",
+                background: "rgba(255,255,255,0.92)",
+                borderRadius: 20,
+                boxShadow: "0 4px 12px rgba(245,158,11,0.18)",
+              }}
+            >
+              <div style={{ display: "flex", marginRight: 4 }}>
+                <span style={{ fontSize: 18, marginLeft: -4 }}>🇺🇸</span>
+                <span style={{ fontSize: 18, marginLeft: -4 }}>🇯🇵</span>
+                <span style={{ fontSize: 18, marginLeft: -4 }}>🇪🇸</span>
+              </div>
+              <span style={{ fontSize: 12, fontWeight: 700, color: otherColor }}>
+                寻找身边母语者
+              </span>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "5px 14px",
+                borderRadius: 20,
+                background: `${otherColor}18`,
+                color: otherColor,
+                fontSize: 11,
+                fontWeight: 800,
+                letterSpacing: "0.02em",
+              }}
+            >
+              <Sparkles size={13} />
+              <span>HelloTalk VIP 特权俱乐部</span>
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    return wrap(
+      <div className="preview-hero-container">
+        <div className="hero-glow-badge">
+          <Sparkles size={14} /> HelloTalk VIP Club
+        </div>
+      </div>
+    );
+  }
+
+  if (node.type === "Text") {
+    if (node.config?.variant === "safety-pill") {
+      const pillText = (onboardingCarouselSlide % 3 === 2)
+        ? "ⓘ 可随时在 App Store 取消"
+        : (node.content || "ⓘ 订阅可随时取消，无需支付任何费用");
+      return wrap(
+        <div className="ht-safety-pill">
+          <span>{pillText}</span>
+        </div>
+      );
+    }
+    if (node.config?.variant === "safety-note") {
+      return wrap(
+        <div className="ht-safety-note">
+          {node.content || "订阅可随时取消，无需支付任何费用"}
+        </div>
+      );
+    }
+    return wrap(
+      <div style={{ textAlign: "center", fontSize: 11, color: "#64748b", margin: "4px 0" }}>
+        {node.content}
+      </div>
+    );
+  }
+
+  return wrap(<div style={{ padding: "6px 0", fontSize: 11 }}>{node.content || node.type}</div>);
+}
+
+function BuilderProperties({
+  active,
+  setBuilderTab,
+  markUnknown,
+  boundary,
+  templateLinks,
+  setTemplateLinks,
+  updateNode,
+  removeNode,
+  addNestedNode,
+  notify,
+  isOnboardingPage,
+  activeSubTemplate,
+  updateSubTemplateTheme,
+  onTriggerRetainModal,
+  onSwitchSubTemplate,
+  activeCompareTab = 0,
+  setActiveCompareTab,
+}) {
+
+  const [tab, setTab] = useState("content");
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [tempName, setTempName] = useState("");
+
+  useEffect(() => {
+    setIsEditingName(false);
+    setTempName("");
+  }, [active?.id]);
+
+  if (!active) {
+    return (
+      <div className="property-scroll" style={{ padding: "40px 20px", textAlign: "center", color: "#94a3b8" }}>
+        <Sliders size={36} style={{ marginBottom: 12, opacity: 0.4, color: "#6366f1" }} />
+        <h4 style={{ fontSize: 13, fontWeight: 700, color: "#475569", margin: "0 0 6px" }}>未选中组件</h4>
+        <p style={{ fontSize: 11, lineHeight: 1.6, margin: 0, color: "#94a3b8" }}>
+          👈 请在左侧「组件树与图层」或中间「iPhone 画布」点击任意组件，即可在此直接配置其文案、样式与业务参数。
+        </p>
+      </div>
+    );
+  }
+  const type = active.type;
+
+  const insertJinja = (variable) => {
+    updateNode(active.id, { content: (active.content ?? "") + ` ${variable} ` });
+  };
+
+  return (
+    <div className="property-scroll">
+      <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12, paddingBottom: 10, borderBottom: "1px solid #f1f5f9" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          {isEditingName ? (
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <input
+                type="text"
+                value={tempName}
+                autoFocus
+                onChange={(e) => setTempName(e.target.value)}
+                onBlur={() => {
+                  if (tempName.trim() && tempName.trim() !== getNodeLabel(active)) {
+                    updateNode(active.id, { label: tempName.trim() });
+                    notify?.(`已重命名为: ${tempName.trim()}`);
+                  }
+                  setIsEditingName(false);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    if (tempName.trim() && tempName.trim() !== getNodeLabel(active)) {
+                      updateNode(active.id, { label: tempName.trim() });
+                      notify?.(`已重命名为: ${tempName.trim()}`);
+                    }
+                    setIsEditingName(false);
+                  } else if (e.key === "Escape") {
+                    setIsEditingName(false);
+                  }
+                }}
+                style={{
+                  fontSize: 13,
+                  fontWeight: 600,
+                  padding: "3px 7px",
+                  borderRadius: 4,
+                  border: "1px solid #6366f1",
+                  outline: "none",
+                  width: 140
+                }}
+              />
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
+                {getNodeLabel(active)}
+              </h3>
+              <button
+                type="button"
+                title="编辑组件名称"
+                onClick={() => {
+                  setTempName(getNodeLabel(active));
+                  setIsEditingName(true);
+                }}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  padding: "3px 5px",
+                  background: "#f8fafc",
+                  border: "1px solid #e2e8f0",
+                  borderRadius: 4,
+                  color: "#64748b",
+                  cursor: "pointer"
+                }}
+              >
+                <Pencil size={12} />
+              </button>
+            </div>
+          )}
+          <button
+            type="button"
+            title={`删除 ${getNodeLabel(active)} 组件`}
+            onClick={() => {
+              removeNode(active.id);
+              notify?.(`已删除组件: ${getNodeLabel(active)}`);
+            }}
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              fontSize: 10.5,
+              fontWeight: 600,
+              color: "#ef4444",
+              background: "#fef2f2",
+              border: "1px solid #fecaca",
+              borderRadius: 4,
+              padding: "2px 7px",
+              cursor: "pointer"
+            }}
+          >
+            <Trash2 size={11} /> 删除组件
+          </button>
+        </div>
+      </div>
+
+      <div className="property-tabs">
+        <button className={tab === "content" ? "active" : ""} onClick={() => setTab("content")}>内容</button>
+        <button className={tab === "style" || tab === "layout" ? "active" : ""} onClick={() => setTab("style")}>样式</button>
+      </div>
+
+      {tab === "content" && (
+        <>
+          {/* Jinja Variable Toolbar for Text / Header */}
+          {["Header", "Subhead", "Text"].includes(type) && (
+            <div style={{ marginBottom: 12 }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
+                插入动态变量
+              </span>
+              <div className="jinja-chips-container">
+                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ nick_name }}")}>+ 用户昵称</button>
+                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_expired_days }}")}>+ 到期天数</button>
+                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_expire_time }}")}>+ 到期日期</button>
+                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_privilege_model_v2_max }}")}>+ 特权上限</button>
+                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ visitor_count }}")}>+ 访客人数</button>
+                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_chat_translate_count }}")}>+ 消耗翻译</button>
+              </div>
+            </div>
+          )}
+
+          {(type === "Hero Image" || active.config?.variant === "onboarding-wave-hero" || active.config?.variant === "onboarding-carousel-hero" || active.label === "背景图" || active.id?.includes("hero")) && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 16px" }}>
+              <div style={{ background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
+                  🖼️ 背景图形态与风格
+                </span>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
+                  {[
+                    { key: "illustration", label: "🌍 原生插画" },
+                    { key: "image", label: "🖼️ 自定义图片" },
+                    { key: "gradient", label: "🎨 渐变底色" },
+                  ].map((m) => {
+                    const isSelected = (active.config?.bgMode || "illustration") === m.key;
+                    return (
+                      <button
+                        key={m.key}
+                        type="button"
+                        style={{
+                          fontSize: 11,
+                          padding: "6px 4px",
+                          borderRadius: 6,
+                          border: isSelected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                          background: isSelected ? "#eff6ff" : "#fff",
+                          color: isSelected ? "#1d4ed8" : "#475569",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, bgMode: m.key } })}
+                      >
+                        {m.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {(active.config?.bgMode === "illustration" || !active.config?.bgMode) && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <Field label="浮层气泡标语文案">
+                      <input
+                        value={active.config?.sloganText ?? "寻找身边母语者"}
+                        placeholder="例如：寻找身边母语者"
+                        onChange={(e) => updateNode(active.id, { config: { ...active.config, sloganText: e.target.value } })}
+                      />
+                    </Field>
+
+                    <Field label="标语气泡底色">
+                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                        {["#2563eb", "#ea580c", "#1e293b", "#7c3aed", "#059669", "#dc2626"].map((c) => (
+                          <button
+                            key={c}
+                            type="button"
+                            style={{
+                              width: 20,
+                              height: 20,
+                              borderRadius: "50%",
+                              background: c,
+                              border: (active.config?.bubbleBg || "#2563eb") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => updateNode(active.id, { config: { ...active.config, bubbleBg: c } })}
+                          />
+                        ))}
+                      </div>
+                    </Field>
+
+                    <Field label="插画主题底色">
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        {[
+                          { key: "orange", label: "🍊 暖橙经典", bg: "linear-gradient(135deg, #ea580c, #f97316)" },
+                          { key: "gold", label: "👑 尊享黑金", bg: "linear-gradient(135deg, #1e1b4b, #312e81)" },
+                          { key: "blue", label: "🌌 极光深蓝", bg: "linear-gradient(135deg, #1e3a8a, #3b82f6)" },
+                          { key: "purple", label: "🌸 优雅粉紫", bg: "linear-gradient(135deg, #831843, #ec4899)" },
+                        ].map((theme) => {
+                          const isSelected = (active.config?.themeColor || "orange") === theme.key;
+                          return (
+                            <button
+                              key={theme.key}
+                              type="button"
+                              style={{
+                                fontSize: 10.5,
+                                padding: "6px 8px",
+                                borderRadius: 6,
+                                border: isSelected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                                background: theme.bg,
+                                color: "#fff",
+                                fontWeight: 700,
+                                cursor: "pointer",
+                                textAlign: "left",
+                              }}
+                              onClick={() => updateNode(active.id, { config: { ...active.config, themeColor: theme.key } })}
+                            >
+                              {theme.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </Field>
+                  </div>
+                )}
+
+                {active.config?.bgMode === "image" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <Field label="自定义背景图片 URL">
+                      <input
+                        value={active.config?.customBgImage || ""}
+                        placeholder="https://... 或点击预设挑选"
+                        onChange={(e) => updateNode(active.id, { config: { ...active.config, customBgImage: e.target.value } })}
+                      />
+                    </Field>
+                    <Field label="预设高质量插画壁纸挑选">
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        {[
+                          { name: "🌏 环球母语连结", url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80" },
+                          { name: "✨ 晨曦极简学习", url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80" },
+                          { name: "🏙️ 全球城市漫游", url: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=600&q=80" },
+                          { name: "🎓 专业导师答疑", url: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80" },
+                        ].map((item) => (
+                          <button
+                            key={item.name}
+                            type="button"
+                            style={{
+                              padding: "6px 8px",
+                              borderRadius: 6,
+                              border: active.config?.customBgImage === item.url ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                              background: active.config?.customBgImage === item.url ? "#eff6ff" : "#fff",
+                              fontSize: 10.5,
+                              cursor: "pointer",
+                              textAlign: "left",
+                              fontWeight: active.config?.customBgImage === item.url ? 700 : 500,
+                            }}
+                            onClick={() => updateNode(active.id, { config: { ...active.config, customBgImage: item.url } })}
+                          >
+                            {item.name}
+                          </button>
+                        ))}
+                      </div>
+                    </Field>
+                  </div>
+                )}
+
+                {active.config?.bgMode === "gradient" && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    <Field label="预设渐变底色">
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        {[
+                          { name: "黑金极夜", grad: "linear-gradient(135deg, #18181b 0%, #27272a 100%)", color: "#fafafa" },
+                          { name: "深海湛蓝", grad: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)", color: "#f0f9ff" },
+                          { name: "落日余晖", grad: "linear-gradient(135deg, #ea580c 0%, #c2410c 100%)", color: "#fff7ed" },
+                          { name: "静谧紫夜", grad: "linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%)", color: "#f5f3ff" },
+                          { name: "翡翠森林", grad: "linear-gradient(135deg, #059669 0%, #047857 100%)", color: "#ecfdf5" },
+                          { name: "极光珊瑚", grad: "linear-gradient(135deg, #e11d48 0%, #be123c 100%)", color: "#fff1f2" },
+                        ].map((g) => (
+                          <button
+                            key={g.name}
+                            type="button"
+                            style={{
+                              background: g.grad,
+                              color: g.color,
+                              padding: "8px 6px",
+                              borderRadius: 6,
+                              border: active.config?.gradientBg === g.grad ? "2px solid #2563eb" : "1px solid rgba(0,0,0,0.1)",
+                              fontSize: 11,
+                              cursor: "pointer",
+                              fontWeight: 600,
+                            }}
+                            onClick={() => updateNode(active.id, { config: { ...active.config, gradientBg: g.grad } })}
+                          >
+                            {g.name}
+                          </button>
+                        ))}
+                      </div>
+                    </Field>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
+          {type === "Header" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📝 标题内容配置</span>
+              {(active.config?.kicker || active.id === "t1-headline") && (
+                <Field label="顶部前缀 / VIP 标识">
+                  <input
+                    value={active.config?.kicker ?? "HelloTalk VIP 👑"}
+                    placeholder="例如：HelloTalk VIP 👑"
+                    onChange={(e) => updateNode(active.id, { config: { ...active.config, kicker: e.target.value } })}
+                  />
+                </Field>
+              )}
+              <Field label="主标题文案">
+                <input
+                  value={active.content ?? ""}
+                  placeholder="例如：首年额外 20% 优惠！"
+                  onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                />
+              </Field>
+              {active.config?.variant === "vip-banner" && (
+                <Field label="副标题说明">
+                  <input
+                    value={active.config?.subtitle ?? "畅享 16 项高阶语言学习特权"}
+                    onChange={(e) => updateNode(active.id, { config: { ...active.config, subtitle: e.target.value } })}
+                  />
+                </Field>
+              )}
+              {active.config?.variant === "brand-hero" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
+                  <label style={{ fontSize: 11, fontWeight: 700, color: "#475569" }}>3 大核心特权标语 (纯中文展示)</label>
+                  {(active.config?.bullets || ["无限翻译", "查看谁喜欢了你", "搜索全世界的语伴"]).map((b, bIdx) => (
+                    <input
+                      key={bIdx}
+                      value={b}
+                      placeholder={`特权标语 ${bIdx + 1}`}
+                      onChange={(e) => {
+                        const nextBullets = [...(active.config?.bullets || ["无限翻译", "查看谁喜欢了你", "搜索全世界的语伴"])];
+                        nextBullets[bIdx] = e.target.value;
+                        updateNode(active.id, { config: { ...active.config, bullets: nextBullets } });
+                      }}
+                      style={{ fontSize: 11, padding: "4px 8px", borderRadius: 4, border: "1px solid #cbd5e1", background: "#ffffff" }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {type === "Subhead" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📝 副标题配置</span>
+              <Field label="副标题文案">
+                <input
+                  value={active.content ?? ""}
+                  placeholder="例如：仅限今日"
+                  onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                />
+              </Field>
+              <Field label="副标题文本颜色">
+                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                  {["#DE6876", "#FF4D6D", "#F59E0B", "#64748b", "#0284C7", "#2D1832"].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      style={{
+                        width: 20,
+                        height: 20,
+                        borderRadius: "50%",
+                        background: c,
+                        border: (active.config?.color || "#DE6876") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
+                    />
+                  ))}
+                </div>
+              </Field>
+            </div>
+          )}
+
+          {type === "Benefit List" ? (
+            <CoreBenefitsManager
+              node={active}
+              updateNode={updateNode}
+              notify={notify}
+              themeConfig={activeSubTemplate?.theme || null}
+            />
+          ) : type === "Carousel Cards" ? (
+            <PrivilegeSwitchManager
+              node={active}
+              updateNode={updateNode}
+              notify={notify}
+              defaultMode="carousel"
+            />
+          ) : type === "Comparison Table" ? (
+            <ComparisonTableManager
+              node={active}
+              updateNode={updateNode}
+              notify={notify}
+              onSwitchCompareTab={setActiveCompareTab}
+            />
+          ) : (type === "Products" || type === "Dismiss Button" || type === "Header" || type === "Subhead" || type === "Hero Image" || type === "Timer" || type === "Purchase Button" || type === "Switch Tabs" || type === "User Profile" || type === "Dynamic Metrics" || type === "Mascot Illustration") ? null : (
+            <Field label="文本内容">
+              <textarea
+                rows={4}
+                value={active.content ?? ""}
+                onChange={(e) => updateNode(active.id, { content: e.target.value })}
+              />
+            </Field>
+          )}
+
+          {type === "User Profile" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>👤 用户画像配置 (Avatar & Badge)</span>
+              <Field label="用户昵称 (nick_name)">
+                <input
+                  type="text"
+                  value={active.config?.userName || active.content?.split("|")[0] || "Yeah"}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    const flag = active.config?.userFlag || active.content?.split("|")[1] || "🇩🇪";
+                    updateNode(active.id, {
+                      content: `${newName}|${flag}`,
+                      config: { ...active.config, userName: newName, userFlag: flag },
+                    });
+                  }}
+                />
+              </Field>
+              <Field label="国籍国旗 (Flag Emoji)">
+                <input
+                  type="text"
+                  value={active.config?.userFlag || active.content?.split("|")[1] || "🇩🇪"}
+                  onChange={(e) => {
+                    const newFlag = e.target.value;
+                    const name = active.config?.userName || active.content?.split("|")[0] || "Yeah";
+                    updateNode(active.id, {
+                      content: `${name}|${newFlag}`,
+                      config: { ...active.config, userName: name, userFlag: newFlag },
+                    });
+                  }}
+                />
+              </Field>
+            </div>
+          )}
+
+          {type === "Dynamic Metrics" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 动态指标矩阵 / 变量插值配置</span>
+              <Field label="数据展示形态">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 11,
+                      padding: "7px 6px",
+                      borderRadius: 6,
+                      border: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "2px solid #6C3EDE" : "1px solid #CBD5E1",
+                      background: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "#F5F0FF" : "#FFF",
+                      color: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "#6C3EDE" : "#475569",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, styleType: "VIP失效样式", visitorCount: undefined }, content: "972、762、487、673、837、899、116、156、939、446、650、442" })}
+                  >
+                    12组数据矩阵 (失效/非订阅)
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 11,
+                      padding: "7px 6px",
+                      borderRadius: 6,
+                      border: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "2px solid #FF6A00" : "1px solid #CBD5E1",
+                      background: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "#FFF7ED" : "#FFF",
+                      color: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "#FF6A00" : "#475569",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, styleType: "非VIP样式", visitorCount: 21 }, content: "21 new visitors in the past 7 days 👀" })}
+                  >
+                    访客统计大数字 (非VIP访客)
+                  </button>
+                </div>
+              </Field>
+              {active.config?.visitorCount ? (
+                <Field label="7天内访客人数 (visitor_count_7d)">
+                  <input
+                    type="number"
+                    value={active.config?.visitorCount || 21}
+                    onChange={(e) => {
+                      const num = parseInt(e.target.value, 10) || 0;
+                      updateNode(active.id, {
+                        config: { ...active.config, visitorCount: num },
+                        content: `${num} new visitors in the past 7 days 👀`,
+                      });
+                    }}
+                  />
+                </Field>
+              ) : (
+                <Field label="指标变量数值 (顿号或空格分隔)">
+                  <textarea
+                    rows={3}
+                    value={active.content || ""}
+                    onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                  />
+                </Field>
+              )}
+            </div>
+          )}
+
+          {type === "Mascot Illustration" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🎨 吉祥物插画配置</span>
+              <Field label="官方吉祥物形态">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "8px 4px",
+                      borderRadius: 6,
+                      border: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "2px solid #6C3EDE" : "1px solid #CBD5E1",
+                      background: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "#F5F0FF" : "#FFF",
+                      color: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "#6C3EDE" : "#475569",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "crown-gift" }, content: "crown-gift" })}
+                  >
+                    👑 皇冠之星<br />(失效样式)
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "8px 4px",
+                      borderRadius: 6,
+                      border: active.config?.mascotType === "binoculars" ? "2px solid #FF6A00" : "1px solid #CBD5E1",
+                      background: active.config?.mascotType === "binoculars" ? "#FFF7ED" : "#FFF",
+                      color: active.config?.mascotType === "binoculars" ? "#FF6A00" : "#475569",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "binoculars" }, content: "binoculars" })}
+                  >
+                    🔍 望远镜星<br />(访客样式)
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "8px 4px",
+                      borderRadius: 6,
+                      border: active.config?.mascotType === "translate-coin" ? "2px solid #FF8A00" : "1px solid #CBD5E1",
+                      background: active.config?.mascotType === "translate-coin" ? "#FEF7E5" : "#FFF",
+                      color: active.config?.mascotType === "translate-coin" ? "#FF8A00" : "#475569",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "translate-coin" }, content: "translate-coin" })}
+                  >
+                    🪙 翻译金币<br />(非订阅样式)
+                  </button>
+                </div>
+              </Field>
+            </div>
+          )}
+
+          {type === "Switch Tabs" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🔀 切换标签配置 (VIP / VIP+)</span>
+              <Field label="当前激活标签预览联动">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 11,
+                      padding: "8px",
+                      borderRadius: 6,
+                      fontWeight: 700,
+                      border: activeCompareTab === 0 ? "2px solid #F59E0B" : "1px solid #CBD5E1",
+                      background: activeCompareTab === 0 ? "#FFFBEB" : "#FFF",
+                      color: activeCompareTab === 0 ? "#B45309" : "#475569",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      setActiveCompareTab?.(0);
+                      notify?.("已切换画布预览为: VIP 进阶版 (图一官方规范)");
+                    }}
+                  >
+                    🌟 VIP 进阶版 (图一)
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 11,
+                      padding: "8px",
+                      borderRadius: 6,
+                      fontWeight: 700,
+                      border: activeCompareTab === 1 ? "2px solid #8B5CF6" : "1px solid #CBD5E1",
+                      background: activeCompareTab === 1 ? "#F5F3FF" : "#FFF",
+                      color: activeCompareTab === 1 ? "#6D28D9" : "#475569",
+                      cursor: "pointer",
+                    }}
+                    onClick={() => {
+                      setActiveCompareTab?.(1);
+                      notify?.("已切换画布预览为: VIP+ 旗舰版 (图四官方规范)");
+                    }}
+                  >
+                    👑 VIP+ 旗舰版 (图四)
+                  </button>
+                </div>
+              </Field>
+            </div>
+          )}
+
+
+          {type === "Timer" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>⚡ 倒计时组件配置</span>
+              <Field label="倒计时展示形态">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "5px 6px",
+                      borderRadius: 4,
+                      border: active.config?.variant === "clean-text" || (!active.config?.variant && active.id === "t1-timer") ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                      background: active.config?.variant === "clean-text" || (!active.config?.variant && active.id === "t1-timer") ? "#F0F9FF" : "#fff",
+                      color: active.config?.variant === "clean-text" || (!active.config?.variant && active.id === "t1-timer") ? "#0284c7" : "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, variant: "clean-text" } })}
+                  >
+                    极简纯文本
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "5px 6px",
+                      borderRadius: 4,
+                      border: active.config?.variant === "card" || active.config?.variant === "digit-cards" || (!active.config?.variant && active.id !== "t1-timer") ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                      background: active.config?.variant === "card" || active.config?.variant === "digit-cards" || (!active.config?.variant && active.id !== "t1-timer") ? "#F0F9FF" : "#fff",
+                      color: active.config?.variant === "card" || active.config?.variant === "digit-cards" || (!active.config?.variant && active.id !== "t1-timer") ? "#0284c7" : "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, variant: "card" } })}
+                  >
+                    色块数字框
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "5px 6px",
+                      borderRadius: 4,
+                      border: active.config?.variant === "badge-pill" ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                      background: active.config?.variant === "badge-pill" ? "#F0F9FF" : "#fff",
+                      color: active.config?.variant === "badge-pill" ? "#0284c7" : "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, variant: "badge-pill" } })}
+                  >
+                    胶囊提示条
+                  </button>
+                </div>
+              </Field>
+              <Field label="倒计时提示标签">
+                <input
+                  value={active.config?.timerLabel ?? active.config?.label ?? active.content ?? "优惠截止时间"}
+                  placeholder="例如：优惠截止时间 或 黑五限时活动倒计时"
+                  onChange={(e) => updateNode(active.id, { content: e.target.value, config: { ...active.config, timerLabel: e.target.value, label: "倒计时" } })}
+                />
+              </Field>
+              <Field label="倒计时期限（小时）">
+                <input
+                  type="number"
+                  min="1"
+                  max="168"
+                  value={active.config?.hours ?? 20}
+                  onChange={(e) => updateNode(active.id, { config: { ...active.config, hours: Number(e.target.value) } })}
+                />
+              </Field>
+            </div>
+          )}
+
+          {type === "Products" && (active.config?.variant === "entry-price-tier" || active.label === "特惠价格" || active.id === "t1-products" || active.id === "t2-products") && active.config?.variant !== "vertical-list-tiers" && active.config?.variant !== "onboarding-dual-tiers" && active.config?.variant !== "3-column-tiers" && active.label !== "纵向套餐列表" && active.label !== "产品双套餐" && !active.config?.listTiers && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🏷️ 特惠价格配置</span>
+              <Field label="展示排版">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 11,
+                      padding: "5px 8px",
+                      borderRadius: 4,
+                      border: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                      background: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "#F0F9FF" : "#fff",
+                      color: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "#0284c7" : "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, displayMode: "clean-text" } })}
+                  >
+                    极简排版 (原版推荐)
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 11,
+                      padding: "5px 8px",
+                      borderRadius: 4,
+                      border: active.config?.displayMode === "card" ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                      background: active.config?.displayMode === "card" ? "#F0F9FF" : "#fff",
+                      color: active.config?.displayMode === "card" ? "#0284c7" : "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, displayMode: "card" } })}
+                  >
+                    卡片边框
+                  </button>
+                </div>
+              </Field>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                <Field label="原价文案">
+                  <input
+                    value={active.config?.priceOriginal ?? "原价 ¥488/年"}
+                    placeholder="原价 ¥488/年"
+                    onChange={(e) => updateNode(active.id, { config: { ...active.config, priceOriginal: e.target.value } })}
+                  />
+                </Field>
+                <Field label="折扣特惠价">
+                  <input
+                    value={active.config?.priceNow ?? "折扣价 ¥388/年"}
+                    placeholder="折扣价 ¥388/年"
+                    onChange={(e) => updateNode(active.id, { config: { ...active.config, priceNow: e.target.value } })}
+                  />
+                </Field>
+              </div>
+              {active.config?.displayMode === "card" && (
+                <>
+                  <Field label="角标文案">
+                    <input
+                      value={active.config?.promoBadge ?? "限时特惠"}
+                      onChange={(e) => updateNode(active.id, { config: { ...active.config, promoBadge: e.target.value } })}
+                    />
+                  </Field>
+                  <Field label="折扣标签">
+                    <input
+                      value={active.config?.discountTag ?? "-20% 折扣"}
+                      onChange={(e) => updateNode(active.id, { config: { ...active.config, discountTag: e.target.value } })}
+                    />
+                  </Field>
+                  <Field label="底部计费说明">
+                    <input
+                      value={active.config?.priceSub ?? "仅 ¥0.35/天 · 新客立省 20% · 随时取消"}
+                      onChange={(e) => updateNode(active.id, { config: { ...active.config, priceSub: e.target.value } })}
+                    />
+                  </Field>
+                </>
+              )}
+            </div>
+          )}
+
+          {type === "Products" && (active.config?.variant === "onboarding-dual-tiers" || active.label === "产品双套餐" || active.id === "trial-t1-products") && active.config?.variant !== "vertical-list-tiers" && active.label !== "纵向套餐列表" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 产品双套餐配置 (试用年卡 + 基础月卡)</span>
+              {(active.config?.tiers || [
+                { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+              ]).map((tier, tIdx) => (
+                <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                    <strong style={{ fontSize: 11, color: "#334155" }}>
+                      套餐 {tIdx + 1}：{tier.name}
+                    </strong>
+                    <span style={{ fontSize: 9.5, background: tier.hasTrial ? "#fef3c7" : "#e0e7ff", color: tier.hasTrial ? "#92400e" : "#3730a3", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>
+                      {tier.badge || (tier.hasTrial ? "免费试用" : "直接购买")}
+                    </span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
+                    <Field label="套餐名称">
+                      <input
+                        value={tier.name}
+                        onChange={(e) => {
+                          const currentTiers = active.config?.tiers || [
+                            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                            { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                          ];
+                          const newTiers = [...currentTiers];
+                          newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
+                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                        }}
+                      />
+                    </Field>
+                    <Field label="月均价格">
+                      <input
+                        value={tier.monthly}
+                        onChange={(e) => {
+                          const currentTiers = active.config?.tiers || [
+                            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                            { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                          ];
+                          const newTiers = [...currentTiers];
+                          newTiers[tIdx] = { ...newTiers[tIdx], monthly: e.target.value };
+                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                        }}
+                      />
+                    </Field>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                    <Field label="总价 / 扣费说明">
+                      <input
+                        value={tier.total}
+                        onChange={(e) => {
+                          const currentTiers = active.config?.tiers || [
+                            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                            { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                          ];
+                          const newTiers = [...currentTiers];
+                          newTiers[tIdx] = { ...newTiers[tIdx], total: e.target.value };
+                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                        }}
+                      />
+                    </Field>
+                    <Field label="角标 / 折扣标签">
+                      <input
+                        value={tier.discount || tier.badge || ""}
+                        placeholder="例如：48%OFF / 免费试用"
+                        onChange={(e) => {
+                          const currentTiers = active.config?.tiers || [
+                            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                            { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                          ];
+                          const newTiers = [...currentTiers];
+                          newTiers[tIdx] = { ...newTiers[tIdx], discount: e.target.value, badge: e.target.value };
+                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                        }}
+                      />
+                    </Field>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {type === "Products" && (active.config?.variant === "3-column-tiers" || active.label === "横向套餐卡片" || (active.config?.tiers && !active.config?.listTiers && active.config?.variant !== "onboarding-dual-tiers" && active.label !== "产品双套餐")) && active.config?.variant !== "vertical-list-tiers" && active.label !== "纵向套餐列表" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 横向套餐卡片配置</span>
+              {(active.config?.tiers || [
+                { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+              ]).map((tier, tIdx) => (
+                <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                    <strong style={{ fontSize: 11, color: "#334155" }}>档位 {tIdx + 1}：{tier.name}</strong>
+                    {tier.isRecommended && <span style={{ fontSize: 9.5, background: "#dbeafe", color: "#1d4ed8", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>默认推荐档</span>}
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
+                    <Field label="套餐名称">
+                      <input
+                        value={tier.name}
+                        onChange={(e) => {
+                          const currentTiers = active.config?.tiers || [
+                            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                          ];
+                          const newTiers = [...currentTiers];
+                          newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
+                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                        }}
+                      />
+                    </Field>
+                    <Field label="月均单价">
+                      <input
+                        value={tier.monthly}
+                        onChange={(e) => {
+                          const currentTiers = active.config?.tiers || [
+                            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                          ];
+                          const newTiers = [...currentTiers];
+                          newTiers[tIdx] = { ...newTiers[tIdx], monthly: e.target.value };
+                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                        }}
+                      />
+                    </Field>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                    <Field label="总价文案">
+                      <input
+                        value={tier.total}
+                        onChange={(e) => {
+                          const currentTiers = active.config?.tiers || [
+                            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                          ];
+                          const newTiers = [...currentTiers];
+                          newTiers[tIdx] = { ...newTiers[tIdx], total: e.target.value };
+                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                        }}
+                      />
+                    </Field>
+                    <Field label="角标/节省文案">
+                      <input
+                        value={tier.badge || tier.save || ""}
+                        placeholder="例如：推荐 / 省54%"
+                        onChange={(e) => {
+                          const currentTiers = active.config?.tiers || [
+                            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                          ];
+                          const newTiers = [...currentTiers];
+                          newTiers[tIdx] = { ...newTiers[tIdx], badge: e.target.value, save: e.target.value };
+                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                        }}
+                      />
+                    </Field>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {type === "Products" && (
+            active.config?.variant === "vertical-list-tiers" ||
+            active.label === "纵向套餐列表" ||
+            active.config?.listTiers ||
+            (!active.config?.variant?.includes("3-column") && !active.config?.tiers && active.config?.variant !== "entry-price-tier" && active.config?.variant !== "onboarding-dual-tiers" && active.label !== "特惠价格" && active.label !== "产品双套餐" && active.label !== "横向套餐卡片" && active.id !== "t1-products" && active.id !== "t2-products" && active.id !== "trial-t1-products")
+          ) && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📋 纵向套餐列表配置</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const cur = getVerticalListTiers(active);
+                    const newTiers = [...cur, { name: `连续套餐 ${cur.length + 1}`, price: "¥68/季", daily: "¥0.75/天", tag: "特惠", isDefault: false }];
+                    saveVerticalListTiers(active, newTiers, updateNode);
+                  }}
+                  style={{
+                    fontSize: 10.5,
+                    fontWeight: 600,
+                    padding: "3px 8px",
+                    background: "#fff",
+                    border: "1px solid #cbd5e1",
+                    borderRadius: 4,
+                    cursor: "pointer",
+                    color: "#475569",
+                  }}
+                >
+                  + 添加档位
+                </button>
+              </div>
+
+              {getVerticalListTiers(active).map((tier, tIdx, arr) => (
+                <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                    <strong style={{ fontSize: 11, color: "#334155" }}>档位 {tIdx + 1}：{tier.name}</strong>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      {tier.isDefault ? (
+                        <span style={{ fontSize: 9.5, background: "#dbeafe", color: "#1d4ed8", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>
+                          默认选中
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newTiers = arr.map((t, i) => ({ ...t, isDefault: i === tIdx }));
+                            saveVerticalListTiers(active, newTiers, updateNode);
+                          }}
+                          style={{ fontSize: 9.5, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 3, padding: "1px 4px", cursor: "pointer" }}
+                        >
+                          设为默认
+                        </button>
+                      )}
+                      {arr.length > 1 && (
+                        <button
+                          type="button"
+                          title="删除档位"
+                          onClick={() => {
+                            const newTiers = arr.filter((_, i) => i !== tIdx);
+                            saveVerticalListTiers(active, newTiers, updateNode);
+                          }}
+                          style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: "1px 2px", display: "flex", alignItems: "center" }}
+                        >
+                          <Trash2 size={12} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
+                    <Field label="套餐名称">
+                      <input
+                        value={tier.name}
+                        onChange={(e) => {
+                          const newTiers = [...arr];
+                          newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
+                          saveVerticalListTiers(active, newTiers, updateNode);
+                        }}
+                      />
+                    </Field>
+                    <Field label="套餐价格">
+                      <input
+                        value={tier.price}
+                        placeholder="例如：¥198/年"
+                        onChange={(e) => {
+                          const newTiers = [...arr];
+                          newTiers[tIdx] = { ...newTiers[tIdx], price: e.target.value };
+                          saveVerticalListTiers(active, newTiers, updateNode);
+                        }}
+                      />
+                    </Field>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                    <Field label="日均/副文案">
+                      <input
+                        value={tier.daily || ""}
+                        placeholder="例如：¥0.54/天"
+                        onChange={(e) => {
+                          const newTiers = [...arr];
+                          newTiers[tIdx] = { ...newTiers[tIdx], daily: e.target.value };
+                          saveVerticalListTiers(active, newTiers, updateNode);
+                        }}
+                      />
+                    </Field>
+                    <Field label="角标/促销标签">
+                      <input
+                        value={tier.tag || ""}
+                        placeholder="例如：推荐 / 月付"
+                        onChange={(e) => {
+                          const newTiers = [...arr];
+                          newTiers[tIdx] = { ...newTiers[tIdx], tag: e.target.value };
+                          saveVerticalListTiers(active, newTiers, updateNode);
+                        }}
+                      />
+                    </Field>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {type === "Purchase Button" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🛒 购买按钮配置</span>
+              <Field label="按钮主文案">
+                <input
+                  value={active.content ?? ""}
+                  placeholder="例如：继续"
+                  onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                />
+              </Field>
+              <Field label="按钮副标题文案">
+                <input
+                  value={active.config?.subtitle ?? ""}
+                  placeholder="例如：到期后 ¥198/年，可随时取消"
+                  onChange={(e) => updateNode(active.id, { config: { ...active.config, subtitle: e.target.value } })}
+                />
+              </Field>
+              <Field label="按钮强调色">
+                <div style={{ display: "flex", gap: 6, marginTop: 4, alignItems: "center" }}>
+                  {["#C85B6B", "#DE6876", "#FF4D6D", "#0284C7", "#F59E0B", "#10B981", "#1E293B"].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      style={{
+                        width: 24,
+                        height: 24,
+                        borderRadius: "50%",
+                        background: c,
+                        border: (active.config?.color || "#C85B6B") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
+                    />
+                  ))}
+                  <input
+                    type="color"
+                    value={active.config?.color || "#C85B6B"}
+                    onChange={(e) => updateNode(active.id, { config: { ...active.config, color: e.target.value } })}
+                    style={{ width: 28, height: 28, padding: 0, border: "none", background: "none", cursor: "pointer" }}
+                  />
+                </div>
+              </Field>
+            </div>
+          )}
+
+          {type === "Dismiss Button" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>❌ 关闭按钮配置</span>
+              <Field label="按钮形态">
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "6px 4px",
+                      borderRadius: 4,
+                      border: active.config?.variant === "circle-close" ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                      background: active.config?.variant === "circle-close" ? "#F0F9FF" : "#fff",
+                      color: active.config?.variant === "circle-close" ? "#0284c7" : "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { content: "✕", config: { ...active.config, variant: "circle-close", position: "top-right" } })}
+                  >
+                    ✕ 圆形 (半窗)
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "6px 4px",
+                      borderRadius: 4,
+                      border: active.config?.variant === "close-icon" || (active.content === "✕" && active.config?.variant !== "circle-close") ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                      background: active.config?.variant === "close-icon" || (active.content === "✕" && active.config?.variant !== "circle-close") ? "#F0F9FF" : "#fff",
+                      color: active.config?.variant === "close-icon" || (active.content === "✕" && active.config?.variant !== "circle-close") ? "#0284c7" : "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { content: "✕", config: { ...active.config, variant: "close-icon" } })}
+                  >
+                    ✕ 图标 (全屏)
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      fontSize: 10.5,
+                      padding: "6px 4px",
+                      borderRadius: 4,
+                      border: active.config?.variant === "text-link" || (active.config?.variant !== "close-icon" && active.config?.variant !== "circle-close" && active.content !== "✕") ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                      background: active.config?.variant === "text-link" || (active.config?.variant !== "close-icon" && active.config?.variant !== "circle-close" && active.content !== "✕") ? "#F0F9FF" : "#fff",
+                      color: active.config?.variant === "text-link" || (active.config?.variant !== "close-icon" && active.config?.variant !== "circle-close" && active.content !== "✕") ? "#0284c7" : "#334155",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                    onClick={() => updateNode(active.id, { content: "不，谢谢", config: { ...active.config, variant: "text-link" } })}
+                  >
+                    纯文本链接
+                  </button>
+                </div>
+              </Field>
+
+              {active.config?.variant !== "close-icon" && active.content !== "✕" ? (
+                <Field label="关闭链接文案">
+                  <input
+                    value={active.content ?? ""}
+                    placeholder="例如：暂时不用，谢谢"
+                    onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                  />
+                </Field>
+              ) : (
+                <Field label="显示位置">
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                    {["top-left", "top-right", "center"].map((pos) => (
+                      <button
+                        key={pos}
+                        type="button"
+                        style={{
+                          fontSize: 10.5,
+                          padding: "5px 6px",
+                          borderRadius: 4,
+                          border: (active.config?.position || "top-left") === pos ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                          background: (active.config?.position || "top-left") === pos ? "#F0F9FF" : "#fff",
+                          color: (active.config?.position || "top-left") === pos ? "#0284c7" : "#334155",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, position: pos } })}
+                      >
+                        {pos === "top-left" ? "左上角" : pos === "top-right" ? "右上角" : "居中"}
+                      </button>
+                    ))}
+                  </div>
+                </Field>
+              )}
+            </div>
+          )}
+
+          {type === "Badge Tag" && (
+            <Field label="徽章强调色">
+              <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+                {["#1ECA92", "#FAAD14", "#FF4D4F", "#722ED1", "#13C2C2", "#6366F1"].map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    style={{ width: 24, height: 24, borderRadius: "50%", background: c, border: active.config?.color === c ? "2px solid #000" : "0" }}
+                    onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
+                  />
+                ))}
+              </div>
+            </Field>
+          )}
+
+
+          {type === "Carousel Cards" && (
+            <div style={{ fontSize: 11, color: "#64748b", margin: "6px 0 12px", background: "#f8fafc", padding: 8, borderRadius: 6 }}>
+              💡 格式说明：每行一张卡片，格式为 <code>卡片标题|详细权益描述文案</code>
+            </div>
+          )}
+        </>
+      )}
+
+      {(tab === "style" || tab === "layout") && (
+        <div>
+          <Field label="字体大小"><input defaultValue="16px" /></Field>
+          <Field label="文本对齐"><div className="select-like">居中对齐 <ChevronDown size={14} /></div></Field>
+          <Field label="内边距"><input defaultValue="12px" /></Field>
+          <Field label="外边距"><input defaultValue="8px" /></Field>
+          <Field label="最大宽度"><input defaultValue="100%" /></Field>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function WorkspaceHeader({ selected, setView, duplicate, setModal, markUnknown, notify }) {
+  const cleanTitle = selected.name ? selected.name.replace(/\s*\([^)]*\)/g, "").trim() : "";
+  return (
+    <>
+      <button className="back" onClick={() => setView("list")}><ArrowLeft size={16} /> 返回列表</button>
+      <div className="workspace-heading">
+        <div className="workspace-title-wrap">
+          <h1 className="compact-workspace-title">{cleanTitle}</h1>
+        </div>
+        <div className="workspace-actions">
+          <button className="secondary compact-action-btn" onClick={duplicate}><Copy size={14} /> 复制</button>
+          <button className="primary compact-action-btn" onClick={() => notify?.("配置保存成功")}>保存配置</button>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function TemplatesModal({ selected, setSelected, onClose, onOpenAi, onOpenBuilder }) {
+  const [pendingSelected, setPendingSelected] = useState(selected);
+  const [categoryFilter, setCategoryFilter] = useState("HelloTalk 官方");
+
+  const filteredTemplates = templates.filter((t) => categoryFilter === "All" || t.category === categoryFilter);
+  const pendingTemplate = pendingSelected !== null ? templates[pendingSelected] : null;
+
+  return (
+    <Modal title="选择付费墙模版 (Choose a template)" onClose={onClose} wide>
+      <div className="template-modal">
+        <aside>
+          <div className="filter-heading"><strong>模版分类</strong><span className="filter-count">{filteredTemplates.length}</span></div>
+          <p>业务类别</p>
+          <label className="filter-option">
+            <input type="radio" checked={categoryFilter === "HelloTalk 官方"} onChange={() => setCategoryFilter("HelloTalk 官方")} /> HelloTalk 官方 (12)
+          </label>
+          <label className="filter-option">
+            <input type="radio" checked={categoryFilter === "Popular"} onChange={() => setCategoryFilter("Popular")} /> 国际流行 (Popular)
+          </label>
+          <label className="filter-option">
+            <input type="radio" checked={categoryFilter === "All"} onChange={() => setCategoryFilter("All")} /> 全部模版 (All)
+          </label>
+        </aside>
+
+        <div className="template-content">
+          <div className="template-selection-summary">
+            {pendingTemplate ? (
+              <>
+                <span>已选模版</span>
+                <strong>{pendingTemplate.title}</strong>
+                <small>{pendingTemplate.subtitle}</small>
+              </>
+            ) : <span>尚未选择模版</span>}
+          </div>
+
+          <div className="template-grid rich-template-grid">
+            {filteredTemplates.map((template) => {
+              const index = templates.indexOf(template);
+              return (
+                <button
+                  key={template.id}
+                  className={`template ${pendingSelected === index ? "selected" : ""}`}
+                  onClick={() => setPendingSelected(index)}
+                  style={{ minHeight: 180, display: "flex", flexDirection: "column", justifyContent: "space-between" }}
+                >
+                  <div>
+                    <div style={{ height: 90, borderRadius: 6, background: template.theme === "sale" ? "#fee2e2" : template.theme === "night" ? "#1e293b" : template.theme === "ocean" ? "#e0f2fe" : template.theme === "lime" ? "#ecfdf5" : "#e0e7ff", display: "grid", placeItems: "center", color: template.theme === "night" ? "#fff" : "#4338ca", fontWeight: 800, fontSize: 13, padding: 8, textAlign: "center" }}>
+                      {template.title}
+                    </div>
+                    <strong style={{ fontSize: 12, marginTop: 8, display: "block" }}>{template.title}</strong>
+                    <small style={{ color: "#64748b", fontSize: 10 }}>{template.subtitle}</small>
+                  </div>
+                  <div style={{ marginTop: 8 }}>
+                    <span style={{ fontSize: 9, padding: "2px 6px", background: "#f1f5f9", borderRadius: 4, color: "#475569" }}>
+                      {template.category}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="modal-actions">
+            <button className="secondary" onClick={onClose}>取消</button>
+            <button className="primary" disabled={pendingSelected === null} onClick={() => onOpenBuilder(pendingSelected)}>
+              在构建器中打开 (Open in Builder)
+            </button>
+          </div>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function LayoutSettings({
+  markUnknown,
+  boundary,
+  setModal,
+  appliedTemplate,
+  isOnboardingPage,
+  activeSubTemplate,
+  updateSubTemplateTheme,
+  onTriggerRetainModal,
+  onSwitchSubTemplate,
+}) {
+  const [langModalField, setLangModalField] = useState(null);
+
+  if (isOnboardingPage) {
+    const theme = activeSubTemplate?.theme || {};
+    const curSubId = activeSubTemplate?.id || "trial-tpl-1";
+    const retain = theme.retainModal || {
+      title: "提示",
+      prompt: "你确定要放弃免费试用 VIP 的机会吗？关闭后无法再打开此页面。",
+      primaryBtn: "不，我不放弃",
+      cancelBtn: "是，暂时不用",
+    };
+    const showDismiss = theme.showDismissBtn !== false;
+
+    return (
+      <div className="property-scroll layout-settings">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid #f1f5f9" }}>
+          <div>
+            <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#0f172a" }}>注册引导与免费试用页 设置</h3>
+            <span style={{ fontSize: 10, color: "#64748b" }}>HelloTalk 官方后台 CMS 1:1 对标配置</span>
+          </div>
+          <button className="secondary" style={{ fontSize: 10.5, padding: "3px 8px" }} onClick={() => setModal({ kind: "templates" })}>
+            切换页面
+          </button>
+        </div>
+
+        {/* 1. 样式模版单选 */}
+        <div style={{ marginBottom: 14 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#334155", display: "block", marginBottom: 6 }}>
+            样式模版 <span style={{ color: "#ef4444" }}>*</span>
+          </span>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            {[
+              { id: "trial-tpl-1", name: "模版四-单张样式新版", desc: "单图吉祥物 · 3阶段时间轴 · 双套餐切换" },
+              { id: "trial-tpl-2", name: "模版五-多张轮播图新版", desc: "3张轮播卡片 · 垂直提醒 · 试用后套餐" },
+            ].map((t) => {
+              const checked = curSubId === t.id;
+              return (
+                <label
+                  key={t.id}
+                  style={{
+                    display: "flex",
+                    alignItems: "flex-start",
+                    gap: 8,
+                    padding: "8px 10px",
+                    borderRadius: 8,
+                    border: checked ? "1.5px solid #6366f1" : "1px solid #e2e8f0",
+                    background: checked ? "#f5f3ff" : "#ffffff",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => onSwitchSubTemplate?.(t.id)}
+                >
+                  <input
+                    type="radio"
+                    name="onboarding-sub-template"
+                    checked={checked}
+                    onChange={() => onSwitchSubTemplate?.(t.id)}
+                    style={{ marginTop: 2 }}
+                  />
+                  <div>
+                    <strong style={{ fontSize: 12, color: "#0f172a", display: "block" }}>{t.name}</strong>
+                    <span style={{ fontSize: 10, color: "#64748b" }}>{t.desc}</span>
+                  </div>
+                </label>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* 2. 顶部标题 */}
+        <Field label="顶部标题">
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <input
+              value={theme.titleText ?? (curSubId === "trial-tpl-1" ? "3天会员免费试用" : "专享会员\n更好练习外语")}
+              onChange={(e) => updateSubTemplateTheme?.({ titleText: e.target.value })}
+              placeholder="请输入顶部主标题"
+            />
+            <button
+              type="button"
+              className="secondary"
+              style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 8px", fontSize: 11, whiteSpace: "nowrap" }}
+              onClick={() => setLangModalField({ name: "titleText", label: "顶部标题", current: theme.titleText || "3天会员免费试用" })}
+            >
+              <Globe size={13} />
+              <span>多语言</span>
+            </button>
+          </div>
+        </Field>
+
+        {/* 3. 按钮文案 */}
+        <Field label="按钮文案">
+          <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+            <input
+              value={theme.btnText ?? "开启3天 VIP免费试用"}
+              onChange={(e) => updateSubTemplateTheme?.({ btnText: e.target.value })}
+              placeholder="请输入主行动按钮文案"
+            />
+            <button
+              type="button"
+              className="secondary"
+              style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 8px", fontSize: 11, whiteSpace: "nowrap" }}
+              onClick={() => setLangModalField({ name: "btnText", label: "按钮文案", current: theme.btnText || "开启3天 VIP免费试用" })}
+            >
+              <Globe size={13} />
+              <span>多语言</span>
+            </button>
+          </div>
+        </Field>
+
+        {/* 4. 是否展示底部关闭按钮 */}
+        <div style={{ marginBottom: 12 }}>
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#334155", display: "block", marginBottom: 6 }}>
+            是否展示底部关闭按钮
+          </span>
+          <div style={{ display: "flex", gap: 16 }}>
+            <label style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="showDismissBtn"
+                checked={showDismiss}
+                onChange={() => updateSubTemplateTheme?.({ showDismissBtn: true })}
+              />
+              <span>是</span>
+            </label>
+            <label style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, cursor: "pointer" }}>
+              <input
+                type="radio"
+                name="showDismissBtn"
+                checked={!showDismiss}
+                onChange={() => updateSubTemplateTheme?.({ showDismissBtn: false })}
+              />
+              <span>否</span>
+            </label>
+          </div>
+        </div>
+
+        {/* 5. 关闭按钮文案 */}
+        {showDismiss && (
+          <Field label="关闭按钮文案">
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              <input
+                value={theme.dismissBtnText ?? "不，谢谢"}
+                onChange={(e) => updateSubTemplateTheme?.({ dismissBtnText: e.target.value })}
+                placeholder="例如：不，谢谢"
+              />
+              <button
+                type="button"
+                className="secondary"
+                style={{ display: "inline-flex", alignItems: "center", gap: 4, padding: "6px 8px", fontSize: 11, whiteSpace: "nowrap" }}
+                onClick={() => setLangModalField({ name: "dismissBtnText", label: "关闭按钮文案", current: theme.dismissBtnText || "不，谢谢" })}
+              >
+                <Globe size={13} />
+                <span>多语言</span>
+              </button>
+            </div>
+          </Field>
+        )}
+
+        {/* 6. 挽留弹窗配置 */}
+        <div
+          style={{
+            marginTop: 14,
+            padding: 12,
+            background: "#f8fafc",
+            borderRadius: 10,
+            border: "1px solid #e2e8f0",
+            display: "flex",
+            flexDirection: "column",
+            gap: 10,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+            <div>
+              <strong style={{ fontSize: 12, color: "#0f172a", display: "block" }}>挽留弹窗配置</strong>
+              <span style={{ fontSize: 9.5, color: "#64748b" }}>点击关闭或跳过时触发弹窗</span>
+            </div>
+            <button
+              type="button"
+              className="primary"
+              style={{ display: "inline-flex", alignItems: "center", gap: 4, fontSize: 11, padding: "4px 8px", borderRadius: 6 }}
+              onClick={onTriggerRetainModal}
+              title="在画布上直接弹出挽留弹窗预览"
+            >
+              <Eye size={12} />
+              <span>画布预览挽留弹窗</span>
+            </button>
+          </div>
+
+          <Field label="弹窗标题">
+            <input
+              value={retain.title ?? "提示"}
+              onChange={(e) =>
+                updateSubTemplateTheme?.({
+                  retainModal: { ...retain, title: e.target.value },
+                })
+              }
+            />
+          </Field>
+
+          <Field label="提示文案">
+            <textarea
+              rows={2}
+              style={{ resize: "vertical", fontSize: 11.5 }}
+              value={retain.prompt ?? "你确定要放弃免费试用 VIP 的机会吗？关闭后无法再打开此页面。"}
+              onChange={(e) =>
+                updateSubTemplateTheme?.({
+                  retainModal: { ...retain, prompt: e.target.value },
+                })
+              }
+            />
+          </Field>
+
+          <Field label="主按钮文案 (挽留)">
+            <input
+              value={retain.primaryBtn ?? "不，我不放弃"}
+              onChange={(e) =>
+                updateSubTemplateTheme?.({
+                  retainModal: { ...retain, primaryBtn: e.target.value },
+                })
+              }
+            />
+          </Field>
+
+          <Field label="关闭按钮文案 (确认放弃)">
+            <input
+              value={retain.cancelBtn ?? "是，暂时不用"}
+              onChange={(e) =>
+                updateSubTemplateTheme?.({
+                  retainModal: { ...retain, cancelBtn: e.target.value },
+                })
+              }
+            />
+          </Field>
+        </div>
+
+        {/* 多语言弹窗 */}
+        {langModalField && (
+          <Modal title={`多语言翻译配置: ${langModalField.label}`} onClose={() => setLangModalField(null)}>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "8px 0" }}>
+              <p style={{ margin: 0, fontSize: 12, color: "#64748b" }}>
+                配置 <strong>{langModalField.label}</strong> 在不同客户端语言环境下的文案：
+              </p>
+              <Field label="简体中文 (zh-CN) [当前默认]">
+                <input value={langModalField.current} readOnly style={{ background: "#f8fafc" }} />
+              </Field>
+              <Field label="English (en-US)">
+                <input
+                  defaultValue={
+                    langModalField.name === "titleText"
+                      ? "3-Day VIP Free Trial"
+                      : langModalField.name === "btnText"
+                      ? "Start 3-Day VIP Free Trial"
+                      : "No, Thanks"
+                  }
+                />
+              </Field>
+              <Field label="繁体中文 (zh-Hant)">
+                <input
+                  defaultValue={
+                    langModalField.name === "titleText"
+                      ? "3天會員免費試用"
+                      : langModalField.name === "btnText"
+                      ? "開啟3天 VIP免費試用"
+                      : "不，謝謝"
+                  }
+                />
+              </Field>
+              <Field label="日本語 (ja-JP)">
+                <input
+                  defaultValue={
+                    langModalField.name === "titleText"
+                      ? "3日間VIP無料体験"
+                      : langModalField.name === "btnText"
+                      ? "3日間VIP無料体験を開始"
+                      : "結構です"
+                  }
+                />
+              </Field>
+              <Field label="한국어 (ko-KR)">
+                <input
+                  defaultValue={
+                    langModalField.name === "titleText"
+                      ? "3일 VIP 무료 체험"
+                      : langModalField.name === "btnText"
+                      ? "3일 VIP 무료 체험 시작"
+                      : "괜찮습니다"
+                  }
+                />
+              </Field>
+              <div className="modal-actions" style={{ marginTop: 12 }}>
+                <button className="secondary" onClick={() => setLangModalField(null)}>取消</button>
+                <button className="primary" onClick={() => setLangModalField(null)}>保存多语言</button>
+              </div>
+            </div>
+          </Modal>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="property-scroll layout-settings">
+      <h3>全局布局设置</h3>
+      <Field label="当前模版">
+        <div className="inline-select">
+          <span>{appliedTemplate !== null ? templates[appliedTemplate].title : "HelloTalk Onboarding"}</span>
+          <button className="secondary" onClick={() => setModal({ kind: "templates" })}>更换模版</button>
+        </div>
+      </Field>
+      <Field label="设备容器"><div className="select-like">iPhone 15 Pro (393 × 852) <ChevronDown size={14} /></div></Field>
+      <Field label="默认字体"><div className="select-like">PingFang SC / SF Pro Display <ChevronDown size={14} /></div></Field>
+      <label className="switch-row"><input type="checkbox" defaultChecked /><span>开启</span><strong>沉浸式顶部渐变遮罩</strong></label>
+      <label className="switch-row"><input type="checkbox" defaultChecked /><span>开启</span><strong>显示底部服务条款与恢复购买</strong></label>
+    </div>
+  );
 }
 
 function ProductRow({ product, offer, onProductChange, onRemove, markUnknown, readOnly = false }) {
-  const defaultOffer = offer ?? (product.includes("1 Year") ? "Black Friday" : "No offers for this product");
-  const offerBoundary = {
-    id: "P-01",
-    feature: "Product offer selection",
-    known: "已实测：Japanese Ai - 1 Year（Annual）显示 Black Friday；Japanese ai（3 months）显示 No offers for this product。",
-    unknown: "其余 Offer 选项、优惠资格校验、切换后的保存规则与最终交易结果未实测。",
-  };
   return (
     <div className="product-row">
       <select value={product} disabled={readOnly} onChange={(event) => onProductChange?.(event.target.value)}>
         {readOnly ? <option>{product}</option> : productOptions.map((option) => <option key={option}>{option}</option>)}
       </select>
-      <select className="unknown-action" value={defaultOffer} onClick={() => markUnknown(offerBoundary)} onChange={() => markUnknown(offerBoundary)}>
-        <option>Black Friday</option><option>No offers for this product</option>
+      <select defaultValue={offer ?? "常规定价"} disabled={readOnly}>
+        <option>{offer ?? "常规定价"}</option>
+        <option>限时 5 折</option>
+        <option>赠送 7 天试用</option>
       </select>
-      <button className={`icon ${readOnly ? "unknown-action" : ""}`} onClick={() => readOnly ? markUnknown(offerBoundary) : onRemove?.()}><X size={17} /></button>
+      <button className={`icon ${readOnly ? "unknown-action" : ""}`} onClick={() => !readOnly && onRemove?.()}><X size={17} /></button>
     </div>
   );
 }
 
 function Metrics({ setView, markUnknown }) {
-  const [filterMenu, setFilterMenu] = useState(false);
-  const [stateFilter, setStateFilter] = useState(false);
-  const [statePanel, setStatePanel] = useState(false);
-  const [datePanel, setDatePanel] = useState(false);
-  const [groupMenu, setGroupMenu] = useState(false);
-  const [audienceMenu, setAudienceMenu] = useState(false);
-  const boundary = missingItems.find((item) => item.id === "MT-01");
-  const metrics = ["Revenue", "Unique views", "ARPAS", "Trials", "Purchases", "Refunds"];
-  const columns = ["Audience", "Revenue", "Proceeds", "Net proceeds", "ARPPU", "ARPAS", "Unique CR purchases", "CR purchases", "Unique CR trials", "CR trials", "Purchases", "Trials", "Trials cancelled", "Refunds", "Refund rate", "Views", "Unique views"];
-  return <section className="metrics-page"><button className="back" onClick={() => setView("general")}><ArrowLeft size={18} /> Paywall</button><div className="workspace-heading"><div><span className="eyebrow">Paywall</span><h1>Metrics</h1></div><div className="workspace-actions"><button className="secondary" onClick={() => setView("general")}>Edit paywall</button><button className="secondary unknown-action" onClick={() => markUnknown(boundary)}>View in analytics</button></div></div><div className="metrics-controls"><div className="metrics-popover-wrap"><button className="select" onClick={() => setDatePanel((open) => !open)}>Last month <ChevronDown size={16} /></button>{datePanel && <DatePopover />}</div><button className="select">week <ChevronDown size={16} /></button><div className="metrics-popover-wrap"><button className="select" onClick={() => setGroupMenu((open) => !open)}>Group by Product <ChevronDown size={16} /></button>{groupMenu && <div className="metric-menu"><button>Product</button></div>}</div><div className="metrics-popover-wrap"><button className={`secondary ${stateFilter ? "" : ""}`} onClick={() => stateFilter ? setStatePanel((open) => !open) : setFilterMenu((open) => !open)}>{stateFilter ? "State" : <><Plus size={16} /> Add filter</>}</button>{filterMenu && <div className="metric-menu"><button onClick={() => { setStateFilter(true); setFilterMenu(false); setStatePanel(true); }}>State</button></div>}{statePanel && <div className="state-filter-panel"><label className="search"><Search size={15} /><input placeholder="Search" /></label><label><input type="checkbox" defaultChecked /> State</label><div><button className="secondary" onClick={() => { setStateFilter(false); setStatePanel(false); }}>Reset</button><button className="primary" onClick={() => setStatePanel(false)}>Apply</button></div></div>}</div><div className="metrics-popover-wrap"><button className="select" onClick={() => setAudienceMenu((open) => !open)}>Audience based <ChevronDown size={16} /></button>{audienceMenu && <div className="metric-menu"><button className="unknown-action" onClick={() => markUnknown(boundary)}>Audience based</button></div>}</div><label className="install-filter"><input type="checkbox" /> Filter metrics by install date</label><button className="icon unknown-action" onClick={() => markUnknown(boundary)}><Download size={17} /></button></div><div className="metric-grid">{metrics.map((metric) => <div className={`metric-card ${metric === "Revenue" ? "revenue-card" : ""}`} key={metric}><span>{metric}</span><strong>{metric === "Revenue" ? "No Data" : "0"}</strong></div>)}</div><div className="table-wrap metrics-table"><table><thead><tr>{columns.map((column) => <th key={column}>{column}</th>)}</tr></thead><tbody><tr>{columns.map((column, index) => <td key={column}>{index === 0 ? "Total" : column.includes("Revenue") || column.includes("Proceeds") || column === "ARPPU" || column === "ARPAS" ? "$0" : "0"}</td>)}</tr></tbody></table></div></section>;
-}
-
-function DatePopover() {
-  return <div className="date-popover"><strong>Date range</strong><button className="date-preset">Last month <ChevronDown size={14} /></button><h3>21 Jul - 20 Aug</h3><div className="date-fields"><input defaultValue="21.07.2026" /><input defaultValue="20.08.2026" /></div><div className="calendar-preview"><div><strong>July 2026</strong><div className="calendar-grid">{["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su", ...Array.from({ length: 31 }, (_, index) => String(index + 1))].map((day) => <span key={`j${day}`}>{day}</span>)}</div></div><div><strong>August 2026</strong><div className="calendar-grid">{["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su", ...Array.from({ length: 31 }, (_, index) => String(index + 1))].map((day) => <span key={`a${day}`}>{day}</span>)}</div></div></div><div className="grain-row">{["Year", "Quarter", "Month", "Week", "Day"].map((grain) => <button className={grain === "Week" ? "active" : ""} key={grain}>{grain}</button>)}</div><div className="date-actions"><button className="primary">Apply</button></div></div>;
+  const metrics = ["曝光人数 (Views)", "转化购买 (Purchases)", "试用开启 (Trials)", "ARPAS (订阅客单价)", "总营收 (Revenue)"];
+  return (
+    <section className="metrics-page">
+      <button className="back" onClick={() => setView("builder")}><ArrowLeft size={18} /> 返回构建器</button>
+      <div className="workspace-heading">
+        <div><span className="eyebrow">数据分析</span><h1>付费墙转化指标看板</h1></div>
+      </div>
+      <div className="metric-grid" style={{ gridTemplateColumns: "repeat(5, 1fr)" }}>
+        {metrics.map((m, idx) => (
+          <div className="metric-card" key={m}>
+            <span>{m}</span>
+            <strong style={{ marginTop: 12 }}>{idx === 0 ? "48,290" : idx === 1 ? "3,892" : idx === 2 ? "12,408" : idx === 3 ? "¥188.5" : "¥732,840"}</strong>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function ComplianceModal({ compliance, setCompliance, rememberCompliance, setRememberCompliance, onClose, onAccept, context = "draft" }) {
-  const policies = ["Do not make misleading claims about unlocking content.", "Clearly show price and duration.", "Clearly disclose purchase details before purchase.", "Make cross-platform content available immediately.", "Clearly show Terms & Conditions.", "Do not link to external purchase options."];
-  return <Modal title="Paywall publishing confirmation" onClose={onClose}><p className="modal-copy">{context === "builder" ? "Publishing paywall you confirm that it meets the guidelines of the stores." : "This confirmation was observed before creating a Draft, despite its publishing wording."}</p><ul className="policy-list">{policies.map((item) => <li key={item}><Check size={16} /> {item}</li>)}</ul><label className="check-row"><input type="checkbox" checked={compliance} onChange={(event) => setCompliance(event.target.checked)} /> <span>I confirm this paywall complies with App Store Review Guidelines and Google Play Developer Program Policies.</span></label><label className="check-row optional"><input type="checkbox" checked={rememberCompliance} onChange={(event) => setRememberCompliance(event.target.checked)} /> <span>Remember this confirmation for all future paywalls.</span></label><div className="modal-actions"><button className="secondary" onClick={onClose}>Cancel</button><button className="primary" disabled={!compliance} onClick={onAccept}>Accept</button></div></Modal>;
+  const policies = [
+    "明确披露免费试用期天数与后续扣款金额。",
+    "自动续期订阅须提供清晰的一键取消指引。",
+    "包含完整的服务条款（Terms）与隐私政策（Privacy）链接。",
+    "不可向用户隐瞒或误导连续包月/包年的扣费周期。"
+  ];
+  return (
+    <Modal title="付费墙发布合规确认" onClose={onClose}>
+      <p className="modal-copy">确保付费墙严格遵守 Apple App Store 审核准则与 Google Play 政策。</p>
+      <ul className="policy-list">
+        {policies.map((p) => <li key={p}><Check size={16} /> {p}</li>)}
+      </ul>
+      <label className="check-row">
+        <input type="checkbox" checked={compliance} onChange={(e) => setCompliance(e.target.checked)} />
+        <span>我确认此付费墙符合应用商店合规审查要求。</span>
+      </label>
+      <div className="modal-actions">
+        <button className="secondary" onClick={onClose}>取消</button>
+        <button className="primary" disabled={!compliance} onClick={onAccept}>确认保存</button>
+      </div>
+    </Modal>
+  );
 }
 
 function TemplateRequirementsModal({ onClose, onContinue }) {
-  const [termsUrl, setTermsUrl] = useState("");
-  const [privacyUrl, setPrivacyUrl] = useState("");
-  const isComplete = termsUrl.trim().length > 0 && privacyUrl.trim().length > 0;
-  return <Modal title="Complete template setup" onClose={onClose}>
-    <p className="modal-copy">The first template save was observed to surface Custom Fonts and require Terms of Service and Privacy Policy URLs in Links.</p>
-    <div className="template-requirements">
-      <div><strong>Custom Fonts</strong><span>Review the font setup before saving this template.</span></div>
-      <Field label="Terms of Service URL"><input value={termsUrl} onChange={(event) => setTermsUrl(event.target.value)} placeholder="https://example.com/terms" /></Field>
-      <Field label="Privacy Policy URL"><input value={privacyUrl} onChange={(event) => setPrivacyUrl(event.target.value)} placeholder="https://example.com/privacy" /></Field>
-    </div>
-    <div className="modal-actions"><button className="secondary" onClick={onClose}>Cancel</button><button className="primary" disabled={!isComplete} onClick={() => onContinue({ terms: termsUrl, privacy: privacyUrl })}>Continue</button></div>
-  </Modal>;
+  const [termsUrl, setTermsUrl] = useState("https://hellotalk.com/terms");
+  const [privacyUrl, setPrivacyUrl] = useState("https://hellotalk.com/privacy");
+  return (
+    <Modal title="模版必备链接验证" onClose={onClose}>
+      <p className="modal-copy">首次保存模版需要核验服务条款与隐私政策。</p>
+      <Field label="服务条款 URL"><input value={termsUrl} onChange={(e) => setTermsUrl(e.target.value)} /></Field>
+      <Field label="隐私政策 URL"><input value={privacyUrl} onChange={(e) => setPrivacyUrl(e.target.value)} /></Field>
+      <div className="modal-actions">
+        <button className="secondary" onClick={onClose}>取消</button>
+        <button className="primary" onClick={() => onContinue({ terms: termsUrl, privacy: privacyUrl })}>继续保存</button>
+      </div>
+    </Modal>
+  );
 }
 
 function ArchiveModal({ name, onClose, onArchive }) {
   const [value, setValue] = useState("");
-  return <Modal title="Archive paywall" onClose={onClose}><p className="modal-copy">This action cannot be undone. Type the complete paywall name to continue.</p><Field label={`Type "${name}"`}><input value={value} onChange={(event) => setValue(event.target.value)} /></Field><div className="modal-actions"><button className="secondary" onClick={onClose}>Cancel</button><button className="danger-button" disabled={value !== name} onClick={onArchive}>Archive paywall</button></div></Modal>;
-}
-
-function TemplatesModal({ selected, setSelected, onClose, onOpenAi, onOpenBuilder, markUnknown }) {
-  const [pendingSelected, setPendingSelected] = useState(selected);
-  const [filters, setFilters] = useState({
-    products: ["1 product"],
-    media: "All",
-    components: [],
-    length: "All",
-    background: "All",
-    category: "All",
-  });
-  const toggleListFilter = (key, value) => setFilters((current) => ({ ...current, [key]: current[key].includes(value) ? current[key].filter((item) => item !== value) : [...current[key], value] }));
-  const setSingleFilter = (key, value) => setFilters((current) => ({ ...current, [key]: value }));
-  const Filter = ({ children, value, group, list = false }) => {
-    const checked = list ? filters[group].includes(value) : filters[group] === value;
-    return <label className="filter-option"><input type={list ? "checkbox" : "radio"} name={list ? undefined : group} checked={checked} onChange={() => list ? toggleListFilter(group, value) : setSingleFilter(group, value)} /> {children}</label>;
-  };
-  const pendingTemplate = pendingSelected === null ? null : templates[pendingSelected];
-  const displayTags = (template) => sourceTreeObserved.has(template.id) ? template.tags : ["Source preview", "Structure pending"];
-  const filteredTemplates = templates.filter((template) => {
-    const productMatch = !filters.products.length || filters.products.some((item) => template.productCount === (item === "1 product" ? 1 : 2));
-    const mediaMatch = filters.media === "All" || (filters.media === "With Image or Video" ? ["image", "video"].includes(template.media) : template.media === "none");
-    const componentMatch = filters.components.every((item) => sourceVerifiedTemplateComponents[template.id]?.includes(item));
-    const lengthMatch = filters.length === "All" || (filters.length === "Short" ? template.title.length < 28 : template.title.length >= 28);
-    const backgroundMatch = filters.background === "All" || (filters.background === "Dark" ? ["night", "black", "midnight", "ocean", "halloween"].includes(template.theme) : !["night", "black", "midnight", "ocean", "halloween"].includes(template.theme));
-    const categoryMatch = filters.category === "All" || template.category === filters.category;
-    return productMatch && mediaMatch && componentMatch && lengthMatch && backgroundMatch && categoryMatch;
-  });
-  return <Modal title="Choose a template" onClose={onClose} wide><div className="template-modal"><aside><div className="filter-heading"><strong>Filters</strong><span className="filter-count">{filteredTemplates.length}</span></div><p>Number of products</p><Filter group="products" value="1 product" list>1 product (31)</Filter><Filter group="products" value="More than 1 product" list>More than 1 product (56)</Filter><p>Image / video</p><Filter group="media" value="All">All</Filter><Filter group="media" value="With Image or Video">With Image or Video (77)</Filter><Filter group="media" value="No media">No media (3)</Filter><p>Components</p><Filter group="components" value="Free trial toggle" list>Free trial toggle (5)</Filter><Filter group="components" value="Trial timeline" list>Trial timeline (24)</Filter><Filter group="components" value="Reviews" list>Reviews (7)</Filter><Filter group="components" value="Timer" list>Timer (5)</Filter><p>Length</p><Filter group="length" value="All">All</Filter><Filter group="length" value="Short">Short</Filter><Filter group="length" value="Long">Long</Filter><p>Background theme</p><Filter group="background" value="All">All</Filter><Filter group="background" value="Light">Light</Filter><Filter group="background" value="Dark">Dark</Filter><p>Category</p><Filter group="category" value="All">All paywalls</Filter><Filter group="category" value="Popular">Popular</Filter><Filter group="category" value="Seasonal">Seasonal</Filter></aside><div className="template-content"><div className="template-entries"><button className="secondary" onClick={onOpenAi}><WandSparkles size={18} /><span><strong>Generate a Design with AI</strong><small>Don't have a design? Our AI will create a unique paywall for you from scratch.</small></span></button><button onClick={() => markUnknown(missingItems[3])}><Copy size={18} /><span><strong>Copy a Design from Your Apps</strong><small>Reuse a design you've built with Paywall Builder in another app.</small></span></button></div><div className="template-selection-summary">{pendingTemplate ? <><span>Selected template</span><strong>{pendingTemplate.title}</strong><small>{displayTags(pendingTemplate).join(" · ")}</small></> : <span>No template selected</span>}</div><div className="template-grid rich-template-grid">{filteredTemplates.map((template) => { const index = templates.indexOf(template); return <button aria-pressed={pendingSelected === index} className={`template template-${template.theme} ${pendingSelected === index ? "selected" : ""}`} onClick={() => setPendingSelected(index)} key={template.id}><div className="template-source-preview"><SourceTemplateMedia template={template} /></div><strong>{template.title}</strong><small>{displayTags(template).join(" · ")}</small></button>; })}</div>{!filteredTemplates.length && <div className="template-empty">No locally captured Adapty templates match this filter combination.</div>}<div className="modal-actions"><button className="secondary" onClick={onClose}>Cancel</button><button className="primary" disabled={pendingSelected === null} onClick={() => onOpenBuilder(pendingSelected)}>Open in Builder</button></div></div></div></Modal>;
-}
-
-function AiModal({ onClose, markUnknown }) {
-  const [tab, setTab] = useState("chats");
-  const [style, setStyle] = useState("");
-  const examples = ["Trusted Choice", "Push Forward", "Black&white", "Playful Vibes", "Pro Level", "Kind & Supportive", "Exclusive Access", "Welcome Aboard"];
-  const surprise = () => {
-    window.alert("We couldn't detect your app in app store. Please make sure that the Apple App ID is filled in settings in the iOS SDK section.");
-  };
-  return <Modal title="Describe your Perfect Paywall" onClose={onClose}>
-    <div className="segmented"><button className={tab === "chats" ? "active" : ""} onClick={() => setTab("chats")}>Chats</button><button className={tab === "examples" ? "active" : ""} onClick={() => setTab("examples")}>Examples</button></div>
-    {tab === "chats" ? <><div className="ai-empty"><Sparkles size={30} /><h3>Describe your Perfect Paywall</h3><p>Create paywalls in seconds - no manual setup needed! Generate instantly, customize easily, and launch effortlessly. Save time and stay in control!</p></div><div className="chips">{["Trusted", "Playful", "Black&white", "Professional", "Motivational", "Supportive", "Onboarding", "Exclusive"].map((chip) => <button className={style === chip ? "active" : ""} onClick={() => setStyle(chip)} key={chip}>{chip}</button>)}</div><textarea className="prompt" placeholder={'e.g., "A dark-mode paywall for a fitness app, focus on the annual plan"...'} /><p className="ai-how-it-works">How it works: We combine your prompt with your app's store data to create the most relevant paywalls for you.</p><div className="modal-actions"><button className="secondary" onClick={() => setTab("examples")}>Browse examples</button><button className="secondary" onClick={surprise}>Surprise me</button><button className="primary" onClick={surprise}>Generate</button></div></> : <div className="ai-examples">{examples.map((example) => <article key={example}><div><strong>{example}</strong><small>Observed example entry; the prompt body was not opened.</small></div><button className="secondary unknown-action" onClick={() => markUnknown(missingItems[1])}>Use prompt</button></article>)}</div>}
-  </Modal>;
-}
-
-function MigrationModal({ onClose, markUnknown }) {
-  return <Modal title="Migrate paywall's design" onClose={onClose}><p className="modal-copy">Copy only the visual Builder configuration. Products and other paywall configuration are not copied.</p><label className="form-field"><span>1. Select application</span><select disabled><option>No source application available</option></select></label><label className="form-field"><span>2. Select a Builder paywall</span><select disabled><option>Select a Builder paywall</option></select></label><div className="migration-warning"><CircleHelp size={18} /> Remember to test custom fonts on a device, as they may not display correctly.</div><p className="unknown-rule"><CircleHelp size={16} /> The observed account had no other application design candidate, so this Demo does not invent one.</p><div className="modal-actions"><button className="secondary" onClick={onClose}>Cancel</button><button className="primary unknown-action" disabled onClick={() => markUnknown(missingItems[3])}>Copy Selected Paywall</button></div></Modal>;
-}
-
-function AddAppModal({ onClose, markUnknown }) {
-  const [name, setName] = useState("");
-  const [category, setCategory] = useState("");
-  const appBoundary = {
-    id: "G-01",
-    feature: "Create a new app",
-    known: "顶部应用切换菜单包含 Test 与 Add a new app。新增表单含必填 App name、必填 Category、App icon 上传入口、Cancel、Add a new app；Category 共 24 项。",
-    unknown: "提交创建后的校验、应用创建结果、切换后的数据刷新、权限与异常处理未实测。",
-  };
   return (
-    <Modal title="Add a new app" onClose={onClose}>
-      <Field label="App name"><input value={name} placeholder="Enter your app name" onChange={(event) => setName(event.target.value)} /></Field>
-      <Field label="Category"><select value={category} onChange={(event) => setCategory(event.target.value)}><option value="">Select a category</option>{appCategories.map((item) => <option key={item}>{item}</option>)}</select></Field>
-      <Field label="App icon"><button className="upload unknown-action" onClick={() => markUnknown(appBoundary)}><Upload size={18} /> Choose File <small>PNG, JPG, max size 2MB.</small></button></Field>
-      <div className="modal-actions"><button className="secondary" onClick={onClose}>Cancel</button><button className="primary unknown-action" disabled={!name || !category} onClick={() => markUnknown(appBoundary)}>Add a new app</button></div>
+    <Modal title="归档付费墙" onClose={onClose}>
+      <p className="modal-copy">此操作不可撤销。请输入完整的付费墙名称以确认：</p>
+      <Field label={`输入 "${name}"`}><input value={value} onChange={(e) => setValue(e.target.value)} /></Field>
+      <div className="modal-actions">
+        <button className="secondary" onClick={onClose}>取消</button>
+        <button className="danger-button" disabled={value !== name} onClick={onArchive}>确认归档</button>
+      </div>
+    </Modal>
+  );
+}
+
+function DeviceTestModal({ onClose }) {
+  return (
+    <Modal title="真机扫码体验 (Test on Device)" onClose={onClose}>
+      <div className="device-test" style={{ textAlign: "center", padding: "20px 0" }}>
+        <div style={{ width: 140, height: 140, margin: "0 auto 16px", border: "2px solid #e2e8f0", borderRadius: 12, display: "grid", placeItems: "center", fontSize: 48, background: "#f8fafc" }}>
+          📱
+        </div>
+        <p className="modal-copy">使用手机相机扫描二维码，或通过 HelloTalk App 内部预览链接打开体验。</p>
+        <div className="test-link" style={{ display: "flex", gap: 6, maxWidth: 360, margin: "0 auto" }}>
+          <input defaultValue="https://hellotalk.com/paywall/preview?id=ht-onboarding" readOnly />
+          <button className="icon" title="复制链接"><Copy size={16} /></button>
+        </div>
+        <div className="modal-actions" style={{ justifyContent: "center", marginTop: 24 }}>
+          <button className="primary" onClick={onClose}>完成</button>
+        </div>
+      </div>
+    </Modal>
+  );
+}
+
+function AiModal({ onClose }) {
+  return (
+    <Modal title="AI 智能生成付费墙 (AI Generator)" onClose={onClose}>
+      <div className="ai-empty">
+        <Sparkles size={32} color="#6366F1" />
+        <h3>描述你需要的付费墙</h3>
+        <p>输入你的业务场景与偏好（如：“黑五双套餐限时5折”、“访客拦截突出头像模糊”），AI 将自动生成完整的图层节点树。</p>
+      </div>
+      <textarea className="prompt" placeholder="例如：设计一张针对英语学习者的 7 天免费试用付费墙，突出无限制翻译和 AI 语法纠错..." />
+      <div className="modal-actions">
+        <button className="secondary" onClick={onClose}>取消</button>
+        <button className="primary" onClick={() => { window.alert("AI 模版结构已生成并可载入构建器！"); onClose(); }}>立即生成</button>
+      </div>
+    </Modal>
+  );
+}
+
+function MigrationModal({ onClose }) {
+  return (
+    <Modal title="从已有设计复制" onClose={onClose}>
+      <p className="modal-copy">选择源业务线，直接克隆其元素树与样式配置。</p>
+      <Field label="选择来源"><input defaultValue="HelloTalk iOS - Onboarding Trial" readOnly /></Field>
+      <div className="modal-actions">
+        <button className="secondary" onClick={onClose}>取消</button>
+        <button className="primary" onClick={onClose}>开始复制</button>
+      </div>
+    </Modal>
+  );
+}
+
+function AddAppModal({ onClose }) {
+  return (
+    <Modal title="新建业务线" onClose={onClose}>
+      <Field label="业务线名称"><input placeholder="例如：HelloTalk 英语外教专区" /></Field>
+      <div className="modal-actions">
+        <button className="secondary" onClick={onClose}>取消</button>
+        <button className="primary" onClick={onClose}>确认创建</button>
+      </div>
     </Modal>
   );
 }
 
 function UnknownModal({ item, onClose }) {
-  return <Modal title={`${item.id} · Known boundary`} onClose={onClose}><div className="unknown"><span className="eyebrow">Observed</span><p>{item.known}</p><span className="eyebrow">Not reproduced</span><p>{item.unknown}</p><div className="unknown-rule"><CircleHelp size={18} /> This demo keeps the entry point but does not invent its result.</div></div><div className="modal-actions"><button className="primary" onClick={onClose}>Close</button></div></Modal>;
+  return (
+    <Modal title={`${item.id} · 实测边界说明`} onClose={onClose}>
+      <div className="unknown">
+        <span className="eyebrow">已实测特征</span>
+        <p>{item.known}</p>
+        <span className="eyebrow">未复现缺口</span>
+        <p>{item.unknown}</p>
+      </div>
+      <div className="modal-actions"><button className="primary" onClick={onClose}>关闭</button></div>
+    </Modal>
+  );
 }
 
-function Modal({ title, onClose, children, wide = false }) { return <div className="modal-backdrop"><section className={`modal ${wide ? "wide" : ""}`}><header><h2>{title}</h2><button className="icon" onClick={onClose}><X size={19} /></button></header>{children}</section></div>; }
-function Field({ label, children }) { return <label className="form-field"><span>{label}</span>{children}</label>; }
-function StateBadge({ state }) { return <span className={`state ${state.toLowerCase()}`}><i /> {state}</span>; }
-function Sort() { return <span className="sort">↕</span>; }
-function Help() { return <CircleHelp size={15} className="help" />; }
-function SourceTemplateMedia({ template }) {
-  const assets = template.assetParts ?? [template.asset];
-  if (assets.length === 1) return <img src={assets[0]} alt={`Adapty template: ${template.title}`} />;
-  return <div className="source-template-stack">{assets.map((asset) => <img src={asset} alt="" key={asset} />)}</div>;
-}
-function PaywallPreview({ nodes, template, mode, activeNode, onSelect }) {
-  if (template && mode === "source") return <div className="phone source-template-phone"><SourceTemplateMedia template={template} /><button className="close-phone" aria-label="Close preview">×</button></div>;
-  const hero = nodes.find((node) => node.type === "Hero Image");
-  const children = new Map();
-  const parents = new Map();
-  const latestAtDepth = [];
-  nodes.forEach((node) => {
-    const depth = node.depth ?? 0;
-    const parentId = node.parentId ?? (depth > 0 ? latestAtDepth[depth - 1] : undefined);
-    if (parentId) {
-      parents.set(node.id, parentId);
-      children.set(parentId, [...(children.get(parentId) ?? []), node]);
-    }
-    latestAtDepth[depth] = node.id;
-    latestAtDepth.length = depth + 1;
-  });
-  return <div className={`phone template-${hero?.theme ?? "lavender"}`}><button className="close-phone" aria-label="Close preview">×</button><div className="phone-content"><span className="phone-kicker">PREMIUM ACCESS</span>{nodes.filter((node) => !parents.has(node.id)).map((node) => <PreviewElement key={node.id} node={node} children={children.get(node.id) ?? []} active={node.id === activeNode} activeNode={activeNode} onSelect={onSelect} />)}</div></div>;
+function Modal({ title, onClose, children, wide = false }) {
+  return (
+    <div className="modal-backdrop">
+      <section className={`modal ${wide ? "wide" : ""}`}>
+        <header><h2>{title}</h2><button className="icon" onClick={onClose}><X size={19} /></button></header>
+        {children}
+      </section>
+    </div>
+  );
 }
 
-function PreviewElement({ node, active, activeNode, onSelect, children = [] }) {
-  const select = () => onSelect(node.id);
-  const wrap = (content, className = "") => <div className={`preview-node ${active ? "selected" : ""} ${className}`} onClick={select}>{content}</div>;
-  const isTextLayer = ["Text", "Header", "Headline", "Subhead", "Caption", "Legal", "Top Text"].includes(node.type) || /^(HEADER|Header|Caption|Title|Repeats|Subheader) \d+$/.test(node.type);
-  const isListLayer = ["List", "Feature list", "Features"].includes(node.type) || /^List \d+$/.test(node.type);
-  const isListItemLayer = node.type === "List item" || node.type === "Today" || /^Item \d+$/.test(node.type) || /^Day \d+$/.test(node.type);
-  const isImageLayer = ["Image", "Black Friday Image"].includes(node.type) || /^Image \d+$/.test(node.type);
-  if (node.sourcePending) return wrap(<p className="preview-boundary">Source layer confirmed; field content pending</p>, "preview-copy");
-  if (["Hero Image", "Hero Video"].includes(node.type)) return wrap(<div className="preview-media"><span>{node.type === "Hero Video" || node.config?.mediaType === "Video" ? "VIDEO" : node.content === "knowledge" ? "✦" : ""}</span></div>, "preview-hero");
-  if (node.type === "Stars") return wrap(<div className="preview-stars">{node.content || "★★★★★"}</div>);
-  if (node.type === "Discount") return wrap(<h2>{node.content || "Discount"}</h2>, "preview-headline");
-  if (isTextLayer) return wrap(node.variant === "headline" ? <h2>{node.content || "Heading"}</h2> : node.variant === "section" ? <h3>{node.content}</h3> : <p className={node.variant === "boundary" ? "preview-boundary" : ""}>{node.content || "Supporting text"}</p>, node.variant === "headline" ? "preview-headline" : "preview-copy");
-  if (isListLayer) {
-    if (children.length) return wrap(<div className="preview-benefits">{children.map((child) => <PreviewElement key={child.id} node={child} active={child.id === activeNode} activeNode={activeNode} onSelect={onSelect} />)}</div>, "preview-list");
-    if (!node.content) return wrap(<div className="preview-list-anchor">List</div>, "preview-list-anchor-wrap");
-    return wrap(<ul className="preview-benefits">{(node.content || "").split("\n").filter(Boolean).map((item) => { const [title, caption] = item.split("|"); return <li key={item}>✓ <span><strong>{title}</strong>{caption && <small>{caption}</small>}</span></li>; })}</ul>, "preview-list");
+function Field({ label, children }) {
+  return <label className="form-field"><span>{label}</span>{children}</label>;
+}
+
+function StateBadge({ state }) {
+  return <span className={`state ${state.toLowerCase()}`}><i /> {state}</span>;
+}
+
+function Sort() {
+  return <span className="sort">↕</span>;
+}
+
+function Help() {
+  return <CircleHelp size={15} className="help" />;
+}
+
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
   }
-  if (isListItemLayer) { const [title, caption] = (node.content || "").split("|"); return wrap(<div className="preview-list-item"><i>●</i><span><strong>{title || "Item"}</strong>{caption && <small>{caption}</small>}</span></div>, "preview-list-item-wrap"); }
-  if (node.type === "Card") return children.length ? wrap(<div className="preview-card">{children.map((child) => <PreviewElement key={child.id} node={child} active={child.id === activeNode} activeNode={activeNode} onSelect={onSelect} />)}</div>, "preview-card-wrap") : !node.content ? wrap(<div className="preview-card-anchor" />, "preview-card-anchor-wrap") : wrap(<div className="preview-card">{node.content.split("\n").map((row) => { const [title, copy] = row.split("|"); return <div key={row}><strong>{title}</strong>{copy && <small>{copy}</small>}</div>; })}</div>, "preview-card-wrap");
-  if (["Product", "Japanese Ai - 1 Year"].includes(node.type)) { const [name, price] = (node.content || "").split("|"); return wrap(<div className="preview-product"><strong>{name || "Product"}</strong>{price && <small>{price}</small>}</div>, "preview-product-anchor-wrap"); }
-  if (node.type === "App Icon") return wrap(<div className="preview-app-icon">✦</div>, "preview-app-icon-wrap");
-  if (isImageLayer) return wrap(<div className="preview-image">{node.type === "Black Friday Image" ? "BLACK FRIDAY" : node.content}</div>, "preview-image-wrap");
-  if (node.type === "Carousel") return children.length ? wrap(<div className="preview-carousel">{children.map((child) => <PreviewElement key={child.id} node={child} active={child.id === activeNode} activeNode={activeNode} onSelect={onSelect} />)}</div>, "preview-carousel-wrap") : !node.content ? wrap(<div className="preview-card-anchor" />, "preview-card-anchor-wrap") : wrap(<PreviewCarousel content={node.content} />, "preview-carousel-wrap");
-  if (node.type === "Timer") return wrap(<div className="preview-timer">{node.content || "04:59:59"}</div>);
-  if (node.type === "Products") {
-    if (node.variant === "purchase") {
-      const [label = "Continue", , price = ""] = node.content.split("|");
-      return wrap(<button className="preview-cta"><span>{label}</span>{price && <small>{price}</small>}</button>, "preview-button");
-    }
-    if (children.length) return wrap(<div className="preview-products">{children.map((child) => <PreviewElement key={child.id} node={child} active={child.id === activeNode} activeNode={activeNode} onSelect={onSelect} />)}</div>, "preview-products-wrap");
-    return wrap(<PreviewProducts content={node.content} />, "preview-products-wrap");
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
   }
-  if (node.type === "Toggle") return wrap(<PreviewToggle key={`${node.id}-${node.defaultState ?? "Off"}`} content={node.content} defaultState={node.defaultState} />, "preview-toggle-wrap");
-  if (["Toggle On", "Toggle Off"].includes(node.type)) return wrap(<div className="preview-toggle-anchor" />, "preview-toggle-anchor-wrap");
-  if (node.type === "Footer Top Part") return wrap(<div className="preview-card-anchor" />, "preview-card-anchor-wrap");
-  if (node.type === "Button and Links") { const [cta, links] = (node.content || "GET FULL ACCESS|Terms · Privacy · Restore").split("|"); return wrap(<><button className="preview-cta">{cta}</button><small className="preview-links">{links}</small></>, "preview-button"); }
-  if (node.type === "Button" || node.type === "Web Paywall Button" || node.type === "Purchase Button") return wrap(<button className="preview-cta">{node.content || (node.type === "Web Paywall Button" ? "Pay on web" : node.type === "Button" ? "button text" : "Continue")}</button>, "preview-button");
-  if (node.type === "Links") return wrap(<small className="preview-links">{node.content || "Terms · Privacy · Restore · Login"}</small>);
-  if (node.type === "Footer") return wrap(<small className="preview-footer">{node.content}</small>);
-  return wrap(<p>{node.content || node.type}</p>);
+  componentDidCatch(error, errorInfo) {
+    console.error("ErrorBoundary caught:", error, errorInfo);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div style={{ padding: 40, fontFamily: "sans-serif", background: "#f8fafc", minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
+          <div style={{ maxWidth: 600, background: "#fff", padding: 24, borderRadius: 12, boxShadow: "0 4px 20px rgba(0,0,0,0.08)", border: "1px solid #fee2e2" }}>
+            <h2 style={{ color: "#ef4444", fontSize: 18, marginTop: 0 }}>页面渲染遇到异常</h2>
+            <p style={{ fontSize: 13, color: "#64748b" }}>{this.state.error?.message || "未知错误"}</p>
+            <div style={{ display: "flex", gap: 12, marginTop: 16 }}>
+              <button
+                onClick={() => { localStorage.clear(); window.location.reload(); }}
+                style={{ background: "#4f46e5", color: "#fff", border: "none", padding: "8px 16px", borderRadius: 6, cursor: "pointer", fontWeight: 600, fontSize: 13 }}
+              >
+                重置缓存并刷新页面
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                style={{ background: "#f1f5f9", color: "#334155", border: "1px solid #cbd5e1", padding: "8px 16px", borderRadius: 6, cursor: "pointer", fontSize: 13 }}
+              >
+                直接刷新
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
 }
 
-function PreviewCarousel({ content }) {
-  const slides = (content || "Customer story").split("\n---\n").filter(Boolean);
-  const [current, setCurrent] = useState(0);
-  const slide = slides[current] ?? slides[0];
-  const [title, copy] = slide.split("|");
-  return <div className="preview-carousel"><span>★★★★★</span><p>{copy ? <><strong>{title}</strong><small>{copy}</small></> : slide}</p><div><button aria-label="Previous review" onClick={(event) => { event.stopPropagation(); setCurrent((index) => (index - 1 + slides.length) % slides.length); }}>‹</button><i>{slides.map((_, index) => <b className={index === current ? "active" : ""} key={index}>•</b>)}</i><button aria-label="Next review" onClick={(event) => { event.stopPropagation(); setCurrent((index) => (index + 1) % slides.length); }}>›</button></div></div>;
-}
-
-function PreviewProducts({ content }) {
-  const rows = (content || "").split("\n").filter(Boolean).map((row) => { const [name, caption, price] = row.split("|"); return { name, caption, price: price ?? caption }; });
-  const [chosen, setChosen] = useState(0);
-  return <div className="preview-products">{rows.map((row, index) => <button className={index === chosen ? "chosen" : ""} onClick={(event) => { event.stopPropagation(); setChosen(index); }} key={`${row.name}-${index}`}><span><strong>{row.name}</strong>{row.caption && row.price !== row.caption && <small>{row.caption}</small>}</span><em>{row.price}</em></button>)}</div>;
-}
-
-function PreviewToggle({ content, defaultState = "Off" }) {
-  const [title = "Not sure? Get free trial", secondary = "Cancel anytime"] = (content || "").split("|");
-  const [enabled, setEnabled] = useState(defaultState === "On");
-  return <button className={`preview-toggle ${enabled ? "enabled" : ""}`} role="switch" aria-checked={enabled} onClick={(event) => { event.stopPropagation(); setEnabled((value) => !value); }}><span><strong>{title}</strong><small>{secondary}</small></span><i><b /></i></button>;
-}
-
-createRoot(document.getElementById("root")).render(<App />);
+createRoot(document.getElementById("root")).render(
+  <ErrorBoundary>
+    <App />
+  </ErrorBoundary>
+);
