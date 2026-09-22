@@ -16,6 +16,7 @@ import {
   Zap,
   Settings,
   Sliders,
+  SlidersHorizontal,
 } from "lucide-react";
 
 // 优雅的 iOS / Ant Design 风格极简 Switch 组件，彻底杜绝全局 input 样式导致的形变与大黑框
@@ -278,7 +279,9 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
 
   const currentStyleVariant =
     node.config?.styleVariant ||
-    (node.config?.variant === "onboarding-privilege-card" || node.id === "trial-t1-privileges"
+    (node.config?.variant === "carousel" || node.config?.privilegeMode === "carousel" || node.type === "Carousel Cards"
+      ? "carousel"
+      : node.config?.variant === "onboarding-privilege-card" || node.id === "trial-t1-privileges"
       ? "cards"
       : node.config?.variant === "grid-matrix"
       ? "grid"
@@ -304,9 +307,10 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
   const handleStyleChange = (variant) => {
     saveBenefits(benefits, {
       styleVariant: variant,
-      variant: variant === "cards" ? "onboarding-privilege-card" : variant === "grid" ? "grid-matrix" : "entry-checks",
+      variant: variant === "carousel" ? "carousel" : variant === "cards" ? "onboarding-privilege-card" : variant === "grid" ? "grid-matrix" : "entry-checks",
+      privilegeMode: variant === "carousel" ? "carousel" : "list",
     });
-    notify?.("已切换展示形态为：" + (variant === "checklist" ? "单列打勾列表" : variant === "cards" ? "圆角权益大卡流" : "双列网格矩阵"));
+    notify?.("已切换特权展示形态为：" + (variant === "carousel" ? "卡片轮播" : variant === "checklist" ? "单列打勾列表" : variant === "cards" ? "圆角权益大卡流" : "双列网格矩阵"));
   };
 
   const moveItem = (idx, direction) => {
@@ -418,25 +422,31 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
           <Layers size={13} color="#6366f1" />
           <span>特权展现版式（一键切换落地页形态）</span>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
           {[
+            {
+              id: "carousel",
+              label: "卡片轮播",
+              sub: "大卡滑动",
+              icon: <SlidersHorizontal size={13} />,
+            },
             {
               id: "checklist",
               label: "打勾清单",
-              sub: "入门特惠页",
+              sub: "单列打勾",
               icon: <LayoutList size={13} />,
-            },
-            {
-              id: "cards",
-              label: "大卡片流",
-              sub: "试用引导页",
-              icon: <CreditCard size={13} />,
             },
             {
               id: "grid",
               label: "双列网格",
-              sub: "蓝色特权页",
+              sub: "蓝色特权",
               icon: <LayoutGrid size={13} />,
+            },
+            {
+              id: "cards",
+              label: "圆角大卡",
+              sub: "试用引导",
+              icon: <CreditCard size={13} />,
             },
           ].map((item) => {
             const isActive = currentStyleVariant === item.id;
@@ -671,6 +681,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
               return (
                 <div
                   key={item.id}
+                  onClick={() => !isSelected && togglePrivilegeSelection(item)}
                   style={{
                     background: isSelected ? "#fbfbfe" : "#ffffff",
                     borderRadius: 8,
@@ -679,6 +690,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
                     display: "flex",
                     flexDirection: "column",
                     gap: 6,
+                    cursor: !isSelected ? "pointer" : "default",
                     transition: "all 0.15s ease",
                   }}
                 >
@@ -714,16 +726,6 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
                         <span style={{ fontSize: 12, fontWeight: 700, color: isSelected ? "#1e293b" : "#475569" }}>
                           {item.title}
                         </span>
-                        {item.tag && (
-                          <span style={{ fontSize: 9.5, background: isSelected ? "#fee2e2" : "#fef3c7", color: isSelected ? "#b91c1c" : "#92400e", padding: "1px 4px", borderRadius: 3, fontWeight: 700 }}>
-                            {item.tag}
-                          </span>
-                        )}
-                        {isSelected && (
-                          <span style={{ fontSize: 9.5, background: "#ede9fe", color: "#6366f1", padding: "1px 5px", borderRadius: 4, fontWeight: 800 }}>
-                            #{activeIndex + 1}
-                          </span>
-                        )}
                       </div>
 
                       {/* 说明副文案 */}
@@ -746,7 +748,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
 
                     {/* 右侧操作按钮区 */}
                     <div style={{ display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
-                      {isSelected ? (
+                      {isSelected && (
                         <>
                           <button
                             type="button"
@@ -783,23 +785,6 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
                             <Trash2 size={13} />
                           </button>
                         </>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => togglePrivilegeSelection(item)}
-                          style={{
-                            padding: "3px 8px",
-                            background: "#f1f5f9",
-                            border: "1px solid #e2e8f0",
-                            borderRadius: 4,
-                            color: "#475569",
-                            fontSize: 10.5,
-                            fontWeight: 600,
-                            cursor: "pointer",
-                          }}
-                        >
-                          + 勾选
-                        </button>
                       )}
                     </div>
                   </div>

@@ -372,12 +372,15 @@ const zhToTypeMap = {
   "试用多张轮播": "Carousel Cards",
   "3天试用时间轴": "Toggle",
   "试用时间轴": "Toggle",
+  "产品套餐": "Products",
+  "文本与排版": "Header",
+  "操作按钮": "Purchase Button",
+  "对比与时间轴": "Comparison Table",
   "产品双套餐": "Products",
   "横向套餐卡片": "Products",
   "纵向套餐列表": "Products",
   "横向三档套餐": "Products",
   "3档会员套餐": "Products",
-  "产品套餐": "Products",
   "特惠价格": "Products",
   "倒计时": "Timer",
   "开关选项": "Toggle",
@@ -422,8 +425,14 @@ const getNodeLabel = (node) => {
   if (node.config?.variant === "onboarding-3slides" || node.id === "trial-t2-carousel" || raw.includes("多张轮播")) {
     return "多张轮播图";
   }
+  if (node.type === "Benefit List" || node.type === "Carousel Cards" || raw.includes("特权") || raw.includes("权益")) {
+    return "核心特权";
+  }
   if (node.type === "Purchase Button" || raw.includes("购买按钮") || raw === "主购买按钮") {
     return "购买按钮";
+  }
+  if (node.type === "Dismiss Button" || raw.includes("关闭按钮")) {
+    return "关闭按钮";
   }
   if (node.type === "Hero Image" || node.id?.includes("hero") || node.config?.variant?.includes("hero") || raw.includes("头图") || raw.includes("背景图")) {
     return "背景图";
@@ -431,52 +440,23 @@ const getNodeLabel = (node) => {
   if (node.type === "Timer" || raw.includes("倒计时") || node.id?.includes("timer")) {
     return "倒计时";
   }
+  if (node.type === "Comparison Table" || raw.includes("对比表格") || raw.includes("对比与时间轴")) {
+    return "对比表格";
+  }
   if (node.type === "Products") {
-    if (node.config?.variant === "entry-price-tier" || raw === "特惠价格" || node.id === "t1-products" || node.id === "t2-products") {
-      return "特惠价格";
-    }
-    if (node.config?.variant === "onboarding-dual-tiers" || raw === "产品双套餐" || node.id === "trial-t1-products") {
-      return "产品双套餐";
-    }
-    if (node.config?.variant === "3-column-tiers" || raw === "横向套餐卡片" || raw === "横向三档套餐") {
-      return "横向套餐卡片";
-    }
-    if (node.config?.variant === "vertical-list-tiers" || raw === "纵向套餐列表") {
-      return "纵向套餐列表";
-    }
-    if (raw && raw !== "产品套餐" && raw !== "Products" && raw !== "products") {
-      return cleanLabel(raw);
-    }
-    if (node.config?.tiers && !node.config?.listTiers) {
-      return "横向套餐卡片";
-    }
-    return "纵向套餐列表";
+    return "产品套餐";
   }
   return cleanLabel(raw);
 };
 
 const componentCatalog = [
-  "标题",
-  "副标题",
-  "徽标标签",
-  "背景图",
   "核心特权",
-  "特权轮播",
-  "多张轮播图",
-  "3天试用时间轴",
-  "产品双套餐",
-  "横向套餐卡片",
-  "纵向套餐列表",
-  "特惠价格",
-  "对比表格",
-  "切换标签",
+  "产品套餐",
+  "文本与排版",
+  "背景图",
+  "操作按钮",
   "倒计时",
-  "开关选项",
-  "购买按钮",
-  "关闭按钮",
-  "免责声明",
-  "语言标签",
-  "文本",
+  "对比与时间轴",
 ];
 
 function nodeParentId(nodes, index) {
@@ -844,7 +824,45 @@ function createComponentNode(rawType, index) {
   let config = {};
   let content = "";
 
-  if (rawType === "产品双套餐") {
+  if (rawType === "核心特权" || rawType === "特权轮播") {
+    label = "核心特权";
+    config = {
+      variant: "carousel",
+      styleVariant: "carousel",
+      privilegeMode: "carousel",
+      items: [
+        { id: "p-1", title: "无限翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
+        { id: "p-2", title: "多语言学习", desc: "150种语言随时添加和切换", icon: "🌐" },
+        { id: "p-3", title: "动态曝光加速", desc: "让更多母语者看到你的动态", icon: "⚡" },
+      ],
+    };
+    content = "无限翻译|随聊随翻，提高你的词汇量\n多语言学习|150种语言随时添加和切换\n动态曝光加速|让更多母语者看到你的动态";
+  } else if (rawType === "文本与排版") {
+    label = "文本与排版";
+    config = {
+      textRole: "headline",
+      color: "#1e293b",
+    };
+    content = "HelloTalk VIP 会员专享";
+  } else if (rawType === "操作按钮") {
+    label = "购买按钮";
+    config = {
+      label: "购买按钮",
+      subtitle: "订阅可随时取消，无需支付任何费用",
+      color: "#6144e8",
+    };
+    content = "立即升级 VIP";
+  } else if (rawType === "对比与时间轴") {
+    label = "对比表格";
+    config = {
+      variant: "comparison-table",
+      compareMode: "free-vs-vip",
+      featureColTitle: "特权功能",
+      col1Title: "普通会员",
+      col2Title: "VIP会员",
+    };
+    content = "特权对比|普通VIP|VIP+旗舰\n每日翻译|50次/天|无限制\n全球漫游|2个城市|无限制";
+  } else if (rawType === "产品双套餐") {
     label = "产品双套餐";
     config = {
       variant: "onboarding-dual-tiers",
@@ -2564,9 +2582,44 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                 <Plus size={15} /> 添加组件
               </button>
               {addElementOpen && (
-                <div className="add-element-menu">
-                  {componentCatalog.map((item) => (
-                    <button key={item} onClick={() => addElement(item)}>+ {item}</button>
+                <div className="add-element-menu" style={{ width: 220, padding: 6, borderRadius: 8, boxShadow: "0 10px 25px rgba(0,0,0,0.12)" }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, color: "#64748b", padding: "4px 8px 6px", borderBottom: "1px solid #f1f5f9", marginBottom: 4 }}>
+                    选择要添加的核心组件
+                  </div>
+                  {[
+                    { name: "核心特权", sub: "轮播 / 清单 / 网格 / 大卡", icon: "⭐" },
+                    { name: "产品套餐", sub: "横向三列 / 双套餐 / 纵向单选 / 特惠", icon: "💳" },
+                    { name: "文本与排版", sub: "主标题 / 副标题 / 正文 / 条款", icon: "✍️" },
+                    { name: "背景图", sub: "插画 / 自选图片 / 渐变底色", icon: "🖼️" },
+                    { name: "操作按钮", sub: "购买按钮 / 关闭按钮 / 切换标签", icon: "🔘" },
+                    { name: "倒计时", sub: "色块数字框 / 胶囊条 / 极简文本", icon: "⏰" },
+                    { name: "对比与时间轴", sub: "权益对比表格 / 试用时间轴", icon: "📊" },
+                  ].map((item) => (
+                    <button
+                      key={item.name}
+                      onClick={() => addElement(item.name)}
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
+                        padding: "7px 8px",
+                        borderRadius: 6,
+                        border: "none",
+                        background: "transparent",
+                        cursor: "pointer",
+                        width: "100%",
+                        textAlign: "left",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
+                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                    >
+                      <span style={{ fontSize: 14 }}>{item.icon}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#1e293b" }}>+ {item.name}</div>
+                        <div style={{ fontSize: 9.5, color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.sub}</div>
+                      </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -4205,12 +4258,54 @@ function PreviewElement({
     }
 
     const styleVariant = node.config?.styleVariant || (
-      node.config?.variant === "onboarding-privilege-card" || node.id === "trial-t1-privileges"
+      node.config?.variant === "carousel" || node.config?.privilegeMode === "carousel"
+        ? "carousel"
+        : node.config?.variant === "onboarding-privilege-card" || node.id === "trial-t1-privileges"
         ? "cards"
         : node.config?.variant === "grid-matrix"
         ? "grid"
         : "checklist"
     );
+
+    // 0. 卡片轮播形态
+    if (styleVariant === "carousel") {
+      const cards = items;
+      const safeIndex = cards.length > 0 ? carouselIndex % cards.length : 0;
+      const currentCard = cards[safeIndex] || { title: "暂无轮播特权", desc: "请在右侧属性面板配置特权", icon: "✨" };
+      return wrap(
+        <div className="preview-carousel-cards" style={{ margin: "4px 0 12px" }}>
+          <div className="carousel-card-slide" style={{ background: "#ffffff", borderRadius: 14, padding: "16px 14px", boxShadow: "0 2px 10px rgba(0,0,0,0.06)", border: "1px solid rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+              <span style={{ fontSize: 20 }}>{currentCard.icon || "💎"}</span>
+              <strong style={{ fontSize: 14, color: "#1e293b" }}>{currentCard.title || currentCard.name}</strong>
+            </div>
+            <p style={{ fontSize: 11.5, color: "#64748b", margin: 0, lineHeight: 1.4 }}>{currentCard.desc || "HelloTalk VIP 核心专享特权"}</p>
+          </div>
+          {cards.length > 1 && (
+            <div className="carousel-dots" style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 8 }}>
+              {cards.slice(0, 8).map((_, i) => (
+                <span
+                  key={i}
+                  className={`dot ${i === safeIndex ? "active" : ""}`}
+                  style={{
+                    width: i === safeIndex ? 14 : 6,
+                    height: 6,
+                    borderRadius: 3,
+                    background: i === safeIndex ? "#6366f1" : "#cbd5e1",
+                    transition: "all 0.2s ease",
+                    cursor: "pointer",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCarouselIndex(i);
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+      );
+    }
 
     // 1. 圆角权益大卡流 (注册引导与试用页规范)
     if (styleVariant === "cards") {
@@ -4481,7 +4576,17 @@ function PreviewElement({
         </div>
       );
     }
-    if (node.config?.variant === "onboarding-dual-tiers" || node.id === "trial-t1-products") {
+    const effectiveVariant =
+      node.config?.variant ||
+      (node.config?.listTiers || node.label === "纵向套餐列表"
+        ? "vertical-list-tiers"
+        : node.id === "trial-t1-products" || node.label === "产品双套餐"
+        ? "onboarding-dual-tiers"
+        : (node.label === "特惠价格" || node.id === "t1-products" || node.id === "t2-products")
+        ? "entry-price-tier"
+        : "3-column-tiers");
+
+    if (effectiveVariant === "onboarding-dual-tiers") {
       const curSelected = selectedOnboardingTier ?? 0;
       return wrap(
         <div className="ht-dual-tiers-container">
@@ -4528,7 +4633,7 @@ function PreviewElement({
       );
     }
 
-    if (node.config?.variant === "3-column-tiers" || node.config?.tiers) {
+    if (effectiveVariant === "3-column-tiers") {
       const tiers = node.config?.tiers || [
         { name: "1 个月", monthly: "¥78", total: "¥78/ 月", badge: "", save: "", isRecommended: false },
         { name: "12 个月", monthly: "¥388", originalPrice: "¥488", total: "¥388", badge: "🔥 8折", save: "节省 59%", isRecommended: true },
@@ -4563,23 +4668,13 @@ function PreviewElement({
                 )}
                 <div className="tier-col-name">{t.name}</div>
                 {t.originalPrice && (
-                  <div style={{ fontSize: 11, color: "#94a3b8", textDecoration: "line-through", margin: "1px 0" }}>
-                    {t.originalPrice}
-                  </div>
+                  <div className="tier-col-orig">{t.originalPrice}</div>
                 )}
                 {t.save && (
-                  <div
-                    className={`tier-col-save ${isPurpleTheme ? "purple" : isWarm ? "warm" : ""}`}
-                    style={isPurpleTheme ? { color: "#7C5CFC", fontWeight: 700, fontSize: 11 } : {}}
-                  >
-                    {t.save}
-                  </div>
+                  <div className="tier-col-save">{t.save}</div>
                 )}
-                <div
-                  className={`tier-col-monthly ${isPurpleTheme ? "purple" : isWarm ? "warm" : ""}`}
-                  style={isPurpleTheme ? { color: isSel ? "#7C5CFC" : "#1e293b", fontSize: 16, fontWeight: 800 } : {}}
-                >
-                  {t.monthly}
+                <div className="tier-col-price">
+                  <strong>{t.monthly}</strong>
                 </div>
                 {t.total && !t.originalPrice && (
                   <div className="tier-col-total">{t.total}</div>
@@ -4591,16 +4686,7 @@ function PreviewElement({
       );
     }
 
-    if (
-      (node.config?.variant === "entry-price-tier" ||
-        ((node.id === "t1-products" || node.id === "t2-products" || node.label === "特惠价格") &&
-          node.config?.variant !== "vertical-list-tiers" &&
-          node.config?.variant !== "onboarding-dual-tiers" &&
-          node.config?.variant !== "3-column-tiers")) &&
-      node.config?.variant !== "vertical-list-tiers" &&
-      node.label !== "纵向套餐列表" &&
-      !node.config?.listTiers
-    ) {
+    if (effectiveVariant === "entry-price-tier") {
       const otherColor = themeConfig?.otherColor || (themeConfig?.subTemplate === "tpl-2" ? "#F59E0B" : "#DE6876");
       const mainFontColor = themeConfig?.mainFontColor || "#2D1832";
       const priceNow = node.config?.priceNow || themeConfig?.priceNow || "折扣价 ¥388/年";
@@ -5369,6 +5455,48 @@ function BuilderProperties({
   }
   const type = active.type;
 
+  const effectiveProductsVariant =
+    active.config?.variant ||
+    (active.config?.listTiers || active.label === "纵向套餐列表"
+      ? "vertical-list-tiers"
+      : active.id === "trial-t1-products" || active.label === "产品双套餐"
+      ? "onboarding-dual-tiers"
+      : (active.label === "特惠价格" || active.id === "t1-products" || active.id === "t2-products")
+      ? "entry-price-tier"
+      : "3-column-tiers");
+
+  const handleProductVariantSwitch = (targetVariant) => {
+    const nextConfig = {
+      ...(active.config || {}),
+      variant: targetVariant,
+    };
+    if (targetVariant === "3-column-tiers" && !nextConfig.tiers) {
+      nextConfig.tiers = [
+        { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+        { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+        { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+      ];
+    } else if (targetVariant === "onboarding-dual-tiers" && !nextConfig.tiers) {
+      nextConfig.tiers = [
+        { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+        { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+      ];
+    } else if (targetVariant === "entry-price-tier") {
+      if (!nextConfig.priceNow) nextConfig.priceNow = "折扣价 ¥388/年";
+      if (!nextConfig.priceOriginal) nextConfig.priceOriginal = "原价 ¥488/年";
+    } else if (targetVariant === "vertical-list-tiers" && !nextConfig.listTiers) {
+      nextConfig.listTiers = [
+        { name: "连续包年 VIP", price: "¥198/年", daily: "¥0.54/天", tag: "推荐", isDefault: true },
+        { name: "连续包月 VIP", price: "¥28/月", daily: "¥0.93/天", tag: "月付", isDefault: false },
+      ];
+    }
+    updateNode(active.id, {
+      config: nextConfig,
+      label: `产品套餐 (${targetVariant === "3-column-tiers" ? "横向三列" : targetVariant === "onboarding-dual-tiers" ? "双套餐" : targetVariant === "vertical-list-tiers" ? "纵向列表" : "特惠价格"})`,
+    });
+    notify?.(`已切换产品套餐形态为：${targetVariant === "3-column-tiers" ? "横向三列" : targetVariant === "onboarding-dual-tiers" ? "双套餐" : targetVariant === "vertical-list-tiers" ? "纵向列表" : "特惠价格"}`);
+  };
+
   const insertJinja = (variable) => {
     updateNode(active.id, { content: (active.content ?? "") + ` ${variable} ` });
   };
@@ -5669,87 +5797,190 @@ function BuilderProperties({
             </div>
           )}
 
-          {type === "Header" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📝 标题内容配置</span>
-              {(active.config?.kicker || active.id === "t1-headline") && (
-                <Field label="顶部前缀 / VIP 标识">
-                  <input
-                    value={active.config?.kicker ?? "HelloTalk VIP 👑"}
-                    placeholder="例如：HelloTalk VIP 👑"
-                    onChange={(e) => updateNode(active.id, { config: { ...active.config, kicker: e.target.value } })}
-                  />
-                </Field>
-              )}
-              <Field label="主标题文案">
-                <input
-                  value={active.content ?? ""}
-                  placeholder="例如：首年额外 20% 优惠！"
-                  onChange={(e) => updateNode(active.id, { content: e.target.value })}
-                />
-              </Field>
-              {active.config?.variant === "vip-banner" && (
-                <Field label="副标题说明">
-                  <input
-                    value={active.config?.subtitle ?? "畅享 16 项高阶语言学习特权"}
-                    onChange={(e) => updateNode(active.id, { config: { ...active.config, subtitle: e.target.value } })}
-                  />
-                </Field>
-              )}
-              {active.config?.variant === "brand-hero" && (
-                <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
-                  <label style={{ fontSize: 11, fontWeight: 700, color: "#475569" }}>3 大核心特权标语 (纯中文展示)</label>
-                  {(active.config?.bullets || ["无限翻译", "查看谁喜欢了你", "搜索全世界的语伴"]).map((b, bIdx) => (
-                    <input
-                      key={bIdx}
-                      value={b}
-                      placeholder={`特权标语 ${bIdx + 1}`}
-                      onChange={(e) => {
-                        const nextBullets = [...(active.config?.bullets || ["无限翻译", "查看谁喜欢了你", "搜索全世界的语伴"])];
-                        nextBullets[bIdx] = e.target.value;
-                        updateNode(active.id, { config: { ...active.config, bullets: nextBullets } });
-                      }}
-                      style={{ fontSize: 11, padding: "4px 8px", borderRadius: 4, border: "1px solid #cbd5e1", background: "#ffffff" }}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {type === "Subhead" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📝 副标题配置</span>
-              <Field label="副标题文案">
-                <input
-                  value={active.content ?? ""}
-                  placeholder="例如：仅限今日"
-                  onChange={(e) => updateNode(active.id, { content: e.target.value })}
-                />
-              </Field>
-              <Field label="副标题文本颜色">
-                <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                  {["#DE6876", "#FF4D6D", "#F59E0B", "#64748b", "#0284C7", "#2D1832"].map((c) => (
+          {(type === "Header" || type === "Subhead" || type === "Text" || type === "Legal Footer" || active.label?.includes("文本与排版") || active.label?.includes("标题") || active.label?.includes("文本")) && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "#1e293b" }}>
+                <span>✍️ 文本与排版角色</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                {[
+                  { id: "Header", label: "主标题", sub: "醒目大字" },
+                  { id: "Subhead", label: "副标题", sub: "说明标语" },
+                  { id: "Text", label: "正文段落", sub: "内容说明" },
+                  { id: "Legal Footer", label: "免责声明", sub: "法律/条款" },
+                ].map((role) => {
+                  const isActive = type === role.id || active.config?.role === role.id;
+                  return (
                     <button
-                      key={c}
+                      key={role.id}
                       type="button"
-                      style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: "50%",
-                        background: c,
-                        border: (active.config?.color || "#DE6876") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
-                        cursor: "pointer",
+                      onClick={() => {
+                        let newContent = active.content;
+                        if (role.id === "Header" && (!newContent || newContent.length > 50)) {
+                          newContent = "HelloTalk VIP 核心专享特权";
+                        } else if (role.id === "Subhead" && (!newContent || newContent.length > 50)) {
+                          newContent = "畅享 16 项高阶语言学习特权与专属服务";
+                        } else if (role.id === "Legal Footer" && (!newContent || newContent.length < 10)) {
+                          newContent = "服务条款 · 隐私政策 · 恢复购买";
+                        }
+                        updateNode(active.id, {
+                          type: role.id,
+                          label: `文本与排版 (${role.label})`,
+                          content: newContent,
+                          config: { ...(active.config || {}), role: role.id },
+                        });
+                        notify?.(`已切换文本角色为：${role.label}`);
                       }}
-                      onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
+                      style={{
+                        padding: "6px 4px",
+                        background: isActive ? "#eff6ff" : "#ffffff",
+                        border: isActive ? "2px solid #3b82f6" : "1px solid #e2e8f0",
+                        borderRadius: 6,
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
+                      }}
+                    >
+                      <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 500, color: isActive ? "#1d4ed8" : "#334155" }}>{role.label}</span>
+                      <span style={{ fontSize: 9, color: isActive ? "#3b82f6" : "#94a3b8" }}>{role.sub}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {type === "Header" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  {(active.config?.kicker || active.id === "t1-headline") && (
+                    <Field label="顶部前缀 / VIP 标识">
+                      <input
+                        value={active.config?.kicker ?? "HelloTalk VIP 👑"}
+                        placeholder="例如：HelloTalk VIP 👑"
+                        onChange={(e) => updateNode(active.id, { config: { ...active.config, kicker: e.target.value } })}
+                      />
+                    </Field>
+                  )}
+                  <Field label="主标题文案">
+                    <input
+                      value={active.content ?? ""}
+                      placeholder="例如：首年额外 20% 优惠！"
+                      onChange={(e) => updateNode(active.id, { content: e.target.value })}
                     />
-                  ))}
+                  </Field>
+                  {active.config?.variant === "vip-banner" && (
+                    <Field label="副标题说明">
+                      <input
+                        value={active.config?.subtitle ?? "畅享 16 项高阶语言学习特权"}
+                        onChange={(e) => updateNode(active.id, { config: { ...active.config, subtitle: e.target.value } })}
+                      />
+                    </Field>
+                  )}
+                  {active.config?.variant === "brand-hero" && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
+                      <label style={{ fontSize: 11, fontWeight: 700, color: "#475569" }}>3 大核心特权标语 (纯中文展示)</label>
+                      {(active.config?.bullets || ["无限翻译", "查看谁喜欢了你", "搜索全世界的语伴"]).map((b, bIdx) => (
+                        <input
+                          key={bIdx}
+                          value={b}
+                          placeholder={`特权标语 ${bIdx + 1}`}
+                          onChange={(e) => {
+                            const nextBullets = [...(active.config?.bullets || ["无限翻译", "查看谁喜欢了你", "搜索全世界的语伴"])];
+                            nextBullets[bIdx] = e.target.value;
+                            updateNode(active.id, { config: { ...active.config, bullets: nextBullets } });
+                          }}
+                          style={{ fontSize: 11, padding: "4px 8px", borderRadius: 4, border: "1px solid #cbd5e1", background: "#ffffff" }}
+                        />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </Field>
+              )}
+
+              {type === "Subhead" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="副标题文案">
+                    <input
+                      value={active.content ?? ""}
+                      placeholder="例如：仅限今日"
+                      onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                    />
+                  </Field>
+                  <Field label="副标题文本颜色">
+                    <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+                      {["#DE6876", "#FF4D6D", "#F59E0B", "#64748b", "#0284C7", "#2D1832"].map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          style={{
+                            width: 20,
+                            height: 20,
+                            borderRadius: "50%",
+                            background: c,
+                            border: (active.config?.color || "#DE6876") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
+                        />
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+              )}
+
+              {type === "Text" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="正文段落内容">
+                    <textarea
+                      rows={3}
+                      value={active.content ?? ""}
+                      placeholder="输入正文说明文本..."
+                      onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                    />
+                  </Field>
+                </div>
+              )}
+
+              {type === "Legal Footer" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="免责声明 / 条款文案">
+                    <textarea
+                      rows={3}
+                      value={active.content ?? ""}
+                      placeholder="例如：服务条款 · 隐私政策 · 恢复购买"
+                      onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                    />
+                  </Field>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                    {[
+                      "服务条款 · 隐私政策 · 恢复购买",
+                      "订阅可随时取消，无需支付任何费用",
+                      "按年自动扣费，可在 App Store 账户设置中管理",
+                    ].map((snippet) => (
+                      <button
+                        key={snippet}
+                        type="button"
+                        onClick={() => updateNode(active.id, { content: snippet })}
+                        style={{
+                          fontSize: 10,
+                          padding: "2px 6px",
+                          borderRadius: 4,
+                          border: "1px solid #cbd5e1",
+                          background: "#fff",
+                          color: "#475569",
+                          cursor: "pointer",
+                        }}
+                      >
+                        + 插入: {snippet.slice(0, 10)}...
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
-          {type === "Benefit List" ? (
+          {type === "Benefit List" || (type === "Carousel Cards" && active.config?.variant !== "onboarding-3slides" && active.id !== "trial-t2-carousel" && active.label !== "多张轮播图" && !active.label?.includes("多张轮播图")) ? (
             <CoreBenefitsManager
               node={active}
               updateNode={updateNode}
@@ -5768,26 +5999,126 @@ function BuilderProperties({
               }}
             />
           ) : (active.config?.variant === "trial-timeline" || active.id === "trial-t1-timeline" || active.label === "3天试用时间轴" || active.label?.includes("试用时间轴")) ? (
-            <TrialTimelineManager
-              node={active}
-              updateNode={updateNode}
-              notify={notify}
-            />
-          ) : type === "Carousel Cards" ? (
-            <PrivilegeSwitchManager
-              node={active}
-              updateNode={updateNode}
-              notify={notify}
-              defaultMode={active.config?.privilegeMode || "carousel"}
-            />
+            <div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 8px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 对比与时间轴类型</span>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateNode(active.id, {
+                        type: "Comparison Table",
+                        label: "对比表格",
+                        config: {
+                          ...(active.config || {}),
+                          variant: "comparison-table",
+                          compareMode: "free-vs-vip",
+                          featureColTitle: "特权功能",
+                          col1Title: "普通会员",
+                          col2Title: "VIP会员",
+                        },
+                        content: "特权对比|普通VIP|VIP+旗舰\n每日翻译|50次/天|无限制\n全球漫游|2个城市|无限制",
+                      });
+                      notify?.("已切换为：对比表格");
+                    }}
+                    style={{
+                      padding: "6px 8px",
+                      background: "#fff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      fontWeight: 500,
+                      color: "#334155",
+                      fontSize: 11,
+                    }}
+                  >
+                    📊 对比表格
+                  </button>
+                  <button
+                    type="button"
+                    style={{
+                      padding: "6px 8px",
+                      background: "#eff6ff",
+                      border: "2px solid #3b82f6",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      fontWeight: 700,
+                      color: "#1d4ed8",
+                      fontSize: 11,
+                    }}
+                  >
+                    ⏳ 3天试用时间轴 (当前)
+                  </button>
+                </div>
+              </div>
+              <TrialTimelineManager
+                node={active}
+                updateNode={updateNode}
+                notify={notify}
+              />
+            </div>
           ) : type === "Comparison Table" ? (
-            <ComparisonTableManager
-              node={active}
-              updateNode={updateNode}
-              notify={notify}
-              onSwitchCompareTab={setActiveCompareTab}
-            />
-          ) : (type === "Products" || type === "Dismiss Button" || type === "Header" || type === "Subhead" || type === "Hero Image" || type === "Timer" || type === "Purchase Button" || type === "Switch Tabs" || type === "User Profile" || type === "Dynamic Metrics" || type === "Mascot Illustration" || type === "Toggle") ? null : (
+            <div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 8px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 对比与时间轴类型</span>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                  <button
+                    type="button"
+                    style={{
+                      padding: "6px 8px",
+                      background: "#eff6ff",
+                      border: "2px solid #3b82f6",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      fontWeight: 700,
+                      color: "#1d4ed8",
+                      fontSize: 11,
+                    }}
+                  >
+                    📊 对比表格 (当前)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      updateNode(active.id, {
+                        type: "Toggle",
+                        label: "3天试用时间轴",
+                        config: {
+                          ...(active.config || {}),
+                          variant: "trial-timeline",
+                          steps: [
+                            { day: "今天", title: "开始试用", icon: "crown" },
+                            { day: "第2天", title: "即将结束通知", icon: "bell" },
+                            { day: "第3天", title: "试用结束", icon: "clock" },
+                          ],
+                        },
+                        content: "今天|开始试用\n第2天|即将结束通知\n第3天|试用结束",
+                      });
+                      notify?.("已切换为：3天试用时间轴");
+                    }}
+                    style={{
+                      padding: "6px 8px",
+                      background: "#fff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 6,
+                      cursor: "pointer",
+                      fontWeight: 500,
+                      color: "#334155",
+                      fontSize: 11,
+                    }}
+                  >
+                    ⏳ 3天试用时间轴
+                  </button>
+                </div>
+              </div>
+              <ComparisonTableManager
+                node={active}
+                updateNode={updateNode}
+                notify={notify}
+                onSwitchCompareTab={setActiveCompareTab}
+              />
+            </div>
+          ) : (type === "Products" || type === "Dismiss Button" || type === "Header" || type === "Subhead" || type === "Hero Image" || type === "Timer" || type === "Purchase Button" || type === "Switch Tabs" || type === "User Profile" || type === "Dynamic Metrics" || type === "Mascot Illustration" || type === "Toggle" || type === "Text" || type === "Legal Footer") ? null : (
             <Field label="文本内容">
               <textarea
                 rows={4}
@@ -6077,7 +6408,46 @@ function BuilderProperties({
             </div>
           )}
 
-          {type === "Products" && (active.config?.variant === "entry-price-tier" || active.label === "特惠价格" || active.id === "t1-products" || active.id === "t2-products") && active.config?.variant !== "vertical-list-tiers" && active.config?.variant !== "onboarding-dual-tiers" && active.config?.variant !== "3-column-tiers" && active.label !== "纵向套餐列表" && active.label !== "产品双套餐" && !active.config?.listTiers && (
+          {type === "Products" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "#1e293b" }}>
+                <span>📦 产品套餐展现版式</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                {[
+                  { id: "3-column-tiers", label: "横向三列", sub: "3档卡片" },
+                  { id: "onboarding-dual-tiers", label: "双套餐", sub: "年卡+月卡" },
+                  { id: "vertical-list-tiers", label: "纵向列表", sub: "多行列表" },
+                  { id: "entry-price-tier", label: "特惠价格", sub: "单价格" },
+                ].map((tab) => {
+                  const isActive = effectiveProductsVariant === tab.id;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => handleProductVariantSwitch(tab.id)}
+                      style={{
+                        padding: "6px 4px",
+                        background: isActive ? "#eff6ff" : "#ffffff",
+                        border: isActive ? "2px solid #3b82f6" : "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
+                      }}
+                    >
+                      <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 500, color: isActive ? "#1d4ed8" : "#334155" }}>{tab.label}</span>
+                      <span style={{ fontSize: 9, color: isActive ? "#3b82f6" : "#94a3b8" }}>{tab.sub}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {type === "Products" && effectiveProductsVariant === "entry-price-tier" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🏷️ 特惠价格配置</span>
               <Field label="展示排版">
@@ -6157,7 +6527,7 @@ function BuilderProperties({
             </div>
           )}
 
-          {type === "Products" && (active.config?.variant === "onboarding-dual-tiers" || active.label === "产品双套餐" || active.id === "trial-t1-products") && active.config?.variant !== "vertical-list-tiers" && active.label !== "纵向套餐列表" && (
+          {type === "Products" && effectiveProductsVariant === "onboarding-dual-tiers" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 产品双套餐配置 (试用年卡 + 基础月卡)</span>
               {(active.config?.tiers || [
@@ -6239,7 +6609,7 @@ function BuilderProperties({
             </div>
           )}
 
-          {type === "Products" && (active.config?.variant === "3-column-tiers" || active.label === "横向套餐卡片" || (active.config?.tiers && !active.config?.listTiers && active.config?.variant !== "onboarding-dual-tiers" && active.label !== "产品双套餐")) && active.config?.variant !== "vertical-list-tiers" && active.label !== "纵向套餐列表" && (
+          {type === "Products" && effectiveProductsVariant === "3-column-tiers" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 横向套餐卡片配置</span>
               {(active.config?.tiers || [
@@ -6322,12 +6692,7 @@ function BuilderProperties({
             </div>
           )}
 
-          {type === "Products" && (
-            active.config?.variant === "vertical-list-tiers" ||
-            active.label === "纵向套餐列表" ||
-            active.config?.listTiers ||
-            (!active.config?.variant?.includes("3-column") && !active.config?.tiers && active.config?.variant !== "entry-price-tier" && active.config?.variant !== "onboarding-dual-tiers" && active.label !== "特惠价格" && active.label !== "产品双套餐" && active.label !== "横向套餐卡片" && active.id !== "t1-products" && active.id !== "t2-products" && active.id !== "trial-t1-products")
-          ) && (
+          {type === "Products" && effectiveProductsVariant === "vertical-list-tiers" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📋 纵向套餐列表配置</span>
@@ -6438,6 +6803,63 @@ function BuilderProperties({
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {(type === "Purchase Button" || type === "Dismiss Button" || type === "Switch Tabs" || active.label?.includes("操作按钮") || active.label?.includes("按钮")) && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 10px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "#1e293b" }}>
+                <span>🔘 操作按钮角色切换</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
+                {[
+                  { id: "Purchase Button", label: "购买按钮", sub: "主行动点" },
+                  { id: "Dismiss Button", label: "关闭按钮", sub: "跳过/放弃" },
+                  { id: "Switch Tabs", label: "切换标签", sub: "VIP/VIP+切换" },
+                ].map((btnRole) => {
+                  const isActive = type === btnRole.id;
+                  return (
+                    <button
+                      key={btnRole.id}
+                      type="button"
+                      onClick={() => {
+                        let newContent = active.content;
+                        let newConfig = { ...(active.config || {}) };
+                        if (btnRole.id === "Purchase Button") {
+                          newContent = newContent === "✕" ? "立即升级 VIP" : (newContent || "立即升级 VIP");
+                          newConfig.color = newConfig.color || "#6144e8";
+                        } else if (btnRole.id === "Dismiss Button") {
+                          newContent = "✕";
+                          newConfig.variant = "close-icon";
+                        } else if (btnRole.id === "Switch Tabs") {
+                          newContent = "VIP|VIP+";
+                        }
+                        updateNode(active.id, {
+                          type: btnRole.id,
+                          label: btnRole.label,
+                          content: newContent,
+                          config: newConfig,
+                        });
+                        notify?.(`已切换按钮角色为：${btnRole.label}`);
+                      }}
+                      style={{
+                        padding: "6px 4px",
+                        background: isActive ? "#eff6ff" : "#ffffff",
+                        border: isActive ? "2px solid #3b82f6" : "1px solid #e2e8f0",
+                        borderRadius: 6,
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
+                      }}
+                    >
+                      <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 500, color: isActive ? "#1d4ed8" : "#334155" }}>{btnRole.label}</span>
+                      <span style={{ fontSize: 9, color: isActive ? "#3b82f6" : "#94a3b8" }}>{btnRole.sub}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           )}
 
