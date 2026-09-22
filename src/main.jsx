@@ -66,7 +66,7 @@ import {
 
 const originalPaywalls = [
   // HelloTalk CMS「VIP 样式管理」核心 Paywall 商业化矩阵
-  { id: "ht-content-paywall", name: "内容Paywall样式与规则联动 (CONTENT_PAYWALL)", state: "Live", products: 1, startedAt: "20 Sep 2026", templateId: "ht-content-paywall", scene: "内容弹窗/访客/失效挽留" },
+  { id: "ht-content-paywall", name: "内容Paywall样式 (CONTENT_PAYWALL)", state: "Live", products: 1, startedAt: "20 Sep 2026", templateId: "ht-content-paywall", scene: "内容弹窗/访客/失效挽留" },
   { id: "ht-vip-package", name: "会员套餐与蓝色特权页 (VIP_PACKAGE · BLUE_PRIVILEGE)", state: "Live", products: 3, startedAt: "01 Jan 2026", templateId: "ht-vip-package", scene: "会员套餐与蓝色特权主售卖" },
   { id: "ht-entry-aggregation", name: "入门价格页 (ENTRY_PRICE)", state: "Live", products: 2, startedAt: "22 Jun 2026", templateId: "ht-entry-aggregation", scene: "新手特惠 (双模板+倒计时)" },
   { id: "ht-onboarding", name: "注册引导与免费试用页 (FREE_TRIAL)", state: "Live", products: 2, startedAt: "12 Apr 2026", templateId: "ht-onboarding", scene: "0元试用与新客引导" },
@@ -83,7 +83,7 @@ const originalPaywalls = [
 
 const nav = [
   ["Paywalls", Smartphone, "list"],
-  ["内容Paywall (样式与规则)", Layers, "content-paywall"],
+  ["内容Paywall样式", Layers, "content-paywall"],
   ["CMS 架构摸底", Database, "backend"],
 ];
 
@@ -274,9 +274,9 @@ const templates = [
   },
   {
     id: "ht-content-paywall",
-    title: "内容Paywall样式与规则联动 (CONTENT_PAYWALL)",
-    subtitle: "官方三套内容弹窗 (VIP失效/非VIP访客/非订阅状态) · 动态变量插值 · 规则引擎联动",
-    tags: ["3套样式类型", "动态变量矩阵", "规则引擎联动", "1:1官方对标"],
+    title: "内容Paywall样式 (CONTENT_PAYWALL)",
+    subtitle: "官方三套内容弹窗 (VIP失效/非VIP访客/非订阅状态) · 动态变量插值",
+    tags: ["3套样式类型", "动态变量矩阵", "1:1官方对标"],
     productCount: 1,
     media: "image",
     category: "HelloTalk 官方 (VIP样式管理)",
@@ -534,7 +534,7 @@ function createBuilderNodes(templateId = "ht-onboarding") {
   };
   const hero = () => node("hero-image", "Hero Image", template.theme === "violet" ? "learning" : template.id, 0);
 
-  // -1. 内容Paywall模版 (VIP样式管理 - 内容Paywall样式与规则联动)
+  // -1. 内容Paywall模版 (VIP样式管理 - 内容Paywall样式)
   if (template.id === "ht-content-paywall") {
     return [
       node("cp-close", "Dismiss Button", "✕", 0, { variant: "close-icon", position: "top-left", label: "关闭按钮" }),
@@ -1231,7 +1231,7 @@ function App() {
                 openPaywall({
                   id: targetId,
                   templateId: targetId,
-                  name: "内容Paywall样式与规则联动 (CONTENT_PAYWALL)",
+                  name: "内容Paywall样式 (CONTENT_PAYWALL)",
                 });
               }}
               notify={notify}
