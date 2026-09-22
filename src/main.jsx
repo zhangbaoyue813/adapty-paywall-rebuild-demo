@@ -416,37 +416,181 @@ const cleanLabel = (text = "") => {
   return cleaned || text;
 };
 
-const getNodeLabel = (node) => {
+const getNodeCategory = (node) => {
   if (!node) return "";
-  const raw = node.label || node.type || "";
-  if (node.config?.variant === "trial-timeline" || node.id === "trial-t1-timeline" || raw.includes("时间轴")) {
-    return "3天试用时间轴";
+  const type = node.type || "";
+  const raw = node.label || type || "";
+
+  // 1. 文本与排版 (优先判定文本类组件，避免包含“特权”的标题或徽标误判为特权)
+  if (
+    type === "Header" ||
+    type === "Subhead" ||
+    type === "Text" ||
+    type === "Badge Tag" ||
+    type === "User Profile" ||
+    type === "Language Chips" ||
+    type === "Legal Footer" ||
+    type === "Links" ||
+    raw.includes("标题") ||
+    raw.includes("正文") ||
+    raw.includes("用户画像") ||
+    raw.includes("语言标签") ||
+    raw.includes("徽标") ||
+    raw.includes("免责")
+  ) {
+    return "文本与排版";
   }
-  if (node.config?.variant === "onboarding-3slides" || node.id === "trial-t2-carousel" || raw.includes("多张轮播")) {
-    return "多张轮播图";
-  }
-  if (node.type === "Benefit List" || node.type === "Carousel Cards" || raw.includes("特权") || raw.includes("权益")) {
+
+  // 2. 核心特权
+  if (
+    type === "Benefit List" ||
+    type === "Carousel Cards" ||
+    raw.includes("特权") ||
+    raw.includes("权益") ||
+    raw.includes("轮播") ||
+    node.config?.variant === "onboarding-3slides" ||
+    node.id === "trial-t2-carousel"
+  ) {
     return "核心特权";
   }
-  if (node.type === "Purchase Button" || raw.includes("购买按钮") || raw === "主购买按钮") {
-    return "购买按钮";
-  }
-  if (node.type === "Dismiss Button" || raw.includes("关闭按钮")) {
-    return "关闭按钮";
-  }
-  if (node.type === "Hero Image" || node.id?.includes("hero") || node.config?.variant?.includes("hero") || raw.includes("头图") || raw.includes("背景图")) {
-    return "背景图";
-  }
-  if (node.type === "Timer" || raw.includes("倒计时") || node.id?.includes("timer")) {
-    return "倒计时";
-  }
-  if (node.type === "Comparison Table" || raw.includes("对比表格") || raw.includes("对比与时间轴")) {
-    return "对比表格";
-  }
-  if (node.type === "Products") {
+
+  // 3. 产品套餐
+  if (
+    type === "Products" ||
+    raw.includes("套餐") ||
+    raw.includes("价格") ||
+    node.config?.tiers ||
+    node.config?.listTiers ||
+    node.config?.variant === "entry-price-tier" ||
+    node.config?.variant === "onboarding-dual-tiers" ||
+    node.config?.variant === "3-column-tiers" ||
+    node.config?.variant === "vertical-list-tiers"
+  ) {
     return "产品套餐";
   }
+
+  // 4. 背景图
+  if (
+    type === "Hero Image" ||
+    type === "Mascot Illustration" ||
+    raw.includes("背景图") ||
+    raw.includes("头图") ||
+    raw.includes("插画") ||
+    raw.includes("吉祥物") ||
+    node.id?.includes("hero") ||
+    node.id?.includes("mascot")
+  ) {
+    return "背景图";
+  }
+
+  // 5. 操作按钮
+  if (
+    type === "Purchase Button" ||
+    type === "Dismiss Button" ||
+    type === "Switch Tabs" ||
+    (type === "Toggle" && !node.config?.variant?.includes("timeline") && !raw.includes("时间轴")) ||
+    raw.includes("按钮") ||
+    raw.includes("开关") ||
+    node.id?.includes("purchase") ||
+    node.id?.includes("dismiss") ||
+    node.id?.includes("toggle") ||
+    node.id?.includes("close")
+  ) {
+    return "操作按钮";
+  }
+
+  // 6. 倒计时
+  if (
+    type === "Timer" ||
+    raw.includes("倒计时") ||
+    node.id?.includes("timer")
+  ) {
+    return "倒计时";
+  }
+
+  // 7. 对比与时间轴
+  if (
+    type === "Comparison Table" ||
+    type === "Dynamic Metrics" ||
+    raw.includes("对比") ||
+    raw.includes("时间轴") ||
+    raw.includes("指标") ||
+    node.config?.variant === "trial-timeline" ||
+    node.config?.variant === "comparison-table" ||
+    node.id?.includes("timeline") ||
+    node.id?.includes("metrics")
+  ) {
+    return "对比与时间轴";
+  }
+
+  // 默认归入文本与排版
+  return "文本与排版";
+};
+
+const getNodeSubRole = (node) => {
+  if (!node) return "";
+  const type = node.type || "";
+  const raw = node.label || "";
+
+  // 核心特权
+  if (node.config?.variant === "onboarding-3slides" || node.id === "trial-t2-carousel" || raw.includes("多张轮播") || raw.includes("3页")) return "3页引导轮播";
+  if (node.config?.styleVariant === "carousel" || node.config?.variant === "carousel" || type === "Carousel Cards") return "卡片轮播";
+  if (node.config?.styleVariant === "checklist" || node.config?.variant === "entry-checks") return "打勾清单";
+  if (node.config?.styleVariant === "grid" || node.config?.variant === "grid-matrix") return "双列网格";
+  if (node.config?.styleVariant === "cards" || node.config?.variant === "onboarding-privilege-card") return "圆角大卡";
+  if (type === "Benefit List" || raw.includes("特权") || raw.includes("权益")) return "特权清单";
+
+  // 产品套餐
+  if (node.config?.variant === "3-column-tiers") return "横向三列";
+  if (node.config?.variant === "onboarding-dual-tiers") return "双套餐";
+  if (node.config?.variant === "vertical-list-tiers" || node.config?.listTiers) return "纵向列表";
+  if (node.config?.variant === "entry-price-tier" || raw.includes("特惠价格")) return "特惠价格";
+  if (type === "Products" || raw.includes("套餐")) return "套餐卡片";
+
+  // 背景图
+  if (type === "Mascot Illustration" || raw.includes("吉祥物") || raw.includes("插画")) return "吉祥物插画";
+  if (node.config?.bgMode === "image") return "自定义图片";
+  if (node.config?.bgMode === "gradient") return "渐变底色";
+  if (type === "Hero Image" || raw.includes("背景图") || raw.includes("头图")) return "原生插画";
+
+  // 操作按钮
+  if (type === "Purchase Button" || raw.includes("购买")) return "购买按钮";
+  if (type === "Dismiss Button" || raw.includes("关闭")) return "关闭按钮";
+  if (type === "Switch Tabs" || raw.includes("切换标签")) return "切换标签";
+  if (type === "Toggle" || raw.includes("开关")) return "开关选项";
+
+  // 倒计时
+  if (type === "Timer" || raw.includes("倒计时")) {
+    if (node.config?.variant === "badge-pill") return "胶囊提示条";
+    if (node.config?.variant === "clean-text") return "极简纯文本";
+    return "色块数字框";
+  }
+
+  // 对比与时间轴
+  if (type === "Comparison Table" || raw.includes("对比")) return "对比表格";
+  if (node.config?.variant === "trial-timeline" || raw.includes("时间轴")) return "3天试用时间轴";
+  if (type === "Dynamic Metrics" || raw.includes("指标")) return "动态指标";
+
+  // 文本与排版
+  if (type === "Header" || raw.includes("主标题") || raw.includes("标题")) return "主标题";
+  if (type === "Subhead" || raw.includes("副标题")) return "副标题";
+  if (type === "Badge Tag" || raw.includes("徽标")) return "徽标标签";
+  if (type === "User Profile" || raw.includes("用户画像")) return "用户画像";
+  if (type === "Language Chips" || raw.includes("语言标签")) return "语言标签";
+  if (type === "Legal Footer" || raw.includes("免责声明") || raw.includes("免责说明") || type === "Links") return "免责声明";
+  if (type === "Text" || raw.includes("正文") || raw.includes("文本")) return "正文段落";
+
   return cleanLabel(raw);
+};
+
+const getNodeLabel = (node) => {
+  if (!node) return "";
+  const cat = getNodeCategory(node);
+  const sub = getNodeSubRole(node);
+  if (sub && sub !== cat) {
+    return `${cat} (${sub})`;
+  }
+  return cat;
 };
 
 const componentCatalog = [
@@ -517,23 +661,23 @@ function createBuilderNodes(templateId = "ht-onboarding") {
   // -1. 内容Paywall模版 (VIP样式管理 - 内容Paywall样式)
   if (template.id === "ht-content-paywall") {
     return [
-      node("cp-close", "Dismiss Button", "✕", 0, { variant: "close-icon", position: "top-left", label: "关闭按钮" }),
-      node("cp-user", "User Profile", "Yeah|🇩🇪", 0, { userName: "Yeah", userFlag: "🇩🇪", label: "用户画像" }),
+      node("cp-close", "Dismiss Button", "✕", 0, { variant: "close-icon", position: "top-left", label: "操作按钮 (关闭按钮)" }),
+      node("cp-user", "User Profile", "Yeah|🇩🇪", 0, { userName: "Yeah", userFlag: "🇩🇪", label: "文本与排版 (用户画像)" }),
       node("cp-metrics", "Dynamic Metrics", "972、762、487、673、837、899、116、156、939、446、650、442", 0, {
         styleType: "VIP失效样式",
         metricValues: [972, 762, 487, 673, 837, 899, 116, 156, 939, 446, 650, 442],
         visitorCount: 21,
-        label: "动态指标矩阵",
+        label: "对比与时间轴 (动态指标)",
       }),
-      node("cp-subhead", "Subhead", "你的进步有目共睹！", 0, { variant: "body", label: "副标题" }),
+      node("cp-subhead", "Subhead", "你的进步有目共睹！", 0, { variant: "body", label: "文本与排版 (副标题)" }),
       node("cp-headline", "Header", "VIP现已过期\n立即续订，别让沟通速度慢下来！", 0, {
         variant: "content-headline",
         highlightWord: "立即续订",
         highlightColor: "#6C3EDE",
-        label: "主标题",
+        label: "文本与排版 (主标题)",
       }),
-      node("cp-mascot", "Mascot Illustration", "crown-gift", 0, { mascotType: "crown-gift", label: "吉祥物插画" }),
-      node("cp-purchase", "Purchase Button", "立即续订", 0, { label: "购买按钮", color: "#6C3EDE" }),
+      node("cp-mascot", "Mascot Illustration", "crown-gift", 0, { mascotType: "crown-gift", label: "背景图 (吉祥物插画)" }),
+      node("cp-purchase", "Purchase Button", "立即续订", 0, { label: "操作按钮 (购买按钮)", color: "#6C3EDE" }),
     ];
   }
 
@@ -1914,13 +2058,13 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           btnColor: "#6C3EDE",
         },
         nodes: [
-          { id: "cp1-close", type: "Dismiss Button", label: "关闭按钮", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
-          { id: "cp1-user", type: "User Profile", label: "用户画像", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
-          { id: "cp1-metrics", type: "Dynamic Metrics", label: "动态指标矩阵", content: "972、762、487、673、837、899、116、156、939、446、650、442", depth: 0, enabled: true, config: { styleType: "VIP失效样式", metricValues: [972, 762, 487, 673, 837, 899, 116, 156, 939, 446, 650, 442] } },
-          { id: "cp1-subhead", type: "Subhead", label: "副标题", content: "你的进步有目共睹！", depth: 0, enabled: true, config: { variant: "body" } },
-          { id: "cp1-headline", type: "Header", label: "主标题", content: "VIP现已过期\n立即续订，别让沟通速度慢下来！", depth: 0, enabled: true, config: { variant: "content-headline", highlightWord: "立即续订", highlightColor: "#6C3EDE" } },
-          { id: "cp1-mascot", type: "Mascot Illustration", label: "吉祥物插画", content: "crown-gift", depth: 0, enabled: true, config: { mascotType: "crown-gift" } },
-          { id: "cp1-purchase", type: "Purchase Button", label: "购买按钮", content: "立即续订", depth: 0, enabled: true, config: { label: "购买按钮", color: "#6C3EDE" } },
+          { id: "cp1-close", type: "Dismiss Button", label: "操作按钮 (关闭按钮)", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
+          { id: "cp1-user", type: "User Profile", label: "文本与排版 (用户画像)", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
+          { id: "cp1-metrics", type: "Dynamic Metrics", label: "对比与时间轴 (动态指标)", content: "972、762、487、673、837、899、116、156、939、446、650、442", depth: 0, enabled: true, config: { styleType: "VIP失效样式", metricValues: [972, 762, 487, 673, 837, 899, 116, 156, 939, 446, 650, 442] } },
+          { id: "cp1-subhead", type: "Subhead", label: "文本与排版 (副标题)", content: "你的进步有目共睹！", depth: 0, enabled: true, config: { variant: "body" } },
+          { id: "cp1-headline", type: "Header", label: "文本与排版 (主标题)", content: "VIP现已过期\n立即续订，别让沟通速度慢下来！", depth: 0, enabled: true, config: { variant: "content-headline", highlightWord: "立即续订", highlightColor: "#6C3EDE" } },
+          { id: "cp1-mascot", type: "Mascot Illustration", label: "背景图 (吉祥物插画)", content: "crown-gift", depth: 0, enabled: true, config: { mascotType: "crown-gift" } },
+          { id: "cp1-purchase", type: "Purchase Button", label: "操作按钮 (购买按钮)", content: "立即续订", depth: 0, enabled: true, config: { label: "操作按钮 (购买按钮)", color: "#6C3EDE" } },
         ],
       },
       {
@@ -1947,14 +2091,14 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           btnColor: "#FF6A00",
         },
         nodes: [
-          { id: "cp2-close", type: "Dismiss Button", label: "关闭按钮", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
-          { id: "cp2-user", type: "User Profile", label: "用户画像", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
-          { id: "cp2-metrics", type: "Dynamic Metrics", label: "动态指标矩阵", content: "21 new visitors in the past 7 days 👀", depth: 0, enabled: true, config: { styleType: "非VIP样式", visitorCount: 21, visitorTitle: "21 new visitors in the past 7 days 👀" } },
-          { id: "cp2-subhead", type: "Subhead", label: "副标题", content: "Your profile is getting noticed", depth: 0, enabled: true, config: { variant: "body" } },
-          { id: "cp2-headline", type: "Header", label: "主标题", content: "Let more people know you\nReach more people", depth: 0, enabled: true, config: { variant: "content-headline", hook1: "Let more people know you", hook2: "Reach more people" } },
-          { id: "cp2-mascot", type: "Mascot Illustration", label: "吉祥物插画", content: "binoculars", depth: 0, enabled: true, config: { mascotType: "binoculars" } },
-          { id: "cp2-links", type: "Legal Footer", label: "免责说明", content: "Upgrade to VIP to see who viewed your profile", depth: 0, enabled: true, config: { variant: "clean-center" } },
-          { id: "cp2-purchase", type: "Purchase Button", label: "购买按钮", content: "Upgrade Now", depth: 0, enabled: true, config: { label: "购买按钮", color: "#FF6A00", shape: "pill" } },
+          { id: "cp2-close", type: "Dismiss Button", label: "操作按钮 (关闭按钮)", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
+          { id: "cp2-user", type: "User Profile", label: "文本与排版 (用户画像)", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
+          { id: "cp2-metrics", type: "Dynamic Metrics", label: "对比与时间轴 (动态指标)", content: "21 new visitors in the past 7 days 👀", depth: 0, enabled: true, config: { styleType: "非VIP样式", visitorCount: 21, visitorTitle: "21 new visitors in the past 7 days 👀" } },
+          { id: "cp2-subhead", type: "Subhead", label: "文本与排版 (副标题)", content: "Your profile is getting noticed", depth: 0, enabled: true, config: { variant: "body" } },
+          { id: "cp2-headline", type: "Header", label: "文本与排版 (主标题)", content: "Let more people know you\nReach more people", depth: 0, enabled: true, config: { variant: "content-headline", hook1: "Let more people know you", hook2: "Reach more people" } },
+          { id: "cp2-mascot", type: "Mascot Illustration", label: "背景图 (吉祥物插画)", content: "binoculars", depth: 0, enabled: true, config: { mascotType: "binoculars" } },
+          { id: "cp2-links", type: "Legal Footer", label: "文本与排版 (免责声明)", content: "Upgrade to VIP to see who viewed your profile", depth: 0, enabled: true, config: { variant: "clean-center" } },
+          { id: "cp2-purchase", type: "Purchase Button", label: "操作按钮 (购买按钮)", content: "Upgrade Now", depth: 0, enabled: true, config: { label: "操作按钮 (购买按钮)", color: "#FF6A00", shape: "pill" } },
         ],
       },
       {
@@ -1979,13 +2123,13 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           btnColor: "#FF8A00",
         },
         nodes: [
-          { id: "cp3-close", type: "Dismiss Button", label: "关闭按钮", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
-          { id: "cp3-user", type: "User Profile", label: "用户画像", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
-          { id: "cp3-metrics", type: "Dynamic Metrics", label: "动态指标矩阵", content: "899、164、681、640、367、223、292、164、670、150、169、267", depth: 0, enabled: true, config: { styleType: "非订阅状态样式", metricValues: [899, 164, 681, 640, 367, 223, 292, 164, 670, 150, 169, 267] } },
-          { id: "cp3-subhead", type: "Subhead", label: "副标题", content: "你已经在为交朋友认真努力了", depth: 0, enabled: true, config: { variant: "body" } },
-          { id: "cp3-headline", type: "Header", label: "主标题", content: "升级VIP\n让关系继续发生。", depth: 0, enabled: true, config: { variant: "content-headline", highlightWord: "升级VIP", highlightColor: "#FF8A00" } },
-          { id: "cp3-mascot", type: "Mascot Illustration", label: "吉祥物插画", content: "translate-coin", depth: 0, enabled: true, config: { mascotType: "translate-coin" } },
-          { id: "cp3-purchase", type: "Purchase Button", label: "购买按钮", content: "升级 VIP", depth: 0, enabled: true, config: { label: "购买按钮", color: "#FF8A00" } },
+          { id: "cp3-close", type: "Dismiss Button", label: "操作按钮 (关闭按钮)", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
+          { id: "cp3-user", type: "User Profile", label: "文本与排版 (用户画像)", content: "Yeah|🇩🇪", depth: 0, enabled: true, config: { userName: "Yeah", userFlag: "🇩🇪" } },
+          { id: "cp3-metrics", type: "Dynamic Metrics", label: "对比与时间轴 (动态指标)", content: "899、164、681、640、367、223、292、164、670、150、169、267", depth: 0, enabled: true, config: { styleType: "非订阅状态样式", metricValues: [899, 164, 681, 640, 367, 223, 292, 164, 670, 150, 169, 267] } },
+          { id: "cp3-subhead", type: "Subhead", label: "文本与排版 (副标题)", content: "你已经在为交朋友认真努力了", depth: 0, enabled: true, config: { variant: "body" } },
+          { id: "cp3-headline", type: "Header", label: "文本与排版 (主标题)", content: "升级VIP\n让关系继续发生。", depth: 0, enabled: true, config: { variant: "content-headline", highlightWord: "升级VIP", highlightColor: "#FF8A00" } },
+          { id: "cp3-mascot", type: "Mascot Illustration", label: "背景图 (吉祥物插画)", content: "translate-coin", depth: 0, enabled: true, config: { mascotType: "translate-coin" } },
+          { id: "cp3-purchase", type: "Purchase Button", label: "操作按钮 (购买按钮)", content: "升级 VIP", depth: 0, enabled: true, config: { label: "操作按钮 (购买按钮)", color: "#FF8A00" } },
         ],
       },
     ],
@@ -2635,7 +2779,9 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                 const isOver = dragOverNodeId === node.id;
                 const dropClass = isOver ? (dragOverPosition === "above" ? "drop-target-above" : "drop-target-below") : "";
                 const isEnabled = node.enabled !== false;
-                const titleText = getNodeLabel(node);
+                const cat = getNodeCategory(node);
+                const sub = getNodeSubRole(node);
+                const titleText = sub && sub !== cat ? `${cat} · ${sub}` : cat;
                 return (
                   <div
                     role="button"
@@ -2694,9 +2840,31 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                         />
                       </div>
                     )}
-                    <span className="node-title">
-                      <strong>{titleText}</strong>
-                    </span>
+                    <div className="node-title" style={{ display: "flex", alignItems: "center", gap: 5, flex: 1, minWidth: 0, overflow: "hidden" }}>
+                      <strong style={{ fontSize: 11.5, color: "#1e293b", fontWeight: 700, whiteSpace: "nowrap" }}>
+                        {cat}
+                      </strong>
+                      {sub && sub !== cat && (
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            fontWeight: 600,
+                            color: "#4f46e5",
+                            background: "#eef2ff",
+                            border: "1px solid #c7d2fe",
+                            padding: "1px 5px",
+                            borderRadius: 4,
+                            whiteSpace: "nowrap",
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            lineHeight: "14px",
+                          }}
+                          title={sub}
+                        >
+                          {sub}
+                        </span>
+                      )}
+                    </div>
 
                     <div className="node-actions" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
                       <div
@@ -3131,6 +3299,10 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                   setActiveSubTemplateByPage((prev) => ({ ...prev, [currentTemplate.id]: id }));
                   setActiveNode(null);
                 }}
+                activeCompareTab={activeCompareTab}
+                setActiveCompareTab={setActiveCompareTab}
+                onboardingCarouselSlide={onboardingCarouselSlide}
+                setOnboardingCarouselSlide={setOnboardingCarouselSlide}
               />
             )}
           </aside>
@@ -5431,6 +5603,8 @@ function BuilderProperties({
   onSwitchSubTemplate,
   activeCompareTab = 0,
   setActiveCompareTab,
+  onboardingCarouselSlide = 0,
+  setOnboardingCarouselSlide,
 }) {
 
   const [tab, setTab] = useState("content");
@@ -5454,6 +5628,8 @@ function BuilderProperties({
     );
   }
   const type = active.type;
+  const category = getNodeCategory(active);
+  const subRole = getNodeSubRole(active);
 
   const effectiveProductsVariant =
     active.config?.variant ||
@@ -5505,92 +5681,73 @@ function BuilderProperties({
     <div className="property-scroll">
       <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 12, paddingBottom: 10, borderBottom: "1px solid #f1f5f9" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          {isEditingName ? (
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <input
-                type="text"
-                value={tempName}
-                autoFocus
-                onChange={(e) => setTempName(e.target.value)}
-                onBlur={() => {
-                  if (tempName.trim() && tempName.trim() !== getNodeLabel(active)) {
-                    updateNode(active.id, { label: tempName.trim() });
-                    notify?.(`已重命名为: ${tempName.trim()}`);
-                  }
-                  setIsEditingName(false);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    if (tempName.trim() && tempName.trim() !== getNodeLabel(active)) {
-                      updateNode(active.id, { label: tempName.trim() });
-                      notify?.(`已重命名为: ${tempName.trim()}`);
-                    }
-                    setIsEditingName(false);
-                  } else if (e.key === "Escape") {
-                    setIsEditingName(false);
-                  }
-                }}
-                style={{
-                  fontSize: 13,
-                  fontWeight: 600,
-                  padding: "3px 7px",
-                  borderRadius: 4,
-                  border: "1px solid #6366f1",
-                  outline: "none",
-                  width: 140
-                }}
-              />
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <div style={{
+              width: 32,
+              height: 32,
+              borderRadius: 8,
+              background: "#f1f5f9",
+              border: "1px solid #e2e8f0",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 16,
+              flexShrink: 0
+            }}>
+              {category === "核心特权" ? "⭐" :
+               category === "产品套餐" ? "💳" :
+               category === "文本与排版" ? "✍️" :
+               category === "背景图" ? "🖼️" :
+               category === "操作按钮" ? "🔘" :
+               category === "倒计时" ? "⏰" : "📊"}
             </div>
-          ) : (
-            <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
-                {getNodeLabel(active)}
-              </h3>
-              <button
-                type="button"
-                title="编辑组件名称"
-                onClick={() => {
-                  setTempName(getNodeLabel(active));
-                  setIsEditingName(true);
-                }}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  padding: "3px 5px",
-                  background: "#f8fafc",
-                  border: "1px solid #e2e8f0",
-                  borderRadius: 4,
-                  color: "#64748b",
-                  cursor: "pointer"
-                }}
-              >
-                <Pencil size={12} />
-              </button>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#0f172a" }}>
+                  {category}
+                </h3>
+                {subRole && (
+                  <span style={{
+                    fontSize: 10.5,
+                    fontWeight: 700,
+                    color: "#4f46e5",
+                    background: "#eef2ff",
+                    border: "1px solid #c7d2fe",
+                    padding: "1px 6px",
+                    borderRadius: 4
+                  }}>
+                    {subRole}
+                  </span>
+                )}
+              </div>
+              <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>
+                7 大核心母组件类别 · 可在下方切换预设角色与配置
+              </div>
             </div>
-          )}
+          </div>
           <button
             type="button"
-            title={`删除 ${getNodeLabel(active)} 组件`}
+            title={`删除 ${category} 组件`}
             onClick={() => {
               removeNode(active.id);
-              notify?.(`已删除组件: ${getNodeLabel(active)}`);
+              notify?.(`已删除组件: ${category} (${subRole})`);
             }}
             style={{
               display: "inline-flex",
               alignItems: "center",
               gap: 4,
-              fontSize: 10.5,
+              fontSize: 11,
               fontWeight: 600,
               color: "#ef4444",
               background: "#fef2f2",
               border: "1px solid #fecaca",
-              borderRadius: 4,
-              padding: "2px 7px",
-              cursor: "pointer"
+              borderRadius: 6,
+              padding: "4px 8px",
+              cursor: "pointer",
+              flexShrink: 0
             }}
           >
-            <Trash2 size={11} /> 删除组件
+            <Trash2 size={12} /> 删除组件
           </button>
         </div>
       </div>
@@ -5602,239 +5759,63 @@ function BuilderProperties({
 
       {tab === "content" && (
         <>
-          {/* Jinja Variable Toolbar for Text / Header */}
-          {["Header", "Subhead", "Text"].includes(type) && (
-            <div style={{ marginBottom: 12 }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
-                插入动态变量
-              </span>
-              <div className="jinja-chips-container">
-                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ nick_name }}")}>+ 用户昵称</button>
-                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_expired_days }}")}>+ 到期天数</button>
-                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_expire_time }}")}>+ 到期日期</button>
-                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_privilege_model_v2_max }}")}>+ 特权上限</button>
-                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ visitor_count }}")}>+ 访客人数</button>
-                <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_chat_translate_count }}")}>+ 消耗翻译</button>
+          {/* ============================================================ */}
+          {/* 1. 文本与排版 (Typography & Text)                             */}
+          {/* ============================================================ */}
+          {category === "文本与排版" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>✍️ 文本与排版角色预设切换</span>
+                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
               </div>
-            </div>
-          )}
-
-          {(type === "Hero Image" || active.config?.variant === "onboarding-wave-hero" || active.config?.variant === "onboarding-carousel-hero" || active.label === "背景图" || active.id?.includes("hero")) && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 16px" }}>
-              <div style={{ background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-                  🖼️ 背景图形态与风格
-                </span>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6, marginBottom: 10 }}>
-                  {[
-                    { key: "illustration", label: "🌍 原生插画" },
-                    { key: "image", label: "🖼️ 自定义图片" },
-                    { key: "gradient", label: "🎨 渐变底色" },
-                  ].map((m) => {
-                    const isSelected = (active.config?.bgMode || "illustration") === m.key;
-                    return (
-                      <button
-                        key={m.key}
-                        type="button"
-                        style={{
-                          fontSize: 11,
-                          padding: "6px 4px",
-                          borderRadius: 6,
-                          border: isSelected ? "2px solid #2563eb" : "1px solid #cbd5e1",
-                          background: isSelected ? "#eff6ff" : "#fff",
-                          color: isSelected ? "#1d4ed8" : "#475569",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => updateNode(active.id, { config: { ...active.config, bgMode: m.key } })}
-                      >
-                        {m.label}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {(active.config?.bgMode === "illustration" || !active.config?.bgMode) && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <Field label="浮层气泡标语文案">
-                      <input
-                        value={active.config?.sloganText ?? "寻找身边母语者"}
-                        placeholder="例如：寻找身边母语者"
-                        onChange={(e) => updateNode(active.id, { config: { ...active.config, sloganText: e.target.value } })}
-                      />
-                    </Field>
-
-                    <Field label="标语气泡底色">
-                      <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
-                        {["#2563eb", "#ea580c", "#1e293b", "#7c3aed", "#059669", "#dc2626"].map((c) => (
-                          <button
-                            key={c}
-                            type="button"
-                            style={{
-                              width: 20,
-                              height: 20,
-                              borderRadius: "50%",
-                              background: c,
-                              border: (active.config?.bubbleBg || "#2563eb") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
-                              cursor: "pointer",
-                            }}
-                            onClick={() => updateNode(active.id, { config: { ...active.config, bubbleBg: c } })}
-                          />
-                        ))}
-                      </div>
-                    </Field>
-
-                    <Field label="插画主题底色">
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                        {[
-                          { key: "orange", label: "🍊 暖橙经典", bg: "linear-gradient(135deg, #ea580c, #f97316)" },
-                          { key: "gold", label: "👑 尊享黑金", bg: "linear-gradient(135deg, #1e1b4b, #312e81)" },
-                          { key: "blue", label: "🌌 极光深蓝", bg: "linear-gradient(135deg, #1e3a8a, #3b82f6)" },
-                          { key: "purple", label: "🌸 优雅粉紫", bg: "linear-gradient(135deg, #831843, #ec4899)" },
-                        ].map((theme) => {
-                          const isSelected = (active.config?.themeColor || "orange") === theme.key;
-                          return (
-                            <button
-                              key={theme.key}
-                              type="button"
-                              style={{
-                                fontSize: 10.5,
-                                padding: "6px 8px",
-                                borderRadius: 6,
-                                border: isSelected ? "2px solid #2563eb" : "1px solid #cbd5e1",
-                                background: theme.bg,
-                                color: "#fff",
-                                fontWeight: 700,
-                                cursor: "pointer",
-                                textAlign: "left",
-                              }}
-                              onClick={() => updateNode(active.id, { config: { ...active.config, themeColor: theme.key } })}
-                            >
-                              {theme.label}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </Field>
-                  </div>
-                )}
-
-                {active.config?.bgMode === "image" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <Field label="自定义背景图片 URL">
-                      <input
-                        value={active.config?.customBgImage || ""}
-                        placeholder="https://... 或点击预设挑选"
-                        onChange={(e) => updateNode(active.id, { config: { ...active.config, customBgImage: e.target.value } })}
-                      />
-                    </Field>
-                    <Field label="预设高质量插画壁纸挑选">
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                        {[
-                          { name: "🌏 环球母语连结", url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80" },
-                          { name: "✨ 晨曦极简学习", url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80" },
-                          { name: "🏙️ 全球城市漫游", url: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=600&q=80" },
-                          { name: "🎓 专业导师答疑", url: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80" },
-                        ].map((item) => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            style={{
-                              padding: "6px 8px",
-                              borderRadius: 6,
-                              border: active.config?.customBgImage === item.url ? "2px solid #2563eb" : "1px solid #cbd5e1",
-                              background: active.config?.customBgImage === item.url ? "#eff6ff" : "#fff",
-                              fontSize: 10.5,
-                              cursor: "pointer",
-                              textAlign: "left",
-                              fontWeight: active.config?.customBgImage === item.url ? 700 : 500,
-                            }}
-                            onClick={() => updateNode(active.id, { config: { ...active.config, customBgImage: item.url } })}
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </Field>
-                  </div>
-                )}
-
-                {active.config?.bgMode === "gradient" && (
-                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                    <Field label="预设渐变底色">
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                        {[
-                          { name: "黑金极夜", grad: "linear-gradient(135deg, #18181b 0%, #27272a 100%)", color: "#fafafa" },
-                          { name: "深海湛蓝", grad: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)", color: "#f0f9ff" },
-                          { name: "落日余晖", grad: "linear-gradient(135deg, #ea580c 0%, #c2410c 100%)", color: "#fff7ed" },
-                          { name: "静谧紫夜", grad: "linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%)", color: "#f5f3ff" },
-                          { name: "翡翠森林", grad: "linear-gradient(135deg, #059669 0%, #047857 100%)", color: "#ecfdf5" },
-                          { name: "极光珊瑚", grad: "linear-gradient(135deg, #e11d48 0%, #be123c 100%)", color: "#fff1f2" },
-                        ].map((g) => (
-                          <button
-                            key={g.name}
-                            type="button"
-                            style={{
-                              background: g.grad,
-                              color: g.color,
-                              padding: "8px 6px",
-                              borderRadius: 6,
-                              border: active.config?.gradientBg === g.grad ? "2px solid #2563eb" : "1px solid rgba(0,0,0,0.1)",
-                              fontSize: 11,
-                              cursor: "pointer",
-                              fontWeight: 600,
-                            }}
-                            onClick={() => updateNode(active.id, { config: { ...active.config, gradientBg: g.grad } })}
-                          >
-                            {g.name}
-                          </button>
-                        ))}
-                      </div>
-                    </Field>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
-
-          {(type === "Header" || type === "Subhead" || type === "Text" || type === "Legal Footer" || active.label?.includes("文本与排版") || active.label?.includes("标题") || active.label?.includes("文本")) && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "#1e293b" }}>
-                <span>✍️ 文本与排版角色</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 5 }}>
                 {[
-                  { id: "Header", label: "主标题", sub: "醒目大字" },
-                  { id: "Subhead", label: "副标题", sub: "说明标语" },
-                  { id: "Text", label: "正文段落", sub: "内容说明" },
-                  { id: "Legal Footer", label: "免责声明", sub: "法律/条款" },
-                ].map((role) => {
-                  const isActive = type === role.id || active.config?.role === role.id;
+                  { id: "Header", label: "主标题", icon: "👑" },
+                  { id: "Subhead", label: "副标题", icon: "💬" },
+                  { id: "Text", label: "正文段落", icon: "📄" },
+                  { id: "Badge Tag", label: "徽标标签", icon: "🏷️" },
+                  { id: "User Profile", label: "用户画像", icon: "👤" },
+                  { id: "Language Chips", label: "语言标签", icon: "🌐" },
+                  { id: "Legal Footer", label: "免责声明", icon: "⚖️" },
+                ].map((r) => {
+                  const isActiveRole = subRole === r.label || active.type === r.id;
                   return (
                     <button
-                      key={role.id}
+                      key={r.id}
                       type="button"
                       onClick={() => {
                         let newContent = active.content;
-                        if (role.id === "Header" && (!newContent || newContent.length > 50)) {
-                          newContent = "HelloTalk VIP 核心专享特权";
-                        } else if (role.id === "Subhead" && (!newContent || newContent.length > 50)) {
-                          newContent = "畅享 16 项高阶语言学习特权与专属服务";
-                        } else if (role.id === "Legal Footer" && (!newContent || newContent.length < 10)) {
+                        let newConfig = { ...(active.config || {}) };
+                        if (r.id === "Header") {
+                          if (!newContent || newContent.length > 60 || newContent.includes("|")) newContent = "HelloTalk VIP 核心专享特权";
+                        } else if (r.id === "Subhead") {
+                          if (!newContent || newContent.length > 60 || newContent.includes("|")) newContent = "畅享 16 项高阶语言学习特权与专属服务";
+                        } else if (r.id === "Text") {
+                          if (!newContent || newContent.includes("|")) newContent = "升级 VIP，立享全球母语者无限制畅聊与母语级纠错。";
+                        } else if (r.id === "Badge Tag") {
+                          newContent = "VIP 特权中心";
+                          newConfig.color = newConfig.color || "#6366F1";
+                        } else if (r.id === "User Profile") {
+                          newContent = "Yeah|🇩🇪";
+                          newConfig.userName = "Yeah";
+                          newConfig.userFlag = "🇩🇪";
+                        } else if (r.id === "Language Chips") {
+                          newContent = "🇺🇸 英语|🇯🇵 日语|🇰🇷 韩语|🇪🇸 西语";
+                        } else if (r.id === "Legal Footer") {
                           newContent = "服务条款 · 隐私政策 · 恢复购买";
                         }
                         updateNode(active.id, {
-                          type: role.id,
-                          label: `文本与排版 (${role.label})`,
+                          type: r.id,
+                          label: `文本与排版 (${r.label})`,
                           content: newContent,
-                          config: { ...(active.config || {}), role: role.id },
+                          config: newConfig,
                         });
-                        notify?.(`已切换文本角色为：${role.label}`);
+                        notify?.(`已切换文本角色为：${r.label}`);
                       }}
                       style={{
-                        padding: "6px 4px",
-                        background: isActive ? "#eff6ff" : "#ffffff",
-                        border: isActive ? "2px solid #3b82f6" : "1px solid #e2e8f0",
+                        padding: "6px 2px",
+                        background: isActiveRole ? "#eff6ff" : "#fff",
+                        border: isActiveRole ? "2px solid #3b82f6" : "1px solid #cbd5e1",
                         borderRadius: 6,
                         cursor: "pointer",
                         display: "flex",
@@ -5843,24 +5824,40 @@ function BuilderProperties({
                         gap: 2,
                       }}
                     >
-                      <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 500, color: isActive ? "#1d4ed8" : "#334155" }}>{role.label}</span>
-                      <span style={{ fontSize: 9, color: isActive ? "#3b82f6" : "#94a3b8" }}>{role.sub}</span>
+                      <span style={{ fontSize: 13 }}>{r.icon}</span>
+                      <span style={{ fontSize: 10, fontWeight: isActiveRole ? 700 : 500, color: isActiveRole ? "#1d4ed8" : "#334155" }}>
+                        {r.label}
+                      </span>
                     </button>
                   );
                 })}
               </div>
 
-              {type === "Header" && (
+              {/* Jinja Variable Chips */}
+              <div style={{ marginTop: 4 }}>
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
+                  插入动态业务变量 (Jinja)
+                </span>
+                <div className="jinja-chips-container">
+                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ nick_name }}")}>+ 用户昵称</button>
+                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_expired_days }}")}>+ 到期天数</button>
+                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_expire_time }}")}>+ 到期日期</button>
+                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_privilege_model_v2_max }}")}>+ 特权上限</button>
+                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ visitor_count }}")}>+ 访客人数</button>
+                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_chat_translate_count }}")}>+ 消耗翻译</button>
+                </div>
+              </div>
+
+              {/* Sub-role specific forms */}
+              {(subRole === "主标题" || active.type === "Header") && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
-                  {(active.config?.kicker || active.id === "t1-headline") && (
-                    <Field label="顶部前缀 / VIP 标识">
-                      <input
-                        value={active.config?.kicker ?? "HelloTalk VIP 👑"}
-                        placeholder="例如：HelloTalk VIP 👑"
-                        onChange={(e) => updateNode(active.id, { config: { ...active.config, kicker: e.target.value } })}
-                      />
-                    </Field>
-                  )}
+                  <Field label="顶部前缀 / VIP 标识">
+                    <input
+                      value={active.config?.kicker ?? ""}
+                      placeholder="例如：HelloTalk VIP 👑"
+                      onChange={(e) => updateNode(active.id, { config: { ...active.config, kicker: e.target.value } })}
+                    />
+                  </Field>
                   <Field label="主标题文案">
                     <input
                       value={active.content ?? ""}
@@ -5868,13 +5865,30 @@ function BuilderProperties({
                       onChange={(e) => updateNode(active.id, { content: e.target.value })}
                     />
                   </Field>
-                  {active.config?.variant === "vip-banner" && (
+                  {active.config?.subtitle !== undefined && (
                     <Field label="副标题说明">
                       <input
                         value={active.config?.subtitle ?? "畅享 16 项高阶语言学习特权"}
                         onChange={(e) => updateNode(active.id, { config: { ...active.config, subtitle: e.target.value } })}
                       />
                     </Field>
+                  )}
+                  {active.config?.highlightWord !== undefined && (
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                      <Field label="高亮强调词">
+                        <input
+                          value={active.config?.highlightWord || ""}
+                          placeholder="例如：立即续订"
+                          onChange={(e) => updateNode(active.id, { config: { ...active.config, highlightWord: e.target.value } })}
+                        />
+                      </Field>
+                      <Field label="高亮颜色">
+                        <input
+                          value={active.config?.highlightColor || "#6C3EDE"}
+                          onChange={(e) => updateNode(active.id, { config: { ...active.config, highlightColor: e.target.value } })}
+                        />
+                      </Field>
+                    </div>
                   )}
                   {active.config?.variant === "brand-hero" && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 6, marginTop: 4 }}>
@@ -5897,7 +5911,7 @@ function BuilderProperties({
                 </div>
               )}
 
-              {type === "Subhead" && (
+              {(subRole === "副标题" || active.type === "Subhead") && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="副标题文案">
                     <input
@@ -5928,7 +5942,7 @@ function BuilderProperties({
                 </div>
               )}
 
-              {type === "Text" && (
+              {(subRole === "正文段落" || active.type === "Text") && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="正文段落内容">
                     <textarea
@@ -5941,7 +5955,99 @@ function BuilderProperties({
                 </div>
               )}
 
-              {type === "Legal Footer" && (
+              {(subRole === "徽标标签" || active.type === "Badge Tag") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="徽标文本文案">
+                    <input
+                      value={active.content ?? "VIP 特权中心"}
+                      placeholder="例如：VIP 特权中心 / 7天免费体验"
+                      onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                    />
+                  </Field>
+                  <Field label="徽标强调色">
+                    <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
+                      {["#1ECA92", "#FAAD14", "#FF4D4F", "#722ED1", "#13C2C2", "#6366F1"].map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: "50%",
+                            background: c,
+                            border: (active.config?.color || "#6366F1") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
+                        />
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+              )}
+
+              {(subRole === "用户画像" || active.type === "User Profile") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>👤 用户画像配置 (Avatar & Badge)</span>
+                  <Field label="用户昵称 (nick_name)">
+                    <input
+                      type="text"
+                      value={active.config?.userName || active.content?.split("|")[0] || "Yeah"}
+                      onChange={(e) => {
+                        const newName = e.target.value;
+                        const flag = active.config?.userFlag || active.content?.split("|")[1] || "🇩🇪";
+                        updateNode(active.id, {
+                          content: `${newName}|${flag}`,
+                          config: { ...active.config, userName: newName, userFlag: flag },
+                        });
+                      }}
+                    />
+                  </Field>
+                  <Field label="国籍国旗 (Flag Emoji)">
+                    <input
+                      type="text"
+                      value={active.config?.userFlag || active.content?.split("|")[1] || "🇩🇪"}
+                      onChange={(e) => {
+                        const newFlag = e.target.value;
+                        const name = active.config?.userName || active.content?.split("|")[0] || "Yeah";
+                        updateNode(active.id, {
+                          content: `${name}|${newFlag}`,
+                          config: { ...active.config, userName: name, userFlag: newFlag },
+                        });
+                      }}
+                    />
+                  </Field>
+                </div>
+              )}
+
+              {(subRole === "语言标签" || active.type === "Language Chips") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="语言标签列表 (竖线 | 分隔)">
+                    <input
+                      value={active.content || ""}
+                      placeholder="🇺🇸 英语|🇯🇵 日语|🇰🇷 韩语|🇪🇸 西语"
+                      onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                    />
+                  </Field>
+                  <div style={{ display: "flex", gap: 6 }}>
+                    {[
+                      { label: "常见 4 语", val: "🇺🇸 英语|🇯🇵 日语|🇰🇷 韩语|🇪🇸 西语" },
+                      { label: "欧洲语系", val: "🇫🇷 法语|🇩🇪 德语|🇮🇹 意语|🇷🇺 俄语" },
+                    ].map((p) => (
+                      <button
+                        key={p.label}
+                        type="button"
+                        style={{ fontSize: 10, padding: "2px 6px", borderRadius: 4, border: "1px solid #cbd5e1", background: "#fff", cursor: "pointer" }}
+                        onClick={() => updateNode(active.id, { content: p.val })}
+                      >
+                        + 填入 {p.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(subRole === "免责声明" || active.type === "Legal Footer") && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="免责声明 / 条款文案">
                     <textarea
@@ -5980,415 +6086,1238 @@ function BuilderProperties({
             </div>
           )}
 
-          {type === "Benefit List" || (type === "Carousel Cards" && active.config?.variant !== "onboarding-3slides" && active.id !== "trial-t2-carousel" && active.label !== "多张轮播图" && !active.label?.includes("多张轮播图")) ? (
-            <CoreBenefitsManager
-              node={active}
-              updateNode={updateNode}
-              notify={notify}
-              themeConfig={activeSubTemplate?.theme || null}
-            />
-          ) : (active.config?.variant === "onboarding-3slides" || active.id === "trial-t2-carousel" || active.label === "多张轮播图" || active.label?.includes("多张轮播图")) ? (
-            <OnboardingMultiSlidesManager
-              node={active}
-              updateNode={updateNode}
-              notify={notify}
-              activeSlide={onboardingCarouselSlide}
-              onSlideChange={(idx) => {
-                setOnboardingCarouselSlide?.(idx);
-                setCarouselIndex?.(idx);
-              }}
-            />
-          ) : (active.config?.variant === "trial-timeline" || active.id === "trial-t1-timeline" || active.label === "3天试用时间轴" || active.label?.includes("试用时间轴")) ? (
-            <div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 8px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 对比与时间轴类型</span>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      updateNode(active.id, {
-                        type: "Comparison Table",
-                        label: "对比表格",
-                        config: {
-                          ...(active.config || {}),
-                          variant: "comparison-table",
-                          compareMode: "free-vs-vip",
-                          featureColTitle: "特权功能",
-                          col1Title: "普通会员",
-                          col2Title: "VIP会员",
-                        },
-                        content: "特权对比|普通VIP|VIP+旗舰\n每日翻译|50次/天|无限制\n全球漫游|2个城市|无限制",
-                      });
-                      notify?.("已切换为：对比表格");
-                    }}
-                    style={{
-                      padding: "6px 8px",
-                      background: "#fff",
-                      border: "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      cursor: "pointer",
-                      fontWeight: 500,
-                      color: "#334155",
-                      fontSize: 11,
-                    }}
-                  >
-                    📊 对比表格
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      padding: "6px 8px",
-                      background: "#eff6ff",
-                      border: "2px solid #3b82f6",
-                      borderRadius: 6,
-                      cursor: "pointer",
-                      fontWeight: 700,
-                      color: "#1d4ed8",
-                      fontSize: 11,
-                    }}
-                  >
-                    ⏳ 3天试用时间轴 (当前)
-                  </button>
-                </div>
+          {/* ============================================================ */}
+          {/* 2. 背景图 (Background & Illustrations)                       */}
+          {/* ============================================================ */}
+          {category === "背景图" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🖼️ 背景图形态与插画风格</span>
+                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
               </div>
-              <TrialTimelineManager
-                node={active}
-                updateNode={updateNode}
-                notify={notify}
-              />
-            </div>
-          ) : type === "Comparison Table" ? (
-            <div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 8px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 对比与时间轴类型</span>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                  <button
-                    type="button"
-                    style={{
-                      padding: "6px 8px",
-                      background: "#eff6ff",
-                      border: "2px solid #3b82f6",
-                      borderRadius: 6,
-                      cursor: "pointer",
-                      fontWeight: 700,
-                      color: "#1d4ed8",
-                      fontSize: 11,
-                    }}
-                  >
-                    📊 对比表格 (当前)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      updateNode(active.id, {
-                        type: "Toggle",
-                        label: "3天试用时间轴",
-                        config: {
-                          ...(active.config || {}),
-                          variant: "trial-timeline",
-                          steps: [
-                            { day: "今天", title: "开始试用", icon: "crown" },
-                            { day: "第2天", title: "即将结束通知", icon: "bell" },
-                            { day: "第3天", title: "试用结束", icon: "clock" },
-                          ],
-                        },
-                        content: "今天|开始试用\n第2天|即将结束通知\n第3天|试用结束",
-                      });
-                      notify?.("已切换为：3天试用时间轴");
-                    }}
-                    style={{
-                      padding: "6px 8px",
-                      background: "#fff",
-                      border: "1px solid #cbd5e1",
-                      borderRadius: 6,
-                      cursor: "pointer",
-                      fontWeight: 500,
-                      color: "#334155",
-                      fontSize: 11,
-                    }}
-                  >
-                    ⏳ 3天试用时间轴
-                  </button>
-                </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                {[
+                  { key: "illustration", label: "原生插画", icon: "🌍", type: "Hero Image" },
+                  { key: "mascot", label: "吉祥物插画", icon: "🎨", type: "Mascot Illustration" },
+                  { key: "image", label: "自定义图片", icon: "🖼️", type: "Hero Image" },
+                  { key: "gradient", label: "渐变底色", icon: "🎨", type: "Hero Image" },
+                ].map((m) => {
+                  const isSelected = subRole === m.label || (m.key === "mascot" ? active.type === "Mascot Illustration" : (active.config?.bgMode || "illustration") === m.key);
+                  return (
+                    <button
+                      key={m.key}
+                      type="button"
+                      style={{
+                        fontSize: 10.5,
+                        padding: "6px 2px",
+                        borderRadius: 6,
+                        border: isSelected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                        background: isSelected ? "#eff6ff" : "#fff",
+                        color: isSelected ? "#1d4ed8" : "#475569",
+                        fontWeight: isSelected ? 700 : 500,
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
+                      }}
+                      onClick={() => {
+                        if (m.key === "mascot") {
+                          updateNode(active.id, {
+                            type: "Mascot Illustration",
+                            label: "背景图 (吉祥物插画)",
+                            content: active.config?.mascotType || "crown-gift",
+                            config: { ...(active.config || {}), mascotType: active.config?.mascotType || "crown-gift", bgMode: "mascot" },
+                          });
+                        } else {
+                          updateNode(active.id, {
+                            type: "Hero Image",
+                            label: `背景图 (${m.label})`,
+                            config: { ...(active.config || {}), bgMode: m.key },
+                          });
+                        }
+                        notify?.(`已切换背景图形态为：${m.label}`);
+                      }}
+                    >
+                      <span style={{ fontSize: 13 }}>{m.icon}</span>
+                      <span>{m.label}</span>
+                    </button>
+                  );
+                })}
               </div>
-              <ComparisonTableManager
-                node={active}
-                updateNode={updateNode}
-                notify={notify}
-                onSwitchCompareTab={setActiveCompareTab}
-              />
-            </div>
-          ) : (type === "Products" || type === "Dismiss Button" || type === "Header" || type === "Subhead" || type === "Hero Image" || type === "Timer" || type === "Purchase Button" || type === "Switch Tabs" || type === "User Profile" || type === "Dynamic Metrics" || type === "Mascot Illustration" || type === "Toggle" || type === "Text" || type === "Legal Footer") ? null : (
-            <Field label="文本内容">
-              <textarea
-                rows={4}
-                value={active.content ?? ""}
-                onChange={(e) => updateNode(active.id, { content: e.target.value })}
-              />
-            </Field>
-          )}
 
-          {type === "User Profile" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>👤 用户画像配置 (Avatar & Badge)</span>
-              <Field label="用户昵称 (nick_name)">
-                <input
-                  type="text"
-                  value={active.config?.userName || active.content?.split("|")[0] || "Yeah"}
-                  onChange={(e) => {
-                    const newName = e.target.value;
-                    const flag = active.config?.userFlag || active.content?.split("|")[1] || "🇩🇪";
-                    updateNode(active.id, {
-                      content: `${newName}|${flag}`,
-                      config: { ...active.config, userName: newName, userFlag: flag },
-                    });
-                  }}
-                />
-              </Field>
-              <Field label="国籍国旗 (Flag Emoji)">
-                <input
-                  type="text"
-                  value={active.config?.userFlag || active.content?.split("|")[1] || "🇩🇪"}
-                  onChange={(e) => {
-                    const newFlag = e.target.value;
-                    const name = active.config?.userName || active.content?.split("|")[0] || "Yeah";
-                    updateNode(active.id, {
-                      content: `${name}|${newFlag}`,
-                      config: { ...active.config, userName: name, userFlag: newFlag },
-                    });
-                  }}
-                />
-              </Field>
-            </div>
-          )}
-
-          {type === "Dynamic Metrics" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 动态指标矩阵 / 变量插值配置</span>
-              <Field label="数据展示形态">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 11,
-                      padding: "7px 6px",
-                      borderRadius: 6,
-                      border: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "2px solid #6C3EDE" : "1px solid #CBD5E1",
-                      background: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "#F5F0FF" : "#FFF",
-                      color: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "#6C3EDE" : "#475569",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, styleType: "VIP失效样式", visitorCount: undefined }, content: "972、762、487、673、837、899、116、156、939、446、650、442" })}
-                  >
-                    12组数据矩阵 (失效/非订阅)
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 11,
-                      padding: "7px 6px",
-                      borderRadius: 6,
-                      border: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "2px solid #FF6A00" : "1px solid #CBD5E1",
-                      background: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "#FFF7ED" : "#FFF",
-                      color: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "#FF6A00" : "#475569",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, styleType: "非VIP样式", visitorCount: 21 }, content: "21 new visitors in the past 7 days 👀" })}
-                  >
-                    访客统计大数字 (非VIP访客)
-                  </button>
+              {/* Sub-role controls for 背景图 */}
+              {(subRole === "吉祥物插画" || active.type === "Mascot Illustration") ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="官方吉祥物形态">
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                      <button
+                        type="button"
+                        style={{
+                          fontSize: 10.5,
+                          padding: "8px 4px",
+                          borderRadius: 6,
+                          border: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "2px solid #6C3EDE" : "1px solid #CBD5E1",
+                          background: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "#F5F0FF" : "#FFF",
+                          color: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "#6C3EDE" : "#475569",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "crown-gift" }, content: "crown-gift" })}
+                      >
+                        👑 皇冠之星<br />(失效样式)
+                      </button>
+                      <button
+                        type="button"
+                        style={{
+                          fontSize: 10.5,
+                          padding: "8px 4px",
+                          borderRadius: 6,
+                          border: active.config?.mascotType === "binoculars" ? "2px solid #FF6A00" : "1px solid #CBD5E1",
+                          background: active.config?.mascotType === "binoculars" ? "#FFF7ED" : "#FFF",
+                          color: active.config?.mascotType === "binoculars" ? "#FF6A00" : "#475569",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "binoculars" }, content: "binoculars" })}
+                      >
+                        🔍 望远镜星<br />(访客样式)
+                      </button>
+                      <button
+                        type="button"
+                        style={{
+                          fontSize: 10.5,
+                          padding: "8px 4px",
+                          borderRadius: 6,
+                          border: active.config?.mascotType === "translate-coin" ? "2px solid #FF8A00" : "1px solid #CBD5E1",
+                          background: active.config?.mascotType === "translate-coin" ? "#FEF7E5" : "#FFF",
+                          color: active.config?.mascotType === "translate-coin" ? "#FF8A00" : "#475569",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "translate-coin" }, content: "translate-coin" })}
+                      >
+                        🪙 翻译金币<br />(非订阅样式)
+                      </button>
+                    </div>
+                  </Field>
                 </div>
-              </Field>
-              {active.config?.visitorCount ? (
-                <Field label="7天内访客人数 (visitor_count_7d)">
-                  <input
-                    type="number"
-                    value={active.config?.visitorCount || 21}
-                    onChange={(e) => {
-                      const num = parseInt(e.target.value, 10) || 0;
-                      updateNode(active.id, {
-                        config: { ...active.config, visitorCount: num },
-                        content: `${num} new visitors in the past 7 days 👀`,
-                      });
-                    }}
-                  />
-                </Field>
+              ) : active.config?.bgMode === "image" ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="自定义背景图片 URL">
+                    <input
+                      value={active.config?.customBgImage || ""}
+                      placeholder="https://... 或点击预设挑选"
+                      onChange={(e) => updateNode(active.id, { config: { ...active.config, customBgImage: e.target.value } })}
+                    />
+                  </Field>
+                  <Field label="预设高质量插画壁纸挑选">
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                      {[
+                        { name: "🌏 环球母语连结", url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80" },
+                        { name: "✨ 晨曦极简学习", url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80" },
+                        { name: "🏙️ 全球城市漫游", url: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=600&q=80" },
+                        { name: "🎓 专业导师答疑", url: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80" },
+                      ].map((item) => (
+                        <button
+                          key={item.name}
+                          type="button"
+                          style={{
+                            padding: "6px 8px",
+                            borderRadius: 6,
+                            border: active.config?.customBgImage === item.url ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                            background: active.config?.customBgImage === item.url ? "#eff6ff" : "#fff",
+                            fontSize: 10.5,
+                            cursor: "pointer",
+                            textAlign: "left",
+                            fontWeight: active.config?.customBgImage === item.url ? 700 : 500,
+                          }}
+                          onClick={() => updateNode(active.id, { config: { ...active.config, customBgImage: item.url } })}
+                        >
+                          {item.name}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
+              ) : active.config?.bgMode === "gradient" ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="预设渐变底色">
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                      {[
+                        { name: "黑金极夜", grad: "linear-gradient(135deg, #18181b 0%, #27272a 100%)", color: "#fafafa" },
+                        { name: "深海湛蓝", grad: "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)", color: "#f0f9ff" },
+                        { name: "落日余晖", grad: "linear-gradient(135deg, #ea580c 0%, #c2410c 100%)", color: "#fff7ed" },
+                        { name: "静谧紫夜", grad: "linear-gradient(135deg, #7c3aed 0%, #4c1d95 100%)", color: "#f5f3ff" },
+                      ].map((g) => (
+                        <button
+                          key={g.name}
+                          type="button"
+                          style={{
+                            background: g.grad,
+                            color: g.color,
+                            padding: "8px 6px",
+                            borderRadius: 6,
+                            border: active.config?.gradientBg === g.grad ? "2px solid #2563eb" : "1px solid rgba(0,0,0,0.1)",
+                            fontSize: 11,
+                            cursor: "pointer",
+                            fontWeight: 600,
+                          }}
+                          onClick={() => updateNode(active.id, { config: { ...active.config, gradientBg: g.grad } })}
+                        >
+                          {g.name}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                </div>
               ) : (
-                <Field label="指标变量数值 (顿号或空格分隔)">
-                  <textarea
-                    rows={3}
-                    value={active.content || ""}
-                    onChange={(e) => updateNode(active.id, { content: e.target.value })}
-                  />
-                </Field>
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="插画主题底色">
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                      {[
+                        { key: "orange", label: "🍊 暖橙经典", bg: "linear-gradient(135deg, #ea580c, #f97316)" },
+                        { key: "gold", label: "👑 尊享黑金", bg: "linear-gradient(135deg, #1e1b4b, #312e81)" },
+                        { key: "blue", label: "🌌 极光深蓝", bg: "linear-gradient(135deg, #1e3a8a, #3b82f6)" },
+                        { key: "purple", label: "🌸 优雅粉紫", bg: "linear-gradient(135deg, #831843, #ec4899)" },
+                      ].map((theme) => {
+                        const isSelected = (active.config?.themeColor || "orange") === theme.key;
+                        return (
+                          <button
+                            key={theme.key}
+                            type="button"
+                            style={{
+                              fontSize: 10.5,
+                              padding: "6px 8px",
+                              borderRadius: 6,
+                              border: isSelected ? "2px solid #2563eb" : "1px solid #cbd5e1",
+                              background: theme.bg,
+                              color: "#fff",
+                              fontWeight: 700,
+                              cursor: "pointer",
+                              textAlign: "left",
+                            }}
+                            onClick={() => updateNode(active.id, { config: { ...active.config, themeColor: theme.key } })}
+                          >
+                            {theme.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Field>
+                </div>
               )}
             </div>
           )}
 
-          {type === "Mascot Illustration" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🎨 吉祥物插画配置</span>
-              <Field label="官方吉祥物形态">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "8px 4px",
-                      borderRadius: 6,
-                      border: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "2px solid #6C3EDE" : "1px solid #CBD5E1",
-                      background: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "#F5F0FF" : "#FFF",
-                      color: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "#6C3EDE" : "#475569",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "crown-gift" }, content: "crown-gift" })}
-                  >
-                    👑 皇冠之星<br />(失效样式)
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "8px 4px",
-                      borderRadius: 6,
-                      border: active.config?.mascotType === "binoculars" ? "2px solid #FF6A00" : "1px solid #CBD5E1",
-                      background: active.config?.mascotType === "binoculars" ? "#FFF7ED" : "#FFF",
-                      color: active.config?.mascotType === "binoculars" ? "#FF6A00" : "#475569",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "binoculars" }, content: "binoculars" })}
-                  >
-                    🔍 望远镜星<br />(访客样式)
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "8px 4px",
-                      borderRadius: 6,
-                      border: active.config?.mascotType === "translate-coin" ? "2px solid #FF8A00" : "1px solid #CBD5E1",
-                      background: active.config?.mascotType === "translate-coin" ? "#FEF7E5" : "#FFF",
-                      color: active.config?.mascotType === "translate-coin" ? "#FF8A00" : "#475569",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "translate-coin" }, content: "translate-coin" })}
-                  >
-                    🪙 翻译金币<br />(非订阅样式)
-                  </button>
+          {/* ============================================================ */}
+          {/* 3. 操作按钮 (Action Buttons & Switches)                       */}
+          {/* ============================================================ */}
+          {category === "操作按钮" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🔘 操作按钮角色切换</span>
+                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                {[
+                  { id: "Purchase Button", label: "购买按钮", icon: "🛒" },
+                  { id: "Dismiss Button", label: "关闭按钮", icon: "❌" },
+                  { id: "Switch Tabs", label: "切换标签", icon: "🔀" },
+                  { id: "Toggle", label: "开关选项", icon: "🎚️" },
+                ].map((btnRole) => {
+                  const isBtnActive = subRole === btnRole.label || active.type === btnRole.id;
+                  return (
+                    <button
+                      key={btnRole.id}
+                      type="button"
+                      onClick={() => {
+                        let newContent = active.content;
+                        let newConfig = { ...(active.config || {}) };
+                        if (btnRole.id === "Purchase Button") {
+                          newContent = newContent === "✕" ? "立即升级 VIP" : (newContent || "立即升级 VIP");
+                          newConfig.color = newConfig.color || "#6144e8";
+                        } else if (btnRole.id === "Dismiss Button") {
+                          newContent = "✕";
+                          newConfig.variant = "close-icon";
+                        } else if (btnRole.id === "Switch Tabs") {
+                          newContent = "VIP|VIP+";
+                        } else if (btnRole.id === "Toggle") {
+                          newContent = "开启 7 天免费试用|到期前随时取消";
+                        }
+                        updateNode(active.id, {
+                          type: btnRole.id,
+                          label: `操作按钮 (${btnRole.label})`,
+                          content: newContent,
+                          config: newConfig,
+                        });
+                        notify?.(`已切换按钮角色为：${btnRole.label}`);
+                      }}
+                      style={{
+                        padding: "6px 2px",
+                        background: isBtnActive ? "#eff6ff" : "#ffffff",
+                        border: isBtnActive ? "2px solid #3b82f6" : "1px solid #cbd5e1",
+                        borderRadius: 6,
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
+                      }}
+                    >
+                      <span style={{ fontSize: 13 }}>{btnRole.icon}</span>
+                      <span style={{ fontSize: 10, fontWeight: isBtnActive ? 700 : 500, color: isBtnActive ? "#1d4ed8" : "#334155" }}>{btnRole.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Purchase Button Controls */}
+              {(subRole === "购买按钮" || active.type === "Purchase Button") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="按钮主文案">
+                    <input
+                      value={active.content ?? ""}
+                      placeholder="例如：继续"
+                      onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                    />
+                  </Field>
+                  <Field label="按钮副标题文案">
+                    <input
+                      value={active.config?.subtitle ?? ""}
+                      placeholder="例如：到期后 ¥198/年，可随时取消"
+                      onChange={(e) => updateNode(active.id, { config: { ...active.config, subtitle: e.target.value } })}
+                    />
+                  </Field>
+                  <Field label="按钮强调色">
+                    <div style={{ display: "flex", gap: 6, marginTop: 4, alignItems: "center" }}>
+                      {["#6C3EDE", "#C85B6B", "#DE6876", "#FF4D6D", "#0284C7", "#F59E0B", "#10B981"].map((c) => (
+                        <button
+                          key={c}
+                          type="button"
+                          style={{
+                            width: 24,
+                            height: 24,
+                            borderRadius: "50%",
+                            background: c,
+                            border: (active.config?.color || "#6C3EDE") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
+                        />
+                      ))}
+                      <input
+                        type="color"
+                        value={active.config?.color || "#6C3EDE"}
+                        onChange={(e) => updateNode(active.id, { config: { ...active.config, color: e.target.value } })}
+                        style={{ width: 28, height: 28, padding: 0, border: "none", background: "none", cursor: "pointer" }}
+                      />
+                    </div>
+                  </Field>
                 </div>
-              </Field>
+              )}
+
+              {/* Dismiss Button Controls */}
+              {(subRole === "关闭按钮" || active.type === "Dismiss Button") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="按钮形态">
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                      {[
+                        { id: "circle-close", label: "✕ 圆形半窗" },
+                        { id: "close-icon", label: "✕ 图标全屏" },
+                        { id: "text-link", label: "纯文本链接" },
+                      ].map((fm) => (
+                        <button
+                          key={fm.id}
+                          type="button"
+                          style={{
+                            fontSize: 10.5,
+                            padding: "6px 2px",
+                            borderRadius: 4,
+                            border: (active.config?.variant === fm.id || (!active.config?.variant && fm.id === "close-icon")) ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                            background: (active.config?.variant === fm.id || (!active.config?.variant && fm.id === "close-icon")) ? "#F0F9FF" : "#fff",
+                            color: (active.config?.variant === fm.id || (!active.config?.variant && fm.id === "close-icon")) ? "#0284c7" : "#334155",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                          }}
+                          onClick={() => updateNode(active.id, { config: { ...active.config, variant: fm.id } })}
+                        >
+                          {fm.label}
+                        </button>
+                      ))}
+                    </div>
+                  </Field>
+                  {active.config?.variant === "text-link" ? (
+                    <Field label="关闭链接文案">
+                      <input
+                        value={active.content ?? ""}
+                        placeholder="例如：暂时不用，谢谢"
+                        onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                      />
+                    </Field>
+                  ) : (
+                    <Field label="显示位置">
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                        {["top-left", "top-right", "center"].map((pos) => (
+                          <button
+                            key={pos}
+                            type="button"
+                            style={{
+                              fontSize: 10.5,
+                              padding: "5px 6px",
+                              borderRadius: 4,
+                              border: (active.config?.position || "top-left") === pos ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                              background: (active.config?.position || "top-left") === pos ? "#F0F9FF" : "#fff",
+                              color: (active.config?.position || "top-left") === pos ? "#0284c7" : "#334155",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                            onClick={() => updateNode(active.id, { config: { ...active.config, position: pos } })}
+                          >
+                            {pos === "top-left" ? "左上角" : pos === "top-right" ? "右上角" : "居中"}
+                          </button>
+                        ))}
+                      </div>
+                    </Field>
+                  )}
+                </div>
+              )}
+
+              {/* Switch Tabs Controls */}
+              {(subRole === "切换标签" || active.type === "Switch Tabs") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🔀 VIP / VIP+ 标签联动</span>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: 11,
+                        padding: "8px",
+                        borderRadius: 6,
+                        fontWeight: 700,
+                        border: activeCompareTab === 0 ? "2px solid #F59E0B" : "1px solid #CBD5E1",
+                        background: activeCompareTab === 0 ? "#FFFBEB" : "#FFF",
+                        color: activeCompareTab === 0 ? "#B45309" : "#475569",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        setActiveCompareTab?.(0);
+                        notify?.("已切换预览: VIP 进阶版");
+                      }}
+                    >
+                      🌟 VIP 进阶版
+                    </button>
+                    <button
+                      type="button"
+                      style={{
+                        fontSize: 11,
+                        padding: "8px",
+                        borderRadius: 6,
+                        fontWeight: 700,
+                        border: activeCompareTab === 1 ? "2px solid #8B5CF6" : "1px solid #CBD5E1",
+                        background: activeCompareTab === 1 ? "#F5F3FF" : "#FFF",
+                        color: activeCompareTab === 1 ? "#6D28D9" : "#475569",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => {
+                        setActiveCompareTab?.(1);
+                        notify?.("已切换预览: VIP+ 旗舰版");
+                      }}
+                    >
+                      👑 VIP+ 旗舰版
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Toggle Controls */}
+              {(subRole === "开关选项" || active.type === "Toggle") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
+                  <Field label="开关主标题文案">
+                    <input
+                      value={active.content?.split("|")[0] || "开启 7 天免费试用"}
+                      onChange={(e) => {
+                        const sub = active.content?.split("|")[1] || "到期前随时取消";
+                        updateNode(active.id, { content: `${e.target.value}|${sub}` });
+                      }}
+                    />
+                  </Field>
+                  <Field label="开关副文案 / 提示">
+                    <input
+                      value={active.content?.split("|")[1] || "到期前随时取消"}
+                      onChange={(e) => {
+                        const title = active.content?.split("|")[0] || "开启 7 天免费试用";
+                        updateNode(active.id, { content: `${title}|${e.target.value}` });
+                      }}
+                    />
+                  </Field>
+                </div>
+              )}
             </div>
           )}
 
-          {type === "Switch Tabs" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🔀 切换标签配置 (VIP / VIP+)</span>
-              <Field label="当前激活标签预览联动">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 11,
-                      padding: "8px",
-                      borderRadius: 6,
-                      fontWeight: 700,
-                      border: activeCompareTab === 0 ? "2px solid #F59E0B" : "1px solid #CBD5E1",
-                      background: activeCompareTab === 0 ? "#FFFBEB" : "#FFF",
-                      color: activeCompareTab === 0 ? "#B45309" : "#475569",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      setActiveCompareTab?.(0);
-                      notify?.("已切换画布预览为: VIP 进阶版 (图一官方规范)");
-                    }}
-                  >
-                    🌟 VIP 进阶版 (图一)
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 11,
-                      padding: "8px",
-                      borderRadius: 6,
-                      fontWeight: 700,
-                      border: activeCompareTab === 1 ? "2px solid #8B5CF6" : "1px solid #CBD5E1",
-                      background: activeCompareTab === 1 ? "#F5F3FF" : "#FFF",
-                      color: activeCompareTab === 1 ? "#6D28D9" : "#475569",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => {
-                      setActiveCompareTab?.(1);
-                      notify?.("已切换画布预览为: VIP+ 旗舰版 (图四官方规范)");
-                    }}
-                  >
-                    👑 VIP+ 旗舰版 (图四)
-                  </button>
+          {/* ============================================================ */}
+          {/* 4. 核心特权 (Core Benefits & Carousels)                       */}
+          {/* ============================================================ */}
+          {category === "核心特权" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>⭐ 核心特权表现形态</span>
+                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
                 </div>
-              </Field>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4 }}>
+                  {[
+                    { id: "Carousel Cards", label: "卡片轮播", icon: "🎠", variant: "carousel", styleVariant: "carousel" },
+                    { id: "Carousel Cards", label: "3页引导轮播", icon: "📑", variant: "onboarding-3slides", styleVariant: "onboarding" },
+                    { id: "Benefit List", label: "打勾清单", icon: "✅", variant: "entry-checks", styleVariant: "checklist" },
+                    { id: "Benefit List", label: "双列网格", icon: "⊞", variant: "grid-matrix", styleVariant: "grid" },
+                    { id: "Benefit List", label: "圆角大卡", icon: "🎴", variant: "onboarding-privilege-card", styleVariant: "cards" },
+                  ].map((role) => {
+                    const isSelected = subRole === role.label ||
+                      (role.variant === "onboarding-3slides" && (active.config?.variant === "onboarding-3slides" || active.id === "trial-t2-carousel")) ||
+                      (role.variant === "carousel" && active.type === "Carousel Cards" && active.config?.variant !== "onboarding-3slides" && active.id !== "trial-t2-carousel") ||
+                      (role.variant === active.config?.variant || role.styleVariant === active.config?.styleVariant);
+                    return (
+                      <button
+                        key={role.label}
+                        type="button"
+                        onClick={() => {
+                          if (role.variant === "onboarding-3slides") {
+                            updateNode(active.id, {
+                              type: "Carousel Cards",
+                              label: "核心特权 (3页引导轮播)",
+                              config: {
+                                ...(active.config || {}),
+                                variant: "onboarding-3slides",
+                                slides: active.config?.slides || [
+                                  { tag: "核心权益 1", title: "与母语者自由畅聊", desc: "突破语言障碍，随时与全球真人语伴沟通", icon: "globe" },
+                                  { tag: "核心权益 2", title: "AI 实时智能纠错", desc: "母语级润色表达，告别中式英语尴尬", icon: "sparkles" },
+                                  { tag: "核心权益 3", title: "无限即时翻译", desc: "每日超 100 次长句翻译与实时语音转译", icon: "languages" },
+                                ],
+                              },
+                            });
+                          } else if (role.variant === "carousel") {
+                            updateNode(active.id, {
+                              type: "Carousel Cards",
+                              label: "核心特权 (卡片轮播)",
+                              config: {
+                                ...(active.config || {}),
+                                variant: "carousel",
+                                styleVariant: "carousel",
+                                privileges: active.config?.privileges || ALL_HELLOTALK_PRIVILEGES,
+                              },
+                            });
+                          } else {
+                            updateNode(active.id, {
+                              type: "Benefit List",
+                              label: `核心特权 (${role.label})`,
+                              config: {
+                                ...(active.config || {}),
+                                variant: role.variant,
+                                styleVariant: role.styleVariant,
+                              },
+                            });
+                          }
+                          notify?.(`已切换特权角色为：${role.label}`);
+                        }}
+                        style={{
+                          fontSize: 10,
+                          padding: "6px 2px",
+                          borderRadius: 6,
+                          border: isSelected ? "2px solid #3b82f6" : "1px solid #cbd5e1",
+                          background: isSelected ? "#eff6ff" : "#fff",
+                          color: isSelected ? "#1d4ed8" : "#475569",
+                          fontWeight: isSelected ? 700 : 500,
+                          cursor: "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: 2,
+                        }}
+                      >
+                        <span style={{ fontSize: 12 }}>{role.icon}</span>
+                        <span style={{ whiteSpace: "nowrap" }}>{role.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {(subRole === "3页引导轮播" || active.config?.variant === "onboarding-3slides" || active.id === "trial-t2-carousel" || active.label?.includes("多张轮播图")) ? (
+                <OnboardingMultiSlidesManager
+                  node={active}
+                  updateNode={updateNode}
+                  notify={notify}
+                  activeSlide={onboardingCarouselSlide}
+                  onSlideChange={(idx) => {
+                    setOnboardingCarouselSlide?.(idx);
+                    setCarouselIndex?.(idx);
+                  }}
+                />
+              ) : (
+                <CoreBenefitsManager
+                  node={active}
+                  updateNode={updateNode}
+                  notify={notify}
+                  themeConfig={activeSubTemplate?.theme || null}
+                />
+              )}
             </div>
           )}
 
-
-          {type === "Timer" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>⚡ 倒计时组件配置</span>
-              <Field label="倒计时展示形态">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "5px 6px",
-                      borderRadius: 4,
-                      border: active.config?.variant === "clean-text" || (!active.config?.variant && active.id === "t1-timer") ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                      background: active.config?.variant === "clean-text" || (!active.config?.variant && active.id === "t1-timer") ? "#F0F9FF" : "#fff",
-                      color: active.config?.variant === "clean-text" || (!active.config?.variant && active.id === "t1-timer") ? "#0284c7" : "#334155",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, variant: "clean-text" } })}
-                  >
-                    极简纯文本
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "5px 6px",
-                      borderRadius: 4,
-                      border: active.config?.variant === "card" || active.config?.variant === "digit-cards" || (!active.config?.variant && active.id !== "t1-timer") ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                      background: active.config?.variant === "card" || active.config?.variant === "digit-cards" || (!active.config?.variant && active.id !== "t1-timer") ? "#F0F9FF" : "#fff",
-                      color: active.config?.variant === "card" || active.config?.variant === "digit-cards" || (!active.config?.variant && active.id !== "t1-timer") ? "#0284c7" : "#334155",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, variant: "card" } })}
-                  >
-                    色块数字框
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "5px 6px",
-                      borderRadius: 4,
-                      border: active.config?.variant === "badge-pill" ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                      background: active.config?.variant === "badge-pill" ? "#F0F9FF" : "#fff",
-                      color: active.config?.variant === "badge-pill" ? "#0284c7" : "#334155",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, variant: "badge-pill" } })}
-                  >
-                    胶囊提示条
-                  </button>
+          {/* ============================================================ */}
+          {/* 5. 对比与时间轴 (Comparison, Timeline & Metrics)              */}
+          {/* ============================================================ */}
+          {category === "对比与时间轴" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 对比与时间轴角色切换</span>
+                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
                 </div>
-              </Field>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                  {[
+                    { id: "Comparison Table", label: "对比表格", icon: "📊" },
+                    { id: "Trial Timeline", label: "3天试用时间轴", icon: "⏳" },
+                    { id: "Dynamic Metrics", label: "动态指标", icon: "📈" },
+                  ].map((role) => {
+                    const isSelected = subRole === role.label ||
+                      (role.id === "Comparison Table" && active.type === "Comparison Table") ||
+                      (role.id === "Trial Timeline" && (active.config?.variant === "trial-timeline" || active.id?.includes("timeline"))) ||
+                      (role.id === "Dynamic Metrics" && active.type === "Dynamic Metrics");
+                    return (
+                      <button
+                        key={role.id}
+                        type="button"
+                        onClick={() => {
+                          if (role.id === "Comparison Table") {
+                            updateNode(active.id, {
+                              type: "Comparison Table",
+                              label: "对比与时间轴 (对比表格)",
+                              config: {
+                                ...(active.config || {}),
+                                variant: "comparison-table",
+                                compareMode: "free-vs-vip",
+                                featureColTitle: "特权功能",
+                                col1Title: "普通会员",
+                                col2Title: "VIP会员",
+                              },
+                              content: active.type === "Comparison Table" ? active.content : "特权对比|普通VIP|VIP+旗舰\n每日翻译|50次/天|无限制\n全球漫游|2个城市|无限制",
+                            });
+                          } else if (role.id === "Trial Timeline") {
+                            updateNode(active.id, {
+                              type: "Toggle",
+                              label: "对比与时间轴 (3天试用时间轴)",
+                              config: {
+                                ...(active.config || {}),
+                                variant: "trial-timeline",
+                                steps: [
+                                  { day: "今天", title: "开始试用", icon: "crown" },
+                                  { day: "第2天", title: "即将结束通知", icon: "bell" },
+                                  { day: "第3天", title: "试用结束", icon: "clock" },
+                                ],
+                              },
+                              content: "今天|开始试用\n第2天|即将结束通知\n第3天|试用结束",
+                            });
+                          } else if (role.id === "Dynamic Metrics") {
+                            updateNode(active.id, {
+                              type: "Dynamic Metrics",
+                              label: "对比与时间轴 (动态指标)",
+                              config: {
+                                ...(active.config || {}),
+                                styleType: "VIP失效样式",
+                                metricValues: [972, 762, 487, 673, 837, 899, 116, 156, 939, 446, 650, 442],
+                                visitorCount: 21,
+                              },
+                              content: "972、762、487、673、837、899、116、156、939、446、650、442",
+                            });
+                          }
+                          notify?.(`已切换对比与时间轴为：${role.label}`);
+                        }}
+                        style={{
+                          fontSize: 10.5,
+                          padding: "6px 4px",
+                          borderRadius: 6,
+                          border: isSelected ? "2px solid #3b82f6" : "1px solid #cbd5e1",
+                          background: isSelected ? "#eff6ff" : "#fff",
+                          color: isSelected ? "#1d4ed8" : "#475569",
+                          fontWeight: isSelected ? 700 : 500,
+                          cursor: "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: 2,
+                        }}
+                      >
+                        <span style={{ fontSize: 13 }}>{role.icon}</span>
+                        <span>{role.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {(subRole === "对比表格" || active.type === "Comparison Table") && (
+                <ComparisonTableManager
+                  node={active}
+                  updateNode={updateNode}
+                  notify={notify}
+                  onSwitchCompareTab={setActiveCompareTab}
+                />
+              )}
+
+              {(subRole === "3天试用时间轴" || active.config?.variant === "trial-timeline" || active.id?.includes("timeline")) && active.type !== "Comparison Table" && active.type !== "Dynamic Metrics" && (
+                <TrialTimelineManager
+                  node={active}
+                  updateNode={updateNode}
+                  notify={notify}
+                />
+              )}
+
+              {(subRole === "动态指标" || active.type === "Dynamic Metrics") && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 动态指标数据源配置</span>
+                  <Field label="展示版式形态">
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                      <button
+                        type="button"
+                        style={{
+                          fontSize: 11,
+                          padding: "7px 6px",
+                          borderRadius: 6,
+                          border: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "2px solid #6C3EDE" : "1px solid #CBD5E1",
+                          background: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "#F5F0FF" : "#FFF",
+                          color: (!active.config?.visitorCount && active.config?.styleType !== "非VIP样式") ? "#6C3EDE" : "#475569",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, styleType: "VIP失效样式", visitorCount: undefined }, content: "972、762、487、673、837、899、116、156、939、446、650、442" })}
+                      >
+                        12组数据矩阵 (失效/非订阅)
+                      </button>
+                      <button
+                        type="button"
+                        style={{
+                          fontSize: 11,
+                          padding: "7px 6px",
+                          borderRadius: 6,
+                          border: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "2px solid #FF6A00" : "1px solid #CBD5E1",
+                          background: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "#FFF7ED" : "#FFF",
+                          color: (active.config?.visitorCount || active.config?.styleType === "非VIP样式") ? "#FF6A00" : "#475569",
+                          fontWeight: 700,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, styleType: "非VIP样式", visitorCount: 21 }, content: "21 new visitors in the past 7 days 👀" })}
+                      >
+                        访客统计大数字 (非VIP访客)
+                      </button>
+                    </div>
+                  </Field>
+                  {active.config?.visitorCount ? (
+                    <Field label="7天内访客人数 (visitor_count_7d)">
+                      <input
+                        type="number"
+                        value={active.config?.visitorCount || 21}
+                        onChange={(e) => {
+                          const num = parseInt(e.target.value, 10) || 0;
+                          updateNode(active.id, {
+                            config: { ...active.config, visitorCount: num },
+                            content: `${num} new visitors in the past 7 days 👀`,
+                          });
+                        }}
+                      />
+                    </Field>
+                  ) : (
+                    <>
+                      <Field label="指标变量数值 (顿号或空格分隔)">
+                        <textarea
+                          rows={3}
+                          value={active.content || ""}
+                          onChange={(e) => updateNode(active.id, { content: e.target.value })}
+                        />
+                      </Field>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 2 }}>
+                        <span style={{ fontSize: 10, color: "#64748b", width: "100%", fontWeight: 600 }}>快捷插入动态变量：</span>
+                        {["{{ user_stats.matrix }}", "{{ visitor_count_7d }}", "{{ study_days }}"].map((v) => (
+                          <button
+                            key={v}
+                            type="button"
+                            onClick={() => insertJinja(v)}
+                            style={{
+                              fontSize: 10,
+                              background: "#f1f5f9",
+                              border: "1px solid #cbd5e1",
+                              borderRadius: 4,
+                              padding: "2px 6px",
+                              cursor: "pointer",
+                              color: "#334155",
+                              fontFamily: "monospace",
+                            }}
+                          >
+                            + {v}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* 6. 产品套餐 (Products & Pricing Plans)                        */}
+          {/* ============================================================ */}
+          {category === "产品套餐" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px" }}>
+              <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>💳 产品套餐展现版式</span>
+                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+                  {[
+                    { id: "3-column-tiers", label: "横向三列", sub: "3档卡片" },
+                    { id: "onboarding-dual-tiers", label: "双套餐", sub: "年卡+月卡" },
+                    { id: "vertical-list-tiers", label: "纵向列表", sub: "多行列表" },
+                    { id: "entry-price-tier", label: "特惠价格", sub: "单价格" },
+                  ].map((tab) => {
+                    const isActive = effectiveProductsVariant === tab.id;
+                    return (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => handleProductVariantSwitch(tab.id)}
+                        style={{
+                          padding: "6px 4px",
+                          background: isActive ? "#eff6ff" : "#ffffff",
+                          border: isActive ? "2px solid #3b82f6" : "1px solid #cbd5e1",
+                          borderRadius: 6,
+                          cursor: "pointer",
+                          display: "flex",
+                          flexDirection: "column",
+                          alignItems: "center",
+                          gap: 2,
+                        }}
+                      >
+                        <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 500, color: isActive ? "#1d4ed8" : "#334155" }}>{tab.label}</span>
+                        <span style={{ fontSize: 9, color: isActive ? "#3b82f6" : "#94a3b8" }}>{tab.sub}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {effectiveProductsVariant === "entry-price-tier" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🏷️ 特惠价格配置</span>
+                  <Field label="展示排版">
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                      <button
+                        type="button"
+                        style={{
+                          fontSize: 11,
+                          padding: "5px 8px",
+                          borderRadius: 4,
+                          border: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                          background: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "#F0F9FF" : "#fff",
+                          color: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "#0284c7" : "#334155",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, displayMode: "clean-text" } })}
+                      >
+                        极简排版 (原版推荐)
+                      </button>
+                      <button
+                        type="button"
+                        style={{
+                          fontSize: 11,
+                          padding: "5px 8px",
+                          borderRadius: 4,
+                          border: active.config?.displayMode === "card" ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                          background: active.config?.displayMode === "card" ? "#F0F9FF" : "#fff",
+                          color: active.config?.displayMode === "card" ? "#0284c7" : "#334155",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                        }}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, displayMode: "card" } })}
+                      >
+                        卡片边框
+                      </button>
+                    </div>
+                  </Field>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                    <Field label="原价文案">
+                      <input
+                        value={active.config?.priceOriginal ?? "原价 ¥488/年"}
+                        placeholder="原价 ¥488/年"
+                        onChange={(e) => updateNode(active.id, { config: { ...active.config, priceOriginal: e.target.value } })}
+                      />
+                    </Field>
+                    <Field label="折扣特惠价">
+                      <input
+                        value={active.config?.priceNow ?? "折扣价 ¥388/年"}
+                        placeholder="折扣价 ¥388/年"
+                        onChange={(e) => updateNode(active.id, { config: { ...active.config, priceNow: e.target.value } })}
+                      />
+                    </Field>
+                  </div>
+                  {active.config?.displayMode === "card" && (
+                    <>
+                      <Field label="角标文案">
+                        <input
+                          value={active.config?.promoBadge ?? "限时特惠"}
+                          onChange={(e) => updateNode(active.id, { config: { ...active.config, promoBadge: e.target.value } })}
+                        />
+                      </Field>
+                      <Field label="折扣标签">
+                        <input
+                          value={active.config?.discountTag ?? "-20% 折扣"}
+                          onChange={(e) => updateNode(active.id, { config: { ...active.config, discountTag: e.target.value } })}
+                        />
+                      </Field>
+                      <Field label="底部计费说明">
+                        <input
+                          value={active.config?.priceSub ?? "仅 ¥0.35/天 · 新客立省 20% · 随时取消"}
+                          onChange={(e) => updateNode(active.id, { config: { ...active.config, priceSub: e.target.value } })}
+                        />
+                      </Field>
+                    </>
+                  )}
+                </div>
+              )}
+
+              {effectiveProductsVariant === "onboarding-dual-tiers" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 产品双套餐配置 (试用年卡 + 基础月卡)</span>
+                  {(active.config?.tiers || [
+                    { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                    { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                  ]).map((tier, tIdx) => (
+                    <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                        <strong style={{ fontSize: 11, color: "#334155" }}>
+                          套餐 {tIdx + 1}：{tier.name}
+                        </strong>
+                        <span style={{ fontSize: 9.5, background: tier.hasTrial ? "#fef3c7" : "#e0e7ff", color: tier.hasTrial ? "#92400e" : "#3730a3", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>
+                          {tier.badge || (tier.hasTrial ? "免费试用" : "直接购买")}
+                        </span>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
+                        <Field label="套餐名称">
+                          <input
+                            value={tier.name}
+                            onChange={(e) => {
+                              const currentTiers = active.config?.tiers || [
+                                { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                                { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                              ];
+                              const newTiers = [...currentTiers];
+                              newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
+                              updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                            }}
+                          />
+                        </Field>
+                        <Field label="月均价格">
+                          <input
+                            value={tier.monthly}
+                            onChange={(e) => {
+                              const currentTiers = active.config?.tiers || [
+                                { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                                { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                              ];
+                              const newTiers = [...currentTiers];
+                              newTiers[tIdx] = { ...newTiers[tIdx], monthly: e.target.value };
+                              updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                            }}
+                          />
+                        </Field>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        <Field label="总价 / 扣费说明">
+                          <input
+                            value={tier.total}
+                            onChange={(e) => {
+                              const currentTiers = active.config?.tiers || [
+                                { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                                { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                              ];
+                              const newTiers = [...currentTiers];
+                              newTiers[tIdx] = { ...newTiers[tIdx], total: e.target.value };
+                              updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                            }}
+                          />
+                        </Field>
+                        <Field label="角标 / 折扣标签">
+                          <input
+                            value={tier.discount || tier.badge || ""}
+                            placeholder="例如：48%OFF / 免费试用"
+                            onChange={(e) => {
+                              const currentTiers = active.config?.tiers || [
+                                { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+                                { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+                              ];
+                              const newTiers = [...currentTiers];
+                              newTiers[tIdx] = { ...newTiers[tIdx], discount: e.target.value, badge: e.target.value };
+                              updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                            }}
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {effectiveProductsVariant === "3-column-tiers" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 横向套餐卡片配置</span>
+                  {(active.config?.tiers || [
+                    { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                    { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                    { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                  ]).map((tier, tIdx) => (
+                    <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                        <strong style={{ fontSize: 11, color: "#334155" }}>档位 {tIdx + 1}：{tier.name}</strong>
+                        {tier.isRecommended && <span style={{ fontSize: 9.5, background: "#dbeafe", color: "#1d4ed8", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>默认推荐档</span>}
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
+                        <Field label="套餐名称">
+                          <input
+                            value={tier.name}
+                            onChange={(e) => {
+                              const currentTiers = active.config?.tiers || [
+                                { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                                { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                                { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                              ];
+                              const newTiers = [...currentTiers];
+                              newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
+                              updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                            }}
+                          />
+                        </Field>
+                        <Field label="月均单价">
+                          <input
+                            value={tier.monthly}
+                            onChange={(e) => {
+                              const currentTiers = active.config?.tiers || [
+                                { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                                { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                                { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                              ];
+                              const newTiers = [...currentTiers];
+                              newTiers[tIdx] = { ...newTiers[tIdx], monthly: e.target.value };
+                              updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                            }}
+                          />
+                        </Field>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        <Field label="总价文案">
+                          <input
+                            value={tier.total}
+                            onChange={(e) => {
+                              const currentTiers = active.config?.tiers || [
+                                { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                                { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                                { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                              ];
+                              const newTiers = [...currentTiers];
+                              newTiers[tIdx] = { ...newTiers[tIdx], total: e.target.value };
+                              updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                            }}
+                          />
+                        </Field>
+                        <Field label="角标/节省文案">
+                          <input
+                            value={tier.badge || tier.save || ""}
+                            placeholder="例如：推荐 / 省54%"
+                            onChange={(e) => {
+                              const currentTiers = active.config?.tiers || [
+                                { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
+                                { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+                                { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
+                              ];
+                              const newTiers = [...currentTiers];
+                              newTiers[tIdx] = { ...newTiers[tIdx], badge: e.target.value, save: e.target.value };
+                              updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
+                            }}
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {effectiveProductsVariant === "vertical-list-tiers" && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📋 纵向套餐列表配置</span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const cur = getVerticalListTiers(active);
+                        const newTiers = [...cur, { name: `连续套餐 ${cur.length + 1}`, price: "¥68/季", daily: "¥0.75/天", tag: "特惠", isDefault: false }];
+                        saveVerticalListTiers(active, newTiers, updateNode);
+                      }}
+                      style={{
+                        fontSize: 10.5,
+                        fontWeight: 600,
+                        padding: "3px 8px",
+                        background: "#fff",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        color: "#475569",
+                      }}
+                    >
+                      + 添加档位
+                    </button>
+                  </div>
+
+                  {getVerticalListTiers(active).map((tier, tIdx, arr) => (
+                    <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                        <strong style={{ fontSize: 11, color: "#334155" }}>档位 {tIdx + 1}：{tier.name}</strong>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                          {tier.isDefault ? (
+                            <span style={{ fontSize: 9.5, background: "#dbeafe", color: "#1d4ed8", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>
+                              默认选中
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newTiers = arr.map((t, i) => ({ ...t, isDefault: i === tIdx }));
+                                saveVerticalListTiers(active, newTiers, updateNode);
+                              }}
+                              style={{ fontSize: 9.5, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 3, padding: "1px 4px", cursor: "pointer" }}
+                            >
+                              设为默认
+                            </button>
+                          )}
+                          {arr.length > 1 && (
+                            <button
+                              type="button"
+                              title="删除档位"
+                              onClick={() => {
+                                const newTiers = arr.filter((_, i) => i !== tIdx);
+                                saveVerticalListTiers(active, newTiers, updateNode);
+                              }}
+                              style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: "1px 2px", display: "flex", alignItems: "center" }}
+                            >
+                              <Trash2 size={12} />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
+                        <Field label="套餐名称">
+                          <input
+                            value={tier.name}
+                            onChange={(e) => {
+                              const newTiers = [...arr];
+                              newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
+                              saveVerticalListTiers(active, newTiers, updateNode);
+                            }}
+                          />
+                        </Field>
+                        <Field label="套餐价格">
+                          <input
+                            value={tier.price}
+                            placeholder="例如：¥198/年"
+                            onChange={(e) => {
+                              const newTiers = [...arr];
+                              newTiers[tIdx] = { ...newTiers[tIdx], price: e.target.value };
+                              saveVerticalListTiers(active, newTiers, updateNode);
+                            }}
+                          />
+                        </Field>
+                      </div>
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        <Field label="日均/副文案">
+                          <input
+                            value={tier.daily || ""}
+                            placeholder="例如：¥0.54/天"
+                            onChange={(e) => {
+                              const newTiers = [...arr];
+                              newTiers[tIdx] = { ...newTiers[tIdx], daily: e.target.value };
+                              saveVerticalListTiers(active, newTiers, updateNode);
+                            }}
+                          />
+                        </Field>
+                        <Field label="角标/促销标签">
+                          <input
+                            value={tier.tag || ""}
+                            placeholder="例如：推荐 / 月付"
+                            onChange={(e) => {
+                              const newTiers = [...arr];
+                              newTiers[tIdx] = { ...newTiers[tIdx], tag: e.target.value };
+                              saveVerticalListTiers(active, newTiers, updateNode);
+                            }}
+                          />
+                        </Field>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* ============================================================ */}
+          {/* 7. 倒计时 (Timer & Countdown)                                */}
+          {/* ============================================================ */}
+          {category === "倒计时" && (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>⏰ 倒计时形态切换</span>
+                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+              </div>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+                {[
+                  { id: "clean-text", label: "极简纯文本", icon: "⏱️" },
+                  { id: "card", label: "色块数字框", icon: "🔢" },
+                  { id: "badge-pill", label: "胶囊提示条", icon: "💊" },
+                ].map((item) => {
+                  const isCur = (active.config?.variant || "card") === item.id || (item.id === "clean-text" && subRole === "极简纯文本") || (item.id === "badge-pill" && subRole === "胶囊提示条");
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      style={{
+                        fontSize: 10.5,
+                        padding: "6px 2px",
+                        borderRadius: 6,
+                        border: isCur ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                        background: isCur ? "#F0F9FF" : "#fff",
+                        color: isCur ? "#0284c7" : "#334155",
+                        fontWeight: isCur ? 700 : 500,
+                        cursor: "pointer",
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
+                      }}
+                      onClick={() => {
+                        updateNode(active.id, {
+                          config: { ...active.config, variant: item.id },
+                          label: `倒计时 (${item.label})`,
+                        });
+                        notify?.(`已切换倒计时形态为：${item.label}`);
+                      }}
+                    >
+                      <span style={{ fontSize: 13 }}>{item.icon}</span>
+                      <span>{item.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
               <Field label="倒计时提示标签">
                 <input
                   value={active.config?.timerLabel ?? active.config?.label ?? active.content ?? "优惠截止时间"}
@@ -6405,621 +7334,42 @@ function BuilderProperties({
                   onChange={(e) => updateNode(active.id, { config: { ...active.config, hours: Number(e.target.value) } })}
                 />
               </Field>
-            </div>
-          )}
-
-          {type === "Products" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "#1e293b" }}>
-                <span>📦 产品套餐展现版式</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
-                {[
-                  { id: "3-column-tiers", label: "横向三列", sub: "3档卡片" },
-                  { id: "onboarding-dual-tiers", label: "双套餐", sub: "年卡+月卡" },
-                  { id: "vertical-list-tiers", label: "纵向列表", sub: "多行列表" },
-                  { id: "entry-price-tier", label: "特惠价格", sub: "单价格" },
-                ].map((tab) => {
-                  const isActive = effectiveProductsVariant === tab.id;
-                  return (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => handleProductVariantSwitch(tab.id)}
-                      style={{
-                        padding: "6px 4px",
-                        background: isActive ? "#eff6ff" : "#ffffff",
-                        border: isActive ? "2px solid #3b82f6" : "1px solid #cbd5e1",
-                        borderRadius: 6,
-                        cursor: "pointer",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: 2,
-                      }}
-                    >
-                      <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 500, color: isActive ? "#1d4ed8" : "#334155" }}>{tab.label}</span>
-                      <span style={{ fontSize: 9, color: isActive ? "#3b82f6" : "#94a3b8" }}>{tab.sub}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {type === "Products" && effectiveProductsVariant === "entry-price-tier" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🏷️ 特惠价格配置</span>
-              <Field label="展示排版">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 2 }}>
+                <span style={{ fontSize: 10, color: "#64748b", width: "100%", fontWeight: 600 }}>快捷插入倒计时变量：</span>
+                {["{{ expire_hours }}", "{{ discount_countdown }}"].map((v) => (
                   <button
+                    key={v}
                     type="button"
+                    onClick={() => insertJinja(v)}
                     style={{
-                      fontSize: 11,
-                      padding: "5px 8px",
+                      fontSize: 10,
+                      background: "#f1f5f9",
+                      border: "1px solid #cbd5e1",
                       borderRadius: 4,
-                      border: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                      background: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "#F0F9FF" : "#fff",
-                      color: active.config?.displayMode === "clean-text" || !active.config?.displayMode ? "#0284c7" : "#334155",
-                      fontWeight: 600,
+                      padding: "2px 6px",
                       cursor: "pointer",
+                      color: "#334155",
+                      fontFamily: "monospace",
                     }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, displayMode: "clean-text" } })}
                   >
-                    极简排版 (原版推荐)
+                    + {v}
                   </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 11,
-                      padding: "5px 8px",
-                      borderRadius: 4,
-                      border: active.config?.displayMode === "card" ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                      background: active.config?.displayMode === "card" ? "#F0F9FF" : "#fff",
-                      color: active.config?.displayMode === "card" ? "#0284c7" : "#334155",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, displayMode: "card" } })}
-                  >
-                    卡片边框
-                  </button>
-                </div>
-              </Field>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-                <Field label="原价文案">
-                  <input
-                    value={active.config?.priceOriginal ?? "原价 ¥488/年"}
-                    placeholder="原价 ¥488/年"
-                    onChange={(e) => updateNode(active.id, { config: { ...active.config, priceOriginal: e.target.value } })}
-                  />
-                </Field>
-                <Field label="折扣特惠价">
-                  <input
-                    value={active.config?.priceNow ?? "折扣价 ¥388/年"}
-                    placeholder="折扣价 ¥388/年"
-                    onChange={(e) => updateNode(active.id, { config: { ...active.config, priceNow: e.target.value } })}
-                  />
-                </Field>
-              </div>
-              {active.config?.displayMode === "card" && (
-                <>
-                  <Field label="角标文案">
-                    <input
-                      value={active.config?.promoBadge ?? "限时特惠"}
-                      onChange={(e) => updateNode(active.id, { config: { ...active.config, promoBadge: e.target.value } })}
-                    />
-                  </Field>
-                  <Field label="折扣标签">
-                    <input
-                      value={active.config?.discountTag ?? "-20% 折扣"}
-                      onChange={(e) => updateNode(active.id, { config: { ...active.config, discountTag: e.target.value } })}
-                    />
-                  </Field>
-                  <Field label="底部计费说明">
-                    <input
-                      value={active.config?.priceSub ?? "仅 ¥0.35/天 · 新客立省 20% · 随时取消"}
-                      onChange={(e) => updateNode(active.id, { config: { ...active.config, priceSub: e.target.value } })}
-                    />
-                  </Field>
-                </>
-              )}
-            </div>
-          )}
-
-          {type === "Products" && effectiveProductsVariant === "onboarding-dual-tiers" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 产品双套餐配置 (试用年卡 + 基础月卡)</span>
-              {(active.config?.tiers || [
-                { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
-                { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
-              ]).map((tier, tIdx) => (
-                <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                    <strong style={{ fontSize: 11, color: "#334155" }}>
-                      套餐 {tIdx + 1}：{tier.name}
-                    </strong>
-                    <span style={{ fontSize: 9.5, background: tier.hasTrial ? "#fef3c7" : "#e0e7ff", color: tier.hasTrial ? "#92400e" : "#3730a3", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>
-                      {tier.badge || (tier.hasTrial ? "免费试用" : "直接购买")}
-                    </span>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
-                    <Field label="套餐名称">
-                      <input
-                        value={tier.name}
-                        onChange={(e) => {
-                          const currentTiers = active.config?.tiers || [
-                            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
-                            { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
-                          ];
-                          const newTiers = [...currentTiers];
-                          newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
-                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
-                        }}
-                      />
-                    </Field>
-                    <Field label="月均价格">
-                      <input
-                        value={tier.monthly}
-                        onChange={(e) => {
-                          const currentTiers = active.config?.tiers || [
-                            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
-                            { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
-                          ];
-                          const newTiers = [...currentTiers];
-                          newTiers[tIdx] = { ...newTiers[tIdx], monthly: e.target.value };
-                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
-                        }}
-                      />
-                    </Field>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                    <Field label="总价 / 扣费说明">
-                      <input
-                        value={tier.total}
-                        onChange={(e) => {
-                          const currentTiers = active.config?.tiers || [
-                            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
-                            { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
-                          ];
-                          const newTiers = [...currentTiers];
-                          newTiers[tIdx] = { ...newTiers[tIdx], total: e.target.value };
-                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
-                        }}
-                      />
-                    </Field>
-                    <Field label="角标 / 折扣标签">
-                      <input
-                        value={tier.discount || tier.badge || ""}
-                        placeholder="例如：48%OFF / 免费试用"
-                        onChange={(e) => {
-                          const currentTiers = active.config?.tiers || [
-                            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
-                            { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
-                          ];
-                          const newTiers = [...currentTiers];
-                          newTiers[tIdx] = { ...newTiers[tIdx], discount: e.target.value, badge: e.target.value };
-                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
-                        }}
-                      />
-                    </Field>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {type === "Products" && effectiveProductsVariant === "3-column-tiers" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 横向套餐卡片配置</span>
-              {(active.config?.tiers || [
-                { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
-                { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
-                { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
-              ]).map((tier, tIdx) => (
-                <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                    <strong style={{ fontSize: 11, color: "#334155" }}>档位 {tIdx + 1}：{tier.name}</strong>
-                    {tier.isRecommended && <span style={{ fontSize: 9.5, background: "#dbeafe", color: "#1d4ed8", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>默认推荐档</span>}
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
-                    <Field label="套餐名称">
-                      <input
-                        value={tier.name}
-                        onChange={(e) => {
-                          const currentTiers = active.config?.tiers || [
-                            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
-                            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
-                            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
-                          ];
-                          const newTiers = [...currentTiers];
-                          newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
-                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
-                        }}
-                      />
-                    </Field>
-                    <Field label="月均单价">
-                      <input
-                        value={tier.monthly}
-                        onChange={(e) => {
-                          const currentTiers = active.config?.tiers || [
-                            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
-                            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
-                            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
-                          ];
-                          const newTiers = [...currentTiers];
-                          newTiers[tIdx] = { ...newTiers[tIdx], monthly: e.target.value };
-                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
-                        }}
-                      />
-                    </Field>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                    <Field label="总价文案">
-                      <input
-                        value={tier.total}
-                        onChange={(e) => {
-                          const currentTiers = active.config?.tiers || [
-                            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
-                            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
-                            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
-                          ];
-                          const newTiers = [...currentTiers];
-                          newTiers[tIdx] = { ...newTiers[tIdx], total: e.target.value };
-                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
-                        }}
-                      />
-                    </Field>
-                    <Field label="角标/节省文案">
-                      <input
-                        value={tier.badge || tier.save || ""}
-                        placeholder="例如：推荐 / 省54%"
-                        onChange={(e) => {
-                          const currentTiers = active.config?.tiers || [
-                            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
-                            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
-                            { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
-                          ];
-                          const newTiers = [...currentTiers];
-                          newTiers[tIdx] = { ...newTiers[tIdx], badge: e.target.value, save: e.target.value };
-                          updateNode(active.id, { config: { ...active.config, tiers: newTiers } });
-                        }}
-                      />
-                    </Field>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {type === "Products" && effectiveProductsVariant === "vertical-list-tiers" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📋 纵向套餐列表配置</span>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const cur = getVerticalListTiers(active);
-                    const newTiers = [...cur, { name: `连续套餐 ${cur.length + 1}`, price: "¥68/季", daily: "¥0.75/天", tag: "特惠", isDefault: false }];
-                    saveVerticalListTiers(active, newTiers, updateNode);
-                  }}
-                  style={{
-                    fontSize: 10.5,
-                    fontWeight: 600,
-                    padding: "3px 8px",
-                    background: "#fff",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: 4,
-                    cursor: "pointer",
-                    color: "#475569",
-                  }}
-                >
-                  + 添加档位
-                </button>
-              </div>
-
-              {getVerticalListTiers(active).map((tier, tIdx, arr) => (
-                <div key={tIdx} style={{ background: "#fff", border: "1px solid #e2e8f0", borderRadius: 6, padding: 8 }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                    <strong style={{ fontSize: 11, color: "#334155" }}>档位 {tIdx + 1}：{tier.name}</strong>
-                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                      {tier.isDefault ? (
-                        <span style={{ fontSize: 9.5, background: "#dbeafe", color: "#1d4ed8", padding: "1px 5px", borderRadius: 4, fontWeight: 700 }}>
-                          默认选中
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const newTiers = arr.map((t, i) => ({ ...t, isDefault: i === tIdx }));
-                            saveVerticalListTiers(active, newTiers, updateNode);
-                          }}
-                          style={{ fontSize: 9.5, color: "#64748b", background: "none", border: "1px solid #e2e8f0", borderRadius: 3, padding: "1px 4px", cursor: "pointer" }}
-                        >
-                          设为默认
-                        </button>
-                      )}
-                      {arr.length > 1 && (
-                        <button
-                          type="button"
-                          title="删除档位"
-                          onClick={() => {
-                            const newTiers = arr.filter((_, i) => i !== tIdx);
-                            saveVerticalListTiers(active, newTiers, updateNode);
-                          }}
-                          style={{ background: "none", border: "none", color: "#ef4444", cursor: "pointer", padding: "1px 2px", display: "flex", alignItems: "center" }}
-                        >
-                          <Trash2 size={12} />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6, marginBottom: 6 }}>
-                    <Field label="套餐名称">
-                      <input
-                        value={tier.name}
-                        onChange={(e) => {
-                          const newTiers = [...arr];
-                          newTiers[tIdx] = { ...newTiers[tIdx], name: e.target.value };
-                          saveVerticalListTiers(active, newTiers, updateNode);
-                        }}
-                      />
-                    </Field>
-                    <Field label="套餐价格">
-                      <input
-                        value={tier.price}
-                        placeholder="例如：¥198/年"
-                        onChange={(e) => {
-                          const newTiers = [...arr];
-                          newTiers[tIdx] = { ...newTiers[tIdx], price: e.target.value };
-                          saveVerticalListTiers(active, newTiers, updateNode);
-                        }}
-                      />
-                    </Field>
-                  </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
-                    <Field label="日均/副文案">
-                      <input
-                        value={tier.daily || ""}
-                        placeholder="例如：¥0.54/天"
-                        onChange={(e) => {
-                          const newTiers = [...arr];
-                          newTiers[tIdx] = { ...newTiers[tIdx], daily: e.target.value };
-                          saveVerticalListTiers(active, newTiers, updateNode);
-                        }}
-                      />
-                    </Field>
-                    <Field label="角标/促销标签">
-                      <input
-                        value={tier.tag || ""}
-                        placeholder="例如：推荐 / 月付"
-                        onChange={(e) => {
-                          const newTiers = [...arr];
-                          newTiers[tIdx] = { ...newTiers[tIdx], tag: e.target.value };
-                          saveVerticalListTiers(active, newTiers, updateNode);
-                        }}
-                      />
-                    </Field>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {(type === "Purchase Button" || type === "Dismiss Button" || type === "Switch Tabs" || active.label?.includes("操作按钮") || active.label?.includes("按钮")) && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 10px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "#1e293b" }}>
-                <span>🔘 操作按钮角色切换</span>
-              </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
-                {[
-                  { id: "Purchase Button", label: "购买按钮", sub: "主行动点" },
-                  { id: "Dismiss Button", label: "关闭按钮", sub: "跳过/放弃" },
-                  { id: "Switch Tabs", label: "切换标签", sub: "VIP/VIP+切换" },
-                ].map((btnRole) => {
-                  const isActive = type === btnRole.id;
-                  return (
-                    <button
-                      key={btnRole.id}
-                      type="button"
-                      onClick={() => {
-                        let newContent = active.content;
-                        let newConfig = { ...(active.config || {}) };
-                        if (btnRole.id === "Purchase Button") {
-                          newContent = newContent === "✕" ? "立即升级 VIP" : (newContent || "立即升级 VIP");
-                          newConfig.color = newConfig.color || "#6144e8";
-                        } else if (btnRole.id === "Dismiss Button") {
-                          newContent = "✕";
-                          newConfig.variant = "close-icon";
-                        } else if (btnRole.id === "Switch Tabs") {
-                          newContent = "VIP|VIP+";
-                        }
-                        updateNode(active.id, {
-                          type: btnRole.id,
-                          label: btnRole.label,
-                          content: newContent,
-                          config: newConfig,
-                        });
-                        notify?.(`已切换按钮角色为：${btnRole.label}`);
-                      }}
-                      style={{
-                        padding: "6px 4px",
-                        background: isActive ? "#eff6ff" : "#ffffff",
-                        border: isActive ? "2px solid #3b82f6" : "1px solid #e2e8f0",
-                        borderRadius: 6,
-                        cursor: "pointer",
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        gap: 2,
-                      }}
-                    >
-                      <span style={{ fontSize: 11, fontWeight: isActive ? 700 : 500, color: isActive ? "#1d4ed8" : "#334155" }}>{btnRole.label}</span>
-                      <span style={{ fontSize: 9, color: isActive ? "#3b82f6" : "#94a3b8" }}>{btnRole.sub}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {type === "Purchase Button" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🛒 购买按钮配置</span>
-              <Field label="按钮主文案">
-                <input
-                  value={active.content ?? ""}
-                  placeholder="例如：继续"
-                  onChange={(e) => updateNode(active.id, { content: e.target.value })}
-                />
-              </Field>
-              <Field label="按钮副标题文案">
-                <input
-                  value={active.config?.subtitle ?? ""}
-                  placeholder="例如：到期后 ¥198/年，可随时取消"
-                  onChange={(e) => updateNode(active.id, { config: { ...active.config, subtitle: e.target.value } })}
-                />
-              </Field>
-              <Field label="按钮强调色">
-                <div style={{ display: "flex", gap: 6, marginTop: 4, alignItems: "center" }}>
-                  {["#C85B6B", "#DE6876", "#FF4D6D", "#0284C7", "#F59E0B", "#10B981", "#1E293B"].map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      style={{
-                        width: 24,
-                        height: 24,
-                        borderRadius: "50%",
-                        background: c,
-                        border: (active.config?.color || "#C85B6B") === c ? "2px solid #000" : "1px solid rgba(0,0,0,0.15)",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
-                    />
-                  ))}
-                  <input
-                    type="color"
-                    value={active.config?.color || "#C85B6B"}
-                    onChange={(e) => updateNode(active.id, { config: { ...active.config, color: e.target.value } })}
-                    style={{ width: 28, height: 28, padding: 0, border: "none", background: "none", cursor: "pointer" }}
-                  />
-                </div>
-              </Field>
-            </div>
-          )}
-
-          {type === "Dismiss Button" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "10px 0 12px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-              <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>❌ 关闭按钮配置</span>
-              <Field label="按钮形态">
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "6px 4px",
-                      borderRadius: 4,
-                      border: active.config?.variant === "circle-close" ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                      background: active.config?.variant === "circle-close" ? "#F0F9FF" : "#fff",
-                      color: active.config?.variant === "circle-close" ? "#0284c7" : "#334155",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { content: "✕", config: { ...active.config, variant: "circle-close", position: "top-right" } })}
-                  >
-                    ✕ 圆形 (半窗)
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "6px 4px",
-                      borderRadius: 4,
-                      border: active.config?.variant === "close-icon" || (active.content === "✕" && active.config?.variant !== "circle-close") ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                      background: active.config?.variant === "close-icon" || (active.content === "✕" && active.config?.variant !== "circle-close") ? "#F0F9FF" : "#fff",
-                      color: active.config?.variant === "close-icon" || (active.content === "✕" && active.config?.variant !== "circle-close") ? "#0284c7" : "#334155",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { content: "✕", config: { ...active.config, variant: "close-icon" } })}
-                  >
-                    ✕ 图标 (全屏)
-                  </button>
-                  <button
-                    type="button"
-                    style={{
-                      fontSize: 10.5,
-                      padding: "6px 4px",
-                      borderRadius: 4,
-                      border: active.config?.variant === "text-link" || (active.config?.variant !== "close-icon" && active.config?.variant !== "circle-close" && active.content !== "✕") ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                      background: active.config?.variant === "text-link" || (active.config?.variant !== "close-icon" && active.config?.variant !== "circle-close" && active.content !== "✕") ? "#F0F9FF" : "#fff",
-                      color: active.config?.variant === "text-link" || (active.config?.variant !== "close-icon" && active.config?.variant !== "circle-close" && active.content !== "✕") ? "#0284c7" : "#334155",
-                      fontWeight: 600,
-                      cursor: "pointer",
-                    }}
-                    onClick={() => updateNode(active.id, { content: "不，谢谢", config: { ...active.config, variant: "text-link" } })}
-                  >
-                    纯文本链接
-                  </button>
-                </div>
-              </Field>
-
-              {active.config?.variant !== "close-icon" && active.content !== "✕" ? (
-                <Field label="关闭链接文案">
-                  <input
-                    value={active.content ?? ""}
-                    placeholder="例如：暂时不用，谢谢"
-                    onChange={(e) => updateNode(active.id, { content: e.target.value })}
-                  />
-                </Field>
-              ) : (
-                <Field label="显示位置">
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                    {["top-left", "top-right", "center"].map((pos) => (
-                      <button
-                        key={pos}
-                        type="button"
-                        style={{
-                          fontSize: 10.5,
-                          padding: "5px 6px",
-                          borderRadius: 4,
-                          border: (active.config?.position || "top-left") === pos ? "2px solid #0284c7" : "1px solid #cbd5e1",
-                          background: (active.config?.position || "top-left") === pos ? "#F0F9FF" : "#fff",
-                          color: (active.config?.position || "top-left") === pos ? "#0284c7" : "#334155",
-                          fontWeight: 600,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => updateNode(active.id, { config: { ...active.config, position: pos } })}
-                      >
-                        {pos === "top-left" ? "左上角" : pos === "top-right" ? "右上角" : "居中"}
-                      </button>
-                    ))}
-                  </div>
-                </Field>
-              )}
-            </div>
-          )}
-
-          {type === "Badge Tag" && (
-            <Field label="徽章强调色">
-              <div style={{ display: "flex", gap: 6, marginTop: 4 }}>
-                {["#1ECA92", "#FAAD14", "#FF4D4F", "#722ED1", "#13C2C2", "#6366F1"].map((c) => (
-                  <button
-                    key={c}
-                    type="button"
-                    style={{ width: 24, height: 24, borderRadius: "50%", background: c, border: active.config?.color === c ? "2px solid #000" : "0" }}
-                    onClick={() => updateNode(active.id, { config: { ...active.config, color: c } })}
-                  />
                 ))}
               </div>
-            </Field>
+            </div>
           )}
 
-
-          {type === "Carousel Cards" && (
-            <div style={{ fontSize: 11, color: "#64748b", margin: "6px 0 12px", background: "#f8fafc", padding: 8, borderRadius: 6 }}>
-              💡 格式说明：每行一张卡片，格式为 <code>卡片标题|详细权益描述文案</code>
-            </div>
+          {/* ============================================================ */}
+          {/* 通用备选文本输入（兜底）                                      */}
+          {/* ============================================================ */}
+          {!["文本与排版", "背景图", "操作按钮", "核心特权", "对比与时间轴", "产品套餐", "倒计时"].includes(category) && (
+            <Field label="文本内容">
+              <textarea
+                rows={4}
+                value={active.content ?? ""}
+                onChange={(e) => updateNode(active.id, { content: e.target.value })}
+              />
+            </Field>
           )}
         </>
       )}
