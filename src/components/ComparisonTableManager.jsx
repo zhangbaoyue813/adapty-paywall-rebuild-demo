@@ -177,10 +177,10 @@ export default function ComparisonTableManager({ node, updateNode, notify, onSwi
 
   return (
     <div className="comparison-table-manager" style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-      {/* 1. 对比模式选择卡片（图一红色画框横幅已彻底删除） */}
+      {/* 1. 对比模式选择卡片 */}
       <div>
         <label style={{ display: "block", fontSize: 11, fontWeight: 700, color: "#374151", marginBottom: 6 }}>
-          🌟 对比模式选择
+          对比模式选择
         </label>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
           {/* 普通 vs VIP */}
@@ -200,7 +200,7 @@ export default function ComparisonTableManager({ node, updateNode, notify, onSwi
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
               <span style={{ fontSize: 11.5, fontWeight: 800, color: currentMode === "free-vs-vip" ? "#B45309" : "#1F2937" }}>
-                🌟 普通 vs VIP
+                普通 vs VIP
               </span>
               {currentMode === "free-vs-vip" && <Check size={13} color="#B45309" strokeWidth={3} />}
             </div>
@@ -226,7 +226,7 @@ export default function ComparisonTableManager({ node, updateNode, notify, onSwi
           >
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 4 }}>
               <span style={{ fontSize: 11.5, fontWeight: 800, color: currentMode === "vip-vs-plus" ? "#6D28D9" : "#1F2937" }}>
-                👑 VIP vs VIP+
+                VIP vs VIP+
               </span>
               {currentMode === "vip-vs-plus" && <Check size={13} color="#6D28D9" strokeWidth={3} />}
             </div>
@@ -237,10 +237,10 @@ export default function ComparisonTableManager({ node, updateNode, notify, onSwi
         </div>
       </div>
 
-      {/* 2. 列头标题配置（图一绿色框怪异复选框已优化为标准 Switch，无任何畸变） */}
+      {/* 2. 列头标题配置 */}
       <div style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 8, padding: 10 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: "#334155", marginBottom: 8 }}>
-          📊 列头标题配置
+          列头标题配置
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
           <div>

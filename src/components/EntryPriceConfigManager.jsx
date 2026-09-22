@@ -11,7 +11,7 @@ export const DEFAULT_ENTRY_CONFIG = {
   bgImage: "",
   mainFontColor: "#2D1832", // 包含HelloTalk VIP色值,标题色,原价色值,倒计时色值
   titleLang: "Simplified Chinese",
-  titleKicker: "HelloTalk VIP 👑",
+  titleKicker: "HelloTalk VIP",
   titleText: "首年额外 20% 优惠！",
   discountMode: "default", // "default" (默认文案: 带变量) | "flexible" (灵活文案: 纯文本)
   flexibleText: "新客专享限时破冰特惠",
@@ -53,7 +53,7 @@ export default function EntryPriceConfigManager({ node, updateNode, config: prop
 
   const handleAddPrivilege = () => {
     if (config.privileges.length >= 3) {
-      notify?.("⚠️ 业务规则限制：入门价格页最多只能配置 3 个特权！");
+      notify?.("业务规则限制：入门价格页最多只能配置 3 个特权！");
       return;
     }
     const nextId = `p${Date.now()}`;
@@ -190,7 +190,7 @@ export default function EntryPriceConfigManager({ node, updateNode, config: prop
                 color: "#fff",
               }}
             >
-              <span style={{ fontSize: 14 }}>🌍 语伴交流</span>
+              <span style={{ fontSize: 13, fontWeight: 700 }}>语伴交流</span>
               <span style={{ fontSize: 8, background: "rgba(0,0,0,0.25)", padding: "1px 5px", borderRadius: 4 }}>
                 搜索附近的人
               </span>

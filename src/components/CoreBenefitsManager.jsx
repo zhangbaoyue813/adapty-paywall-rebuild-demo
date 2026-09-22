@@ -568,7 +568,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
               gap: 8,
             }}
           >
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#6b21a8" }}>✍️ 添加自定义特权</div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#6b21a8" }}>添加自定义特权</div>
             <div style={{ display: "flex", gap: 6 }}>
               <input
                 type="text"

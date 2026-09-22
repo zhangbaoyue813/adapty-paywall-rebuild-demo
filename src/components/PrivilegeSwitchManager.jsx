@@ -443,7 +443,7 @@ export default function PrivilegeSwitchManager({ node, updateNode, notify, defau
                 color: isCarouselMode ? "#6d28d9" : "#475569",
               }}
             >
-              {isCarouselMode ? "🎠 开轮播" : "📋 不开轮播"}
+              {isCarouselMode ? "开轮播" : "不开轮播"}
             </span>
           </div>
 

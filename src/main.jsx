@@ -45,6 +45,9 @@ import {
   ArrowRight,
   Settings,
   Lock,
+  Type,
+  CreditCard,
+  MousePointer,
 } from "lucide-react";
 import "./styles.css";
 import "./paywall-components.css";
@@ -2191,9 +2194,9 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
   };
 
   const getTemplateBadge = (tpl) => {
-    if (tpl.displayMode === "bottom-sheet") return "🪟 底部弹窗";
-    if (tpl.displayMode === "modal") return "🪟 居中弹窗";
-    return "📱 全屏模式";
+    if (tpl.displayMode === "bottom-sheet") return "底部半窗";
+    if (tpl.displayMode === "modal") return "居中弹窗";
+    return "全屏模式";
   };
 
   useEffect(() => {
@@ -2454,14 +2457,14 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
       [currentTemplate.id]: newId,
     }));
     setActiveNode(newTemplate.nodes[0]?.id || null);
-    notify(`✅ 成功添加「模板 ${nextNum}」！已在左侧模版那一列展示，可自由搭配组件。`);
+    notify(`成功添加「模板 ${nextNum}」！已在左侧模版那一列展示，可自由搭配组件。`);
   };
 
   const handleDeleteSubTemplate = (id, name, e) => {
     e.stopPropagation();
     const list = templatePresetsMap[currentTemplate.id] || [];
     if (list.length <= 1) {
-      notify("⚠️ 至少需要保留一个模版预设");
+      notify("至少需要保留一个模版预设");
       return;
     }
     const remaining = list.filter((t) => t.id !== id);
@@ -2731,13 +2734,13 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                     选择要添加的核心组件
                   </div>
                   {[
-                    { name: "核心特权", sub: "轮播 / 清单 / 网格 / 大卡", icon: "⭐" },
-                    { name: "产品套餐", sub: "横向三列 / 双套餐 / 纵向单选 / 特惠", icon: "💳" },
-                    { name: "文本与排版", sub: "主标题 / 副标题 / 正文 / 条款", icon: "✍️" },
-                    { name: "背景图", sub: "插画 / 自选图片 / 渐变底色", icon: "🖼️" },
-                    { name: "操作按钮", sub: "购买按钮 / 关闭按钮 / 切换标签", icon: "🔘" },
-                    { name: "倒计时", sub: "色块数字框 / 胶囊条 / 极简文本", icon: "⏰" },
-                    { name: "对比与时间轴", sub: "权益对比表格 / 试用时间轴", icon: "📊" },
+                    { name: "核心特权", sub: "轮播 / 清单 / 网格 / 大卡", icon: <Sparkles size={14} color="#d97706" /> },
+                    { name: "产品套餐", sub: "横向三列 / 双套餐 / 纵向单选 / 特惠", icon: <CreditCard size={14} color="#2563eb" /> },
+                    { name: "文本与排版", sub: "主标题 / 副标题 / 正文 / 条款", icon: <Type size={14} color="#7c3aed" /> },
+                    { name: "背景图", sub: "插画 / 自选图片 / 渐变底色", icon: <ImageIcon size={14} color="#059669" /> },
+                    { name: "操作按钮", sub: "购买按钮 / 关闭按钮 / 切换标签", icon: <MousePointer size={14} color="#ea580c" /> },
+                    { name: "倒计时", sub: "色块数字框 / 胶囊条 / 极简文本", icon: <Clock size={14} color="#dc2626" /> },
+                    { name: "对比与时间轴", sub: "权益对比表格 / 试用时间轴", icon: <BarChart3 size={14} color="#4f46e5" /> },
                   ].map((item) => (
                     <button
                       key={item.name}
@@ -2758,7 +2761,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                       onMouseEnter={(e) => (e.currentTarget.style.background = "#f8fafc")}
                       onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
                     >
-                      <span style={{ fontSize: 14 }}>{item.icon}</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: 22, height: 22, borderRadius: 5, background: "#f1f5f9" }}>{item.icon}</span>
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ fontSize: 12, fontWeight: 700, color: "#1e293b" }}>+ {item.name}</div>
                         <div style={{ fontSize: 9.5, color: "#94a3b8", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{item.sub}</div>
@@ -2841,29 +2844,9 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                       </div>
                     )}
                     <div className="node-title" style={{ display: "flex", alignItems: "center", gap: 5, flex: 1, minWidth: 0, overflow: "hidden" }}>
-                      <strong style={{ fontSize: 11.5, color: "#1e293b", fontWeight: 700, whiteSpace: "nowrap" }}>
-                        {cat}
+                      <strong style={{ fontSize: 12, color: "#1e293b", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {(node.label && !node.label.includes("(") && node.label !== node.type) ? node.label : cat}
                       </strong>
-                      {sub && sub !== cat && (
-                        <span
-                          style={{
-                            fontSize: 9.5,
-                            fontWeight: 600,
-                            color: "#4f46e5",
-                            background: "#eef2ff",
-                            border: "1px solid #c7d2fe",
-                            padding: "1px 5px",
-                            borderRadius: 4,
-                            whiteSpace: "nowrap",
-                            overflow: "hidden",
-                            textOverflow: "ellipsis",
-                            lineHeight: "14px",
-                          }}
-                          title={sub}
-                        >
-                          {sub}
-                        </span>
-                      )}
                     </div>
 
                     <div className="node-actions" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
@@ -5622,7 +5605,7 @@ function BuilderProperties({
         <Sliders size={36} style={{ marginBottom: 12, opacity: 0.4, color: "#6366f1" }} />
         <h4 style={{ fontSize: 13, fontWeight: 700, color: "#475569", margin: "0 0 6px" }}>未选中组件</h4>
         <p style={{ fontSize: 11, lineHeight: 1.6, margin: 0, color: "#94a3b8" }}>
-          👈 请在左侧「组件树与图层」或中间「iPhone 画布」点击任意组件，即可在此直接配置其文案、样式与业务参数。
+          请在左侧「组件树与图层」或中间「iPhone 画布」点击任意组件，即可在此直接配置其文案、样式与业务参数。
         </p>
       </div>
     );
@@ -5683,46 +5666,89 @@ function BuilderProperties({
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
             <div style={{
-              width: 32,
-              height: 32,
-              borderRadius: 8,
+              width: 30,
+              height: 30,
+              borderRadius: 6,
               background: "#f1f5f9",
               border: "1px solid #e2e8f0",
               display: "flex",
               alignItems: "center",
               justifyContent: "center",
-              fontSize: 16,
+              color: "#4f46e5",
               flexShrink: 0
             }}>
-              {category === "核心特权" ? "⭐" :
-               category === "产品套餐" ? "💳" :
-               category === "文本与排版" ? "✍️" :
-               category === "背景图" ? "🖼️" :
-               category === "操作按钮" ? "🔘" :
-               category === "倒计时" ? "⏰" : "📊"}
+              {category === "核心特权" ? <Sparkles size={15} /> :
+               category === "产品套餐" ? <CreditCard size={15} /> :
+               category === "文本与排版" ? <Type size={15} /> :
+               category === "背景图" ? <ImageIcon size={15} /> :
+               category === "操作按钮" ? <MousePointer size={15} /> :
+               category === "倒计时" ? <Clock size={15} /> : <BarChart3 size={15} />}
             </div>
             <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#0f172a" }}>
-                  {category}
-                </h3>
-                {subRole && (
-                  <span style={{
-                    fontSize: 10.5,
-                    fontWeight: 700,
-                    color: "#4f46e5",
-                    background: "#eef2ff",
-                    border: "1px solid #c7d2fe",
-                    padding: "1px 6px",
-                    borderRadius: 4
-                  }}>
-                    {subRole}
-                  </span>
-                )}
-              </div>
-              <div style={{ fontSize: 10, color: "#64748b", marginTop: 2 }}>
-                7 大核心母组件类别 · 可在下方切换预设角色与配置
-              </div>
+              {isEditingName ? (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <input
+                    type="text"
+                    value={tempName}
+                    autoFocus
+                    onChange={(e) => setTempName(e.target.value)}
+                    onBlur={() => {
+                      if (tempName.trim()) {
+                        updateNode(active.id, { label: tempName.trim() });
+                        notify?.(`已重命名为: ${tempName.trim()}`);
+                      }
+                      setIsEditingName(false);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        if (tempName.trim()) {
+                          updateNode(active.id, { label: tempName.trim() });
+                          notify?.(`已重命名为: ${tempName.trim()}`);
+                        }
+                        setIsEditingName(false);
+                      } else if (e.key === "Escape") {
+                        setIsEditingName(false);
+                      }
+                    }}
+                    style={{
+                      fontSize: 13,
+                      fontWeight: 700,
+                      padding: "3px 7px",
+                      borderRadius: 4,
+                      border: "1px solid #6366f1",
+                      outline: "none",
+                      width: 140
+                    }}
+                  />
+                </div>
+              ) : (
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
+                    {(active.label && !active.label.includes("(") && active.label !== active.type) ? active.label : category}
+                  </h3>
+                  <button
+                    type="button"
+                    title="编辑组件名称"
+                    onClick={() => {
+                      setTempName((active.label && !active.label.includes("(") && active.label !== active.type) ? active.label : category);
+                      setIsEditingName(true);
+                    }}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      padding: "3px 5px",
+                      background: "#f8fafc",
+                      border: "1px solid #e2e8f0",
+                      borderRadius: 4,
+                      color: "#64748b",
+                      cursor: "pointer"
+                    }}
+                  >
+                    <Pencil size={12} />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
           <button
@@ -5730,7 +5756,7 @@ function BuilderProperties({
             title={`删除 ${category} 组件`}
             onClick={() => {
               removeNode(active.id);
-              notify?.(`已删除组件: ${category} (${subRole})`);
+              notify?.(`已删除组件: ${category}`);
             }}
             style={{
               display: "inline-flex",
@@ -5765,18 +5791,18 @@ function BuilderProperties({
           {category === "文本与排版" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>✍️ 文本与排版角色预设切换</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>文本与排版角色预设切换</span>
                 <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 5 }}>
                 {[
-                  { id: "Header", label: "主标题", icon: "👑" },
-                  { id: "Subhead", label: "副标题", icon: "💬" },
-                  { id: "Text", label: "正文段落", icon: "📄" },
-                  { id: "Badge Tag", label: "徽标标签", icon: "🏷️" },
-                  { id: "User Profile", label: "用户画像", icon: "👤" },
-                  { id: "Language Chips", label: "语言标签", icon: "🌐" },
-                  { id: "Legal Footer", label: "免责声明", icon: "⚖️" },
+                  { id: "Header", label: "主标题" },
+                  { id: "Subhead", label: "副标题" },
+                  { id: "Text", label: "正文段落" },
+                  { id: "Badge Tag", label: "徽标标签" },
+                  { id: "User Profile", label: "用户画像" },
+                  { id: "Language Chips", label: "语言标签" },
+                  { id: "Legal Footer", label: "免责声明" },
                 ].map((r) => {
                   const isActiveRole = subRole === r.label || active.type === r.id;
                   return (
@@ -5796,11 +5822,11 @@ function BuilderProperties({
                           newContent = "VIP 特权中心";
                           newConfig.color = newConfig.color || "#6366F1";
                         } else if (r.id === "User Profile") {
-                          newContent = "Yeah|🇩🇪";
+                          newContent = "Yeah|DE";
                           newConfig.userName = "Yeah";
-                          newConfig.userFlag = "🇩🇪";
+                          newConfig.userFlag = "DE";
                         } else if (r.id === "Language Chips") {
-                          newContent = "🇺🇸 英语|🇯🇵 日语|🇰🇷 韩语|🇪🇸 西语";
+                          newContent = "英语|日语|韩语|西语";
                         } else if (r.id === "Legal Footer") {
                           newContent = "服务条款 · 隐私政策 · 恢复购买";
                         }
@@ -5813,19 +5839,17 @@ function BuilderProperties({
                         notify?.(`已切换文本角色为：${r.label}`);
                       }}
                       style={{
-                        padding: "6px 2px",
+                        padding: "7px 4px",
                         background: isActiveRole ? "#eff6ff" : "#fff",
                         border: isActiveRole ? "2px solid #3b82f6" : "1px solid #cbd5e1",
                         borderRadius: 6,
                         cursor: "pointer",
                         display: "flex",
-                        flexDirection: "column",
                         alignItems: "center",
-                        gap: 2,
+                        justifyContent: "center",
                       }}
                     >
-                      <span style={{ fontSize: 13 }}>{r.icon}</span>
-                      <span style={{ fontSize: 10, fontWeight: isActiveRole ? 700 : 500, color: isActiveRole ? "#1d4ed8" : "#334155" }}>
+                      <span style={{ fontSize: 11, fontWeight: isActiveRole ? 700 : 500, color: isActiveRole ? "#1d4ed8" : "#334155" }}>
                         {r.label}
                       </span>
                     </button>
@@ -5854,7 +5878,7 @@ function BuilderProperties({
                   <Field label="顶部前缀 / VIP 标识">
                     <input
                       value={active.config?.kicker ?? ""}
-                      placeholder="例如：HelloTalk VIP 👑"
+                      placeholder="例如：HelloTalk VIP 核心专享"
                       onChange={(e) => updateNode(active.id, { config: { ...active.config, kicker: e.target.value } })}
                     />
                   </Field>
@@ -5988,14 +6012,14 @@ function BuilderProperties({
 
               {(subRole === "用户画像" || active.type === "User Profile") && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>👤 用户画像配置 (Avatar & Badge)</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>用户画像配置 (Avatar & Badge)</span>
                   <Field label="用户昵称 (nick_name)">
                     <input
                       type="text"
                       value={active.config?.userName || active.content?.split("|")[0] || "Yeah"}
                       onChange={(e) => {
                         const newName = e.target.value;
-                        const flag = active.config?.userFlag || active.content?.split("|")[1] || "🇩🇪";
+                        const flag = active.config?.userFlag || active.content?.split("|")[1] || "DE";
                         updateNode(active.id, {
                           content: `${newName}|${flag}`,
                           config: { ...active.config, userName: newName, userFlag: flag },
@@ -6003,10 +6027,10 @@ function BuilderProperties({
                       }}
                     />
                   </Field>
-                  <Field label="国籍国旗 (Flag Emoji)">
+                  <Field label="国籍标识 (区域或国旗代码)">
                     <input
                       type="text"
-                      value={active.config?.userFlag || active.content?.split("|")[1] || "🇩🇪"}
+                      value={active.config?.userFlag || active.content?.split("|")[1] || "DE"}
                       onChange={(e) => {
                         const newFlag = e.target.value;
                         const name = active.config?.userName || active.content?.split("|")[0] || "Yeah";
@@ -6025,14 +6049,14 @@ function BuilderProperties({
                   <Field label="语言标签列表 (竖线 | 分隔)">
                     <input
                       value={active.content || ""}
-                      placeholder="🇺🇸 英语|🇯🇵 日语|🇰🇷 韩语|🇪🇸 西语"
+                      placeholder="英语|日语|韩语|西语"
                       onChange={(e) => updateNode(active.id, { content: e.target.value })}
                     />
                   </Field>
                   <div style={{ display: "flex", gap: 6 }}>
                     {[
-                      { label: "常见 4 语", val: "🇺🇸 英语|🇯🇵 日语|🇰🇷 韩语|🇪🇸 西语" },
-                      { label: "欧洲语系", val: "🇫🇷 法语|🇩🇪 德语|🇮🇹 意语|🇷🇺 俄语" },
+                      { label: "常见 4 语", val: "英语|日语|韩语|西语" },
+                      { label: "欧洲语系", val: "法语|德语|意语|俄语" },
                     ].map((p) => (
                       <button
                         key={p.label}
@@ -6092,15 +6116,15 @@ function BuilderProperties({
           {category === "背景图" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🖼️ 背景图形态与插画风格</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>背景图形态与插画风格</span>
                 <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
                 {[
-                  { key: "illustration", label: "原生插画", icon: "🌍", type: "Hero Image" },
-                  { key: "mascot", label: "吉祥物插画", icon: "🎨", type: "Mascot Illustration" },
-                  { key: "image", label: "自定义图片", icon: "🖼️", type: "Hero Image" },
-                  { key: "gradient", label: "渐变底色", icon: "🎨", type: "Hero Image" },
+                  { key: "illustration", label: "原生插画", type: "Hero Image" },
+                  { key: "mascot", label: "吉祥物插画", type: "Mascot Illustration" },
+                  { key: "image", label: "自定义图片", type: "Hero Image" },
+                  { key: "gradient", label: "渐变底色", type: "Hero Image" },
                 ].map((m) => {
                   const isSelected = subRole === m.label || (m.key === "mascot" ? active.type === "Mascot Illustration" : (active.config?.bgMode || "illustration") === m.key);
                   return (
@@ -6109,7 +6133,7 @@ function BuilderProperties({
                       type="button"
                       style={{
                         fontSize: 10.5,
-                        padding: "6px 2px",
+                        padding: "7px 4px",
                         borderRadius: 6,
                         border: isSelected ? "2px solid #2563eb" : "1px solid #cbd5e1",
                         background: isSelected ? "#eff6ff" : "#fff",
@@ -6117,9 +6141,8 @@ function BuilderProperties({
                         fontWeight: isSelected ? 700 : 500,
                         cursor: "pointer",
                         display: "flex",
-                        flexDirection: "column",
                         alignItems: "center",
-                        gap: 2,
+                        justifyContent: "center",
                       }}
                       onClick={() => {
                         if (m.key === "mascot") {
@@ -6139,7 +6162,6 @@ function BuilderProperties({
                         notify?.(`已切换背景图形态为：${m.label}`);
                       }}
                     >
-                      <span style={{ fontSize: 13 }}>{m.icon}</span>
                       <span>{m.label}</span>
                     </button>
                   );
@@ -6165,7 +6187,7 @@ function BuilderProperties({
                         }}
                         onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "crown-gift" }, content: "crown-gift" })}
                       >
-                        👑 皇冠之星<br />(失效样式)
+                        皇冠之星<br /><span style={{ fontSize: 9.5, opacity: 0.8 }}>(失效样式)</span>
                       </button>
                       <button
                         type="button"
@@ -6181,7 +6203,7 @@ function BuilderProperties({
                         }}
                         onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "binoculars" }, content: "binoculars" })}
                       >
-                        🔍 望远镜星<br />(访客样式)
+                        望远镜星<br /><span style={{ fontSize: 9.5, opacity: 0.8 }}>(访客样式)</span>
                       </button>
                       <button
                         type="button"
@@ -6197,7 +6219,7 @@ function BuilderProperties({
                         }}
                         onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "translate-coin" }, content: "translate-coin" })}
                       >
-                        🪙 翻译金币<br />(非订阅样式)
+                        翻译金币<br /><span style={{ fontSize: 9.5, opacity: 0.8 }}>(非订阅样式)</span>
                       </button>
                     </div>
                   </Field>
@@ -6214,10 +6236,10 @@ function BuilderProperties({
                   <Field label="预设高质量插画壁纸挑选">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                       {[
-                        { name: "🌏 环球母语连结", url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80" },
-                        { name: "✨ 晨曦极简学习", url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80" },
-                        { name: "🏙️ 全球城市漫游", url: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=600&q=80" },
-                        { name: "🎓 专业导师答疑", url: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80" },
+                        { name: "环球母语连结", url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=600&q=80" },
+                        { name: "晨曦极简学习", url: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&q=80" },
+                        { name: "全球城市漫游", url: "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=600&q=80" },
+                        { name: "专业导师答疑", url: "https://images.unsplash.com/photo-1523240795612-9a054b0db644?w=600&q=80" },
                       ].map((item) => (
                         <button
                           key={item.name}
@@ -6276,10 +6298,10 @@ function BuilderProperties({
                   <Field label="插画主题底色">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                       {[
-                        { key: "orange", label: "🍊 暖橙经典", bg: "linear-gradient(135deg, #ea580c, #f97316)" },
-                        { key: "gold", label: "👑 尊享黑金", bg: "linear-gradient(135deg, #1e1b4b, #312e81)" },
-                        { key: "blue", label: "🌌 极光深蓝", bg: "linear-gradient(135deg, #1e3a8a, #3b82f6)" },
-                        { key: "purple", label: "🌸 优雅粉紫", bg: "linear-gradient(135deg, #831843, #ec4899)" },
+                        { key: "orange", label: "暖橙经典", bg: "linear-gradient(135deg, #ea580c, #f97316)" },
+                        { key: "gold", label: "尊享黑金", bg: "linear-gradient(135deg, #1e1b4b, #312e81)" },
+                        { key: "blue", label: "极光深蓝", bg: "linear-gradient(135deg, #1e3a8a, #3b82f6)" },
+                        { key: "purple", label: "优雅粉紫", bg: "linear-gradient(135deg, #831843, #ec4899)" },
                       ].map((theme) => {
                         const isSelected = (active.config?.themeColor || "orange") === theme.key;
                         return (
@@ -6316,15 +6338,15 @@ function BuilderProperties({
           {category === "操作按钮" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🔘 操作按钮角色切换</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>操作按钮角色切换</span>
                 <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
                 {[
-                  { id: "Purchase Button", label: "购买按钮", icon: "🛒" },
-                  { id: "Dismiss Button", label: "关闭按钮", icon: "❌" },
-                  { id: "Switch Tabs", label: "切换标签", icon: "🔀" },
-                  { id: "Toggle", label: "开关选项", icon: "🎚️" },
+                  { id: "Purchase Button", label: "购买按钮" },
+                  { id: "Dismiss Button", label: "关闭按钮" },
+                  { id: "Switch Tabs", label: "切换标签" },
+                  { id: "Toggle", label: "开关选项" },
                 ].map((btnRole) => {
                   const isBtnActive = subRole === btnRole.label || active.type === btnRole.id;
                   return (
@@ -6354,19 +6376,17 @@ function BuilderProperties({
                         notify?.(`已切换按钮角色为：${btnRole.label}`);
                       }}
                       style={{
-                        padding: "6px 2px",
+                        padding: "7px 4px",
                         background: isBtnActive ? "#eff6ff" : "#ffffff",
                         border: isBtnActive ? "2px solid #3b82f6" : "1px solid #cbd5e1",
                         borderRadius: 6,
                         cursor: "pointer",
                         display: "flex",
-                        flexDirection: "column",
                         alignItems: "center",
-                        gap: 2,
+                        justifyContent: "center",
                       }}
                     >
-                      <span style={{ fontSize: 13 }}>{btnRole.icon}</span>
-                      <span style={{ fontSize: 10, fontWeight: isBtnActive ? 700 : 500, color: isBtnActive ? "#1d4ed8" : "#334155" }}>{btnRole.label}</span>
+                      <span style={{ fontSize: 10.5, fontWeight: isBtnActive ? 700 : 500, color: isBtnActive ? "#1d4ed8" : "#334155" }}>{btnRole.label}</span>
                     </button>
                   );
                 })}
@@ -6486,7 +6506,7 @@ function BuilderProperties({
               {/* Switch Tabs Controls */}
               {(subRole === "切换标签" || active.type === "Switch Tabs") && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🔀 VIP / VIP+ 标签联动</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>VIP / VIP+ 标签联动</span>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                     <button
                       type="button"
@@ -6505,7 +6525,7 @@ function BuilderProperties({
                         notify?.("已切换预览: VIP 进阶版");
                       }}
                     >
-                      🌟 VIP 进阶版
+                      VIP 进阶版
                     </button>
                     <button
                       type="button"
@@ -6524,7 +6544,7 @@ function BuilderProperties({
                         notify?.("已切换预览: VIP+ 旗舰版");
                       }}
                     >
-                      👑 VIP+ 旗舰版
+                      VIP+ 旗舰版
                     </button>
                   </div>
                 </div>
@@ -6563,16 +6583,16 @@ function BuilderProperties({
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>⭐ 核心特权表现形态</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>核心特权表现形态</span>
                   <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4 }}>
                   {[
-                    { id: "Carousel Cards", label: "卡片轮播", icon: "🎠", variant: "carousel", styleVariant: "carousel" },
-                    { id: "Carousel Cards", label: "3页引导轮播", icon: "📑", variant: "onboarding-3slides", styleVariant: "onboarding" },
-                    { id: "Benefit List", label: "打勾清单", icon: "✅", variant: "entry-checks", styleVariant: "checklist" },
-                    { id: "Benefit List", label: "双列网格", icon: "⊞", variant: "grid-matrix", styleVariant: "grid" },
-                    { id: "Benefit List", label: "圆角大卡", icon: "🎴", variant: "onboarding-privilege-card", styleVariant: "cards" },
+                    { id: "Carousel Cards", label: "卡片轮播", variant: "carousel", styleVariant: "carousel" },
+                    { id: "Carousel Cards", label: "3页引导轮播", variant: "onboarding-3slides", styleVariant: "onboarding" },
+                    { id: "Benefit List", label: "打勾清单", variant: "entry-checks", styleVariant: "checklist" },
+                    { id: "Benefit List", label: "双列网格", variant: "grid-matrix", styleVariant: "grid" },
+                    { id: "Benefit List", label: "圆角大卡", variant: "onboarding-privilege-card", styleVariant: "cards" },
                   ].map((role) => {
                     const isSelected = subRole === role.label ||
                       (role.variant === "onboarding-3slides" && (active.config?.variant === "onboarding-3slides" || active.id === "trial-t2-carousel")) ||
@@ -6623,7 +6643,7 @@ function BuilderProperties({
                         }}
                         style={{
                           fontSize: 10,
-                          padding: "6px 2px",
+                          padding: "7px 2px",
                           borderRadius: 6,
                           border: isSelected ? "2px solid #3b82f6" : "1px solid #cbd5e1",
                           background: isSelected ? "#eff6ff" : "#fff",
@@ -6631,12 +6651,10 @@ function BuilderProperties({
                           fontWeight: isSelected ? 700 : 500,
                           cursor: "pointer",
                           display: "flex",
-                          flexDirection: "column",
                           alignItems: "center",
-                          gap: 2,
+                          justifyContent: "center",
                         }}
                       >
-                        <span style={{ fontSize: 12 }}>{role.icon}</span>
                         <span style={{ whiteSpace: "nowrap" }}>{role.label}</span>
                       </button>
                     );
@@ -6673,14 +6691,14 @@ function BuilderProperties({
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 对比与时间轴角色切换</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>对比与时间轴角色切换</span>
                   <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {[
-                    { id: "Comparison Table", label: "对比表格", icon: "📊" },
-                    { id: "Trial Timeline", label: "3天试用时间轴", icon: "⏳" },
-                    { id: "Dynamic Metrics", label: "动态指标", icon: "📈" },
+                    { id: "Comparison Table", label: "对比表格" },
+                    { id: "Trial Timeline", label: "3天试用时间轴" },
+                    { id: "Dynamic Metrics", label: "动态指标" },
                   ].map((role) => {
                     const isSelected = subRole === role.label ||
                       (role.id === "Comparison Table" && active.type === "Comparison Table") ||
@@ -6737,7 +6755,7 @@ function BuilderProperties({
                         }}
                         style={{
                           fontSize: 10.5,
-                          padding: "6px 4px",
+                          padding: "7px 4px",
                           borderRadius: 6,
                           border: isSelected ? "2px solid #3b82f6" : "1px solid #cbd5e1",
                           background: isSelected ? "#eff6ff" : "#fff",
@@ -6745,12 +6763,10 @@ function BuilderProperties({
                           fontWeight: isSelected ? 700 : 500,
                           cursor: "pointer",
                           display: "flex",
-                          flexDirection: "column",
                           alignItems: "center",
-                          gap: 2,
+                          justifyContent: "center",
                         }}
                       >
-                        <span style={{ fontSize: 13 }}>{role.icon}</span>
                         <span>{role.label}</span>
                       </button>
                     );
@@ -6777,7 +6793,7 @@ function BuilderProperties({
 
               {(subRole === "动态指标" || active.type === "Dynamic Metrics") && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📊 动态指标数据源配置</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>动态指标数据源配置</span>
                   <Field label="展示版式形态">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                       <button
@@ -6808,7 +6824,7 @@ function BuilderProperties({
                           fontWeight: 700,
                           cursor: "pointer",
                         }}
-                        onClick={() => updateNode(active.id, { config: { ...active.config, styleType: "非VIP样式", visitorCount: 21 }, content: "21 new visitors in the past 7 days 👀" })}
+                        onClick={() => updateNode(active.id, { config: { ...active.config, styleType: "非VIP样式", visitorCount: 21 }, content: "21 new visitors in the past 7 days" })}
                       >
                         访客统计大数字 (非VIP访客)
                       </button>
@@ -6823,7 +6839,7 @@ function BuilderProperties({
                           const num = parseInt(e.target.value, 10) || 0;
                           updateNode(active.id, {
                             config: { ...active.config, visitorCount: num },
-                            content: `${num} new visitors in the past 7 days 👀`,
+                            content: `${num} new visitors in the past 7 days`,
                           });
                         }}
                       />
@@ -6873,7 +6889,7 @@ function BuilderProperties({
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px" }}>
               <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>💳 产品套餐展现版式</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>产品套餐展现版式</span>
                   <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
@@ -6911,7 +6927,7 @@ function BuilderProperties({
 
               {effectiveProductsVariant === "entry-price-tier" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>🏷️ 特惠价格配置</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>特惠价格配置</span>
                   <Field label="展示排版">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
                       <button
@@ -6991,7 +7007,7 @@ function BuilderProperties({
 
               {effectiveProductsVariant === "onboarding-dual-tiers" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 产品双套餐配置 (试用年卡 + 基础月卡)</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>产品双套餐配置 (试用年卡 + 基础月卡)</span>
                   {(active.config?.tiers || [
                     { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
                     { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
@@ -7073,7 +7089,7 @@ function BuilderProperties({
 
               {effectiveProductsVariant === "3-column-tiers" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📦 横向套餐卡片配置</span>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>横向套餐卡片配置</span>
                   {(active.config?.tiers || [
                     { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
                     { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
@@ -7157,7 +7173,7 @@ function BuilderProperties({
               {effectiveProductsVariant === "vertical-list-tiers" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                    <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>📋 纵向套餐列表配置</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>纵向套餐列表配置</span>
                     <button
                       type="button"
                       onClick={() => {
@@ -7276,14 +7292,14 @@ function BuilderProperties({
           {category === "倒计时" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>⏰ 倒计时形态切换</span>
+                <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>倒计时形态切换</span>
                 <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
                 {[
-                  { id: "clean-text", label: "极简纯文本", icon: "⏱️" },
-                  { id: "card", label: "色块数字框", icon: "🔢" },
-                  { id: "badge-pill", label: "胶囊提示条", icon: "💊" },
+                  { id: "clean-text", label: "极简纯文本" },
+                  { id: "card", label: "色块数字框" },
+                  { id: "badge-pill", label: "胶囊提示条" },
                 ].map((item) => {
                   const isCur = (active.config?.variant || "card") === item.id || (item.id === "clean-text" && subRole === "极简纯文本") || (item.id === "badge-pill" && subRole === "胶囊提示条");
                   return (
@@ -7292,7 +7308,7 @@ function BuilderProperties({
                       type="button"
                       style={{
                         fontSize: 10.5,
-                        padding: "6px 2px",
+                        padding: "7px 4px",
                         borderRadius: 6,
                         border: isCur ? "2px solid #0284c7" : "1px solid #cbd5e1",
                         background: isCur ? "#F0F9FF" : "#fff",
@@ -7300,9 +7316,8 @@ function BuilderProperties({
                         fontWeight: isCur ? 700 : 500,
                         cursor: "pointer",
                         display: "flex",
-                        flexDirection: "column",
                         alignItems: "center",
-                        gap: 2,
+                        justifyContent: "center",
                       }}
                       onClick={() => {
                         updateNode(active.id, {
@@ -7312,7 +7327,6 @@ function BuilderProperties({
                         notify?.(`已切换倒计时形态为：${item.label}`);
                       }}
                     >
-                      <span style={{ fontSize: 13 }}>{item.icon}</span>
                       <span>{item.label}</span>
                     </button>
                   );
@@ -7901,8 +7915,8 @@ function DeviceTestModal({ onClose }) {
   return (
     <Modal title="真机扫码体验 (Test on Device)" onClose={onClose}>
       <div className="device-test" style={{ textAlign: "center", padding: "20px 0" }}>
-        <div style={{ width: 140, height: 140, margin: "0 auto 16px", border: "2px solid #e2e8f0", borderRadius: 12, display: "grid", placeItems: "center", fontSize: 48, background: "#f8fafc" }}>
-          📱
+        <div style={{ width: 140, height: 140, margin: "0 auto 16px", border: "2px solid #e2e8f0", borderRadius: 12, display: "grid", placeItems: "center", background: "#f8fafc" }}>
+          <Smartphone size={48} color="#64748b" />
         </div>
         <p className="modal-copy">使用手机相机扫描二维码，或通过 HelloTalk App 内部预览链接打开体验。</p>
         <div className="test-link" style={{ display: "flex", gap: 6, maxWidth: 360, margin: "0 auto" }}>
