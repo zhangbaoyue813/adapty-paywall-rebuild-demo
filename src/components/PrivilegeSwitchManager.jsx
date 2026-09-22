@@ -515,205 +515,172 @@ export default function PrivilegeSwitchManager({ node, updateNode, notify, defau
           </button>
         </div>
 
-        {/* Summary Counts Bar & Quick Actions */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, padding: "6px 8px", background: "#f8fafc", borderRadius: 6 }}>
-          <div style={{ fontSize: 11, fontWeight: 600, display: "flex", gap: 8 }}>
-            <span style={{ color: "#059669" }}>✓ 已展示：{showCount} 项</span>
-            {isCarouselMode && <span style={{ color: "#6366f1" }}>★ 轮播大卡：{carouselCount} 张</span>}
-          </div>
-          <div style={{ display: "flex", gap: 6 }}>
+        {/* If Carousel Mode */}
+        {isCarouselMode ? (
+          <div>
+            <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span>当前轮播大卡展示清单 ({activeCarouselPrivileges.length} 张)：</span>
+              <span style={{ fontSize: 10, color: "#6366f1", cursor: "pointer" }} onClick={() => setIsModalOpen(true)}>全屏管理 &gt;</span>
+            </div>
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 380, overflowY: "auto" }}>
+              {activeCarouselPrivileges.length === 0 ? (
+                <div style={{ padding: "20px 8px", textAlign: "center", color: "#94a3b8", fontSize: 11.5, background: "#ffffff", borderRadius: 8, border: "1px dashed #cbd5e1" }}>
+                  暂无启用的轮播大卡，请点击下方按钮打开弹窗勾选。
+                </div>
+              ) : (
+                activeCarouselPrivileges.map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: "#ffffff",
+                      borderRadius: 6,
+                      border: "1px solid #e2e8f0",
+                      padding: "8px 10px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {item.name}
+                      </div>
+                      <div style={{ fontSize: 10, color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {item.desc}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => toggleField(item.id, "carousel")}
+                      style={{
+                        fontSize: 10,
+                        padding: "3px 6px",
+                        background: "#f1f5f9",
+                        color: "#64748b",
+                        border: "1px solid #cbd5e1",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        flexShrink: 0,
+                      }}
+                      title="从轮播中移出"
+                    >
+                      移出
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Prominent Button at bottom */}
             <button
               type="button"
-              onClick={() => setIsAddingNew(!isAddingNew)}
+              onClick={() => setIsModalOpen(true)}
               style={{
-                padding: "3px 8px",
-                background: isAddingNew ? "#fee2e2" : "#f0fdf4",
-                color: isAddingNew ? "#991b1b" : "#166534",
-                border: "1px solid",
-                borderColor: isAddingNew ? "#fca5a5" : "#bbf7d0",
-                borderRadius: 4,
-                fontSize: 11,
-                fontWeight: 600,
+                width: "100%",
+                padding: "10px 14px",
+                background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: 8,
+                fontSize: 12.5,
+                fontWeight: 700,
                 cursor: "pointer",
                 display: "flex",
                 alignItems: "center",
-                gap: 3,
+                justifyContent: "center",
+                gap: 8,
+                boxShadow: "0 4px 12px rgba(99,102,241,0.25)",
+                marginTop: 10,
               }}
             >
-              {isAddingNew ? <X size={12} /> : <Plus size={12} />} {isAddingNew ? "取消" : "新增"}
-            </button>
-            {isCarouselMode && (
-              <button
-                type="button"
-                onClick={enableAllCarousel}
-                style={{ padding: "3px 8px", background: "#ede9fe", color: "#6d28d9", border: "1px solid #ddd6fe", borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: "pointer" }}
-              >
-                全开
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={resetToDefault}
-              style={{ padding: "3px 8px", background: "#ffffff", color: "#475569", border: "1px solid #cbd5e1", borderRadius: 4, fontSize: 11, cursor: "pointer" }}
-            >
-              默认
+              <Maximize2 size={15} /> 打开特权与轮播管理
             </button>
           </div>
-        </div>
-
-        {/* Inline Add Privilege Form */}
-        {isAddingNew && (
-          <form
-            onSubmit={handleAddNewPrivilege}
-            style={{ padding: 10, marginBottom: 10, background: "#f8fafc", border: "1.5px dashed #6366f1", borderRadius: 6 }}
-          >
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#1e293b", marginBottom: 6, display: "flex", alignItems: "center", gap: 4 }}>
-              <Plus size={14} color="#6366f1" /> 新增自定义特权功能
+        ) : (
+          <div>
+            <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <span>当前展示特权清单 ({privileges.filter((p) => p.show).length} 项)：</span>
+              <span style={{ fontSize: 10, color: "#6366f1", cursor: "pointer" }} onClick={() => setIsModalOpen(true)}>全屏管理 &gt;</span>
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6, marginBottom: 8 }}>
-              <div>
-                <input
-                  type="text"
-                  placeholder="特权名称（如：AI 口语伴读）"
-                  value={newName}
-                  onChange={(e) => setNewName(e.target.value)}
-                  required
-                  style={{ width: "100%", padding: "5px 8px", fontSize: 11.5, border: "1px solid #cbd5e1", borderRadius: 4 }}
-                />
-              </div>
-              <div>
-                <input
-                  type="text"
-                  placeholder="权益说明（如：24小时专业母语微课辅导）"
-                  value={newDesc}
-                  onChange={(e) => setNewDesc(e.target.value)}
-                  style={{ width: "100%", padding: "5px 8px", fontSize: 11.5, border: "1px solid #cbd5e1", borderRadius: 4 }}
-                />
-              </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                <span style={{ fontSize: 10.5, color: "#64748b" }}>图标：</span>
-                <div style={{ display: "flex", gap: 4 }}>
-                  {AVAILABLE_ICONS.slice(0, 8).map((ic) => (
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 380, overflowY: "auto" }}>
+              {privileges.filter((p) => p.show).length === 0 ? (
+                <div style={{ padding: "20px 8px", textAlign: "center", color: "#94a3b8", fontSize: 11.5, background: "#ffffff", borderRadius: 8, border: "1px dashed #cbd5e1" }}>
+                  暂无启用的特权，请点击下方按钮打开弹窗勾选。
+                </div>
+              ) : (
+                privileges.filter((p) => p.show).map((item) => (
+                  <div
+                    key={item.id}
+                    style={{
+                      background: "#ffffff",
+                      borderRadius: 6,
+                      border: "1px solid #e2e8f0",
+                      padding: "8px 10px",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                    }}
+                  >
+                    <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {item.name}
+                      </div>
+                      <div style={{ fontSize: 10, color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {item.desc}
+                      </div>
+                    </div>
                     <button
-                      key={ic}
                       type="button"
-                      onClick={() => setNewIcon(ic)}
+                      onClick={() => toggleField(item.id, "show")}
                       style={{
-                        width: 24,
-                        height: 24,
+                        fontSize: 10,
+                        padding: "3px 6px",
+                        background: "#f1f5f9",
+                        color: "#64748b",
+                        border: "1px solid #cbd5e1",
                         borderRadius: 4,
-                        border: newIcon === ic ? "2px solid #6366f1" : "1px solid #cbd5e1",
-                        background: newIcon === ic ? "#ede9fe" : "#ffffff",
                         cursor: "pointer",
-                        fontSize: 12,
-                        padding: 0,
+                        flexShrink: 0,
                       }}
+                      title="从列表中移出"
                     >
-                      {ic}
+                      移出
                     </button>
-                  ))}
-                </div>
-              </div>
+                  </div>
+                ))
+              )}
             </div>
-            <div style={{ display: "flex", justifyContent: "flex-end", gap: 6 }}>
-              <button
-                type="button"
-                onClick={() => setIsAddingNew(false)}
-                style={{ padding: "4px 8px", background: "#ffffff", border: "1px solid #cbd5e1", borderRadius: 4, fontSize: 11, cursor: "pointer" }}
-              >
-                取消
-              </button>
-              <button
-                type="submit"
-                style={{ padding: "4px 12px", background: "#6366f1", color: "#ffffff", border: "none", borderRadius: 4, fontSize: 11, fontWeight: 600, cursor: "pointer" }}
-              >
-                确认添加
-              </button>
-            </div>
-          </form>
+
+            {/* Prominent Button at bottom */}
+            <button
+              type="button"
+              onClick={() => setIsModalOpen(true)}
+              style={{
+                width: "100%",
+                padding: "10px 14px",
+                background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
+                color: "#ffffff",
+                border: "none",
+                borderRadius: 8,
+                fontSize: 12.5,
+                fontWeight: 700,
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                boxShadow: "0 4px 12px rgba(99,102,241,0.25)",
+                marginTop: 10,
+              }}
+            >
+              <Maximize2 size={15} /> 打开特权与权益管理
+            </button>
+          </div>
         )}
-
-        {/* Prominent Button to open the full secondary modal */}
-        <button
-          type="button"
-          onClick={() => setIsModalOpen(true)}
-          style={{
-            width: "100%",
-            padding: "10px 14px",
-            background: "linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)",
-            color: "#ffffff",
-            border: "none",
-            borderRadius: 8,
-            fontSize: 12.5,
-            fontWeight: 700,
-            cursor: "pointer",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 8,
-            boxShadow: "0 4px 12px rgba(99,102,241,0.25)",
-            margin: "6px 0 12px",
-          }}
-        >
-          <Maximize2 size={15} /> 打开特权与轮播管理 (二级弹窗)
-        </button>
-
-        {/* Tip */}
-        <div style={{ fontSize: 11, color: "#64748b", marginBottom: 8, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <span>当前轮播大卡展示清单 ({activeCarouselPrivileges.length} 张)：</span>
-          <span style={{ fontSize: 10, color: "#6366f1", cursor: "pointer" }} onClick={() => setIsModalOpen(true)}>全屏管理 &gt;</span>
-        </div>
-
-        {/* Clean, spacious card list for active carousel items (No column compression) */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 380, overflowY: "auto" }}>
-          {activeCarouselPrivileges.length === 0 ? (
-            <div style={{ padding: "20px 8px", textAlign: "center", color: "#94a3b8", fontSize: 11.5, background: "#ffffff", borderRadius: 8, border: "1px dashed #cbd5e1" }}>
-              暂无启用的轮播大卡，请点击上方「全开」或打开二级弹窗勾选。
-            </div>
-          ) : (
-            activeCarouselPrivileges.map((item, idx) => (
-              <div
-                key={item.id}
-                style={{
-                  background: "#ffffff",
-                  borderRadius: 6,
-                  border: "1px solid #e2e8f0",
-                  padding: "8px 10px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                <span style={{ fontSize: 16, flexShrink: 0 }}>{item.icon}</span>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {item.name}
-                  </div>
-                  <div style={{ fontSize: 10, color: "#64748b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                    {item.desc}
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => toggleField(item.id, "carousel")}
-                  style={{
-                    fontSize: 10,
-                    padding: "3px 6px",
-                    background: "#f1f5f9",
-                    color: "#64748b",
-                    border: "1px solid #cbd5e1",
-                    borderRadius: 4,
-                    cursor: "pointer",
-                    flexShrink: 0,
-                  }}
-                  title="从轮播中移出"
-                >
-                  移出
-                </button>
-              </div>
-            ))
-          )}
-        </div>
       </div>
 
       {/* 2. Full-Screen Modal Dialog (Matching Figure 4 Pixel-for-Pixel) */}

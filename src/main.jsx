@@ -56,6 +56,8 @@ import { DEFAULT_ENTRY_CONFIG } from "./components/EntryPriceConfigManager";
 import ComparisonTableManager, { DEFAULT_FREE_VS_VIP_ITEMS, DEFAULT_VIP_VS_PLUS_ITEMS } from "./components/ComparisonTableManager";
 import HelloTalkMascot from "./components/HelloTalkMascot";
 import ContentPaywallManager from "./components/ContentPaywallManager";
+import TrialTimelineManager from "./components/TrialTimelineManager";
+import OnboardingMultiSlidesManager from "./components/OnboardingMultiSlidesManager";
 import {
   ContentCrownMascot,
   ContentBinocularsMascot,
@@ -366,7 +368,10 @@ const zhToTypeMap = {
   "特权轮播": "Carousel Cards",
   "轮播卡片": "Carousel Cards",
   "3张轮播卡片": "Carousel Cards",
+  "多张轮播图": "Carousel Cards",
+  "试用多张轮播": "Carousel Cards",
   "3天试用时间轴": "Toggle",
+  "试用时间轴": "Toggle",
   "产品双套餐": "Products",
   "横向套餐卡片": "Products",
   "纵向套餐列表": "Products",
@@ -395,6 +400,8 @@ const typeToZhMap = componentTypeLabelsZh;
 const cleanLabel = (text = "") => {
   if (!text) return "";
   let cleaned = text.replace(/\s*[\(（][^\)）]*[\)）]/g, "").trim();
+  if (cleaned.includes("时间轴")) return "3天试用时间轴";
+  if (cleaned.includes("多张轮播")) return "多张轮播图";
   if (cleaned.includes("法律免责") || cleaned.includes("免责声明")) return "免责声明";
   if (cleaned.includes("顶部大图") || cleaned.includes("头图") || cleaned.includes("背景图")) return "背景图";
   if (cleaned.includes("购买按钮") || cleaned === "主购买按钮" || cleaned === "主购买") return "购买按钮";
@@ -409,6 +416,12 @@ const cleanLabel = (text = "") => {
 const getNodeLabel = (node) => {
   if (!node) return "";
   const raw = node.label || node.type || "";
+  if (node.config?.variant === "trial-timeline" || node.id === "trial-t1-timeline" || raw.includes("时间轴")) {
+    return "3天试用时间轴";
+  }
+  if (node.config?.variant === "onboarding-3slides" || node.id === "trial-t2-carousel" || raw.includes("多张轮播")) {
+    return "多张轮播图";
+  }
   if (node.type === "Purchase Button" || raw.includes("购买按钮") || raw === "主购买按钮") {
     return "购买按钮";
   }
@@ -449,6 +462,8 @@ const componentCatalog = [
   "背景图",
   "核心特权",
   "特权轮播",
+  "多张轮播图",
+  "3天试用时间轴",
   "产品双套餐",
   "横向套餐卡片",
   "纵向套餐列表",
@@ -871,6 +886,40 @@ function createComponentNode(rawType, index) {
       ],
     };
     content = "连续包年 VIP|¥198/年|¥0.54/天|推荐\n连续包月 VIP|¥28/月|¥0.93/天|月付";
+  } else if (rawType === "3天试用时间轴" || rawType === "试用时间轴") {
+    label = "3天试用时间轴";
+    config = {
+      variant: "trial-timeline",
+      steps: [
+        { day: "今天", title: "开始试用", icon: "crown" },
+        { day: "第2天", title: "即将结束通知", icon: "bell" },
+        { day: "第3天", title: "试用结束", icon: "clock" },
+      ],
+    };
+    content = "今天|开始试用\n第2天|即将结束通知\n第3天|试用结束";
+  } else if (rawType === "多张轮播图" || rawType === "试用多张轮播") {
+    label = "多张轮播图";
+    config = {
+      variant: "onboarding-3slides",
+      slide1Title: "免费体验HelloTalk会员",
+      slide1Items: [
+        { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
+        { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
+        { title: "更多曝光", desc: "专属身份特权，让更多人看到你", icon: "zap" },
+        { title: "无广告", desc: "更沉浸专心的学语言！", icon: "ad" },
+      ],
+      slide2Title: "到期前提醒",
+      slide2Timeline: [
+        { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
+        { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
+        { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
+      ],
+      slide3Title: "选择试用结束后的套餐",
+      slide3Yearly: { name: "12 个月", monthly: "¥40.67/ 月", total: "¥488", discount: "48% OFF", badge: "免费试用" },
+      slide3Monthly: { name: "1 个月", monthly: "¥78/ 月" },
+      slide3SafetyNote: "可随时在 App Store 取消",
+    };
+    content = "Slide 1: 免费体验HelloTalk会员\nSlide 2: 到期前提醒\nSlide 3: 选择试用结束后的套餐";
   } else if (rawType === "背景图" || type === "Hero Image") {
     label = "背景图";
     config = {
@@ -1796,38 +1845,26 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         },
         nodes: [
           { id: "trial-t2-hero", type: "Hero Image", label: "背景图", content: "专享会员\n更好练习外语", depth: 0, enabled: true, config: { variant: "onboarding-carousel-hero", mascot: true, closeBtn: true } },
-          { id: "trial-t2-carousel", type: "Carousel Cards", label: "特权轮播", content: "Slide 1: 免费体验HelloTalk会员\nSlide 2: 到期前提醒\nSlide 3: 选择试用结束后的套餐", depth: 0, enabled: true, config: {
+          { id: "trial-t2-carousel", type: "Carousel Cards", label: "多张轮播图", content: "Slide 1: 免费体验HelloTalk会员\nSlide 2: 到期前提醒\nSlide 3: 选择试用结束后的套餐", depth: 0, enabled: true, config: {
             variant: "onboarding-3slides",
             currentSlide: 0,
-            slides: [
-              {
-                id: "slide-1",
-                title: "免费体验HelloTalk会员",
-                items: [
-                  { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
-                  { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
-                  { title: "更多曝光", desc: "专属身份特权，让更多人看到你", icon: "bolt" },
-                  { title: "无广告", desc: "更沉浸专心的学语言！", icon: "ad" },
-                ],
-              },
-              {
-                id: "slide-2",
-                title: "到期前提醒",
-                timeline: [
-                  { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
-                  { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
-                  { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
-                ],
-              },
-              {
-                id: "slide-3",
-                title: "选择试用结束后的套餐",
-                tiers: [
-                  { name: "12 个月", monthly: "¥40.67/ 月", total: "¥488", discount: "48% OFF", badge: "免费试用", hasTrial: true },
-                  { name: "1 个月", monthly: "¥78/ 月", total: "", discount: "", badge: "", hasTrial: false },
-                ],
-              },
+            slide1Title: "免费体验HelloTalk会员",
+            slide1Items: [
+              { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
+              { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
+              { title: "更多曝光", desc: "专属身份特权，让更多人看到你", icon: "zap" },
+              { title: "无广告", desc: "更沉浸专心的学语言！", icon: "ad" },
             ],
+            slide2Title: "到期前提醒",
+            slide2Timeline: [
+              { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
+              { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
+              { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
+            ],
+            slide3Title: "选择试用结束后的套餐",
+            slide3Yearly: { name: "12 个月", monthly: "¥40.67/ 月", total: "¥488", discount: "48% OFF", badge: "免费试用" },
+            slide3Monthly: { name: "1 个月", monthly: "¥78/ 月" },
+            slide3SafetyNote: "可随时在 App Store 取消",
           } },
           { id: "trial-t2-safenote", type: "Text", label: "安全取消说明", content: "订阅可随时取消，无需支付任何费用", depth: 0, enabled: true, config: { variant: "safety-pill" } },
           { id: "trial-t2-purchase", type: "Purchase Button", label: "购买按钮", content: "开启3天 VIP免费试用", depth: 0, enabled: true, config: { label: "购买按钮", color: "#6144E8" } },
@@ -3833,12 +3870,41 @@ function PreviewElement({
   }
 
   if (node.type === "Carousel Cards") {
-    if (node.config?.variant === "onboarding-3slides" || node.id === "trial-t2-carousel") {
+    if (node.config?.variant === "onboarding-3slides" || node.id === "trial-t2-carousel" || node.label === "多张轮播图" || node.label?.includes("多张轮播图")) {
       const curSlide = (onboardingCarouselSlide ?? carouselIndex) % 3;
       const setCurSlide = (idx) => {
         setOnboardingCarouselSlide?.(idx);
         setCarouselIndex(idx);
       };
+
+      const s1Title = node.config?.slide1Title || "免费体验HelloTalk会员";
+      const s1Items = node.config?.slide1Items || [
+        { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
+        { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
+        { title: "更多曝光", desc: "专属身份特权，让更多人看到你", icon: "zap" },
+        { title: "无广告", desc: "更沉浸专心的学语言！", icon: "ad" },
+      ];
+
+      const s2Title = node.config?.slide2Title || "到期前提醒";
+      const s2Timeline = node.config?.slide2Timeline || [
+        { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
+        { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
+        { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
+      ];
+
+      const s3Title = node.config?.slide3Title || "选择试用结束后的套餐";
+      const s3Yearly = node.config?.slide3Yearly || {
+        name: "12 个月",
+        monthly: "¥40.67/ 月",
+        total: "¥488",
+        discount: "48% OFF",
+        badge: "免费试用",
+      };
+      const s3Monthly = node.config?.slide3Monthly || {
+        name: "1 个月",
+        monthly: "¥78/ 月",
+      };
+      const s3SafetyNote = node.config?.slide3SafetyNote || "可随时在 App Store 取消";
 
       return wrap(
         <div style={{ margin: "2px 0 6px" }}>
@@ -3846,45 +3912,42 @@ function PreviewElement({
             {curSlide === 0 && (
               <>
                 <h4 className="ht-carousel-title">
-                  免费体验HelloTalk会员
+                  {s1Title}
                 </h4>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, padding: "2px 2px 4px" }}>
-                  {[
-                    {
-                      title: "翻译",
-                      desc: "随聊随翻，提高你的词汇量",
-                      icon: <span style={{ fontSize: 13, fontWeight: 800 }}>文A</span>,
-                    },
-                    {
-                      title: "多语言",
-                      desc: "150种语言随时添加和切换",
-                      icon: <Globe size={18} />,
-                    },
-                    {
-                      title: "更多曝光",
-                      desc: "专属身份特权，让更多人看到你",
-                      icon: <Zap size={18} fill="#6144e8" />,
-                    },
-                    {
-                      title: "无广告",
-                      desc: "更沉浸专心的学语言！",
-                      icon: (
+                  {s1Items.map((it, i) => {
+                    let iconElem = <span style={{ fontSize: 13, fontWeight: 800 }}>文A</span>;
+                    if (it.icon === "globe" || (it.title && it.title.includes("多语言"))) {
+                      iconElem = <Globe size={18} />;
+                    } else if (it.icon === "zap" || (it.title && it.title.includes("曝光"))) {
+                      iconElem = <Zap size={18} fill="#6144e8" />;
+                    } else if (it.icon === "ad" || (it.title && it.title.includes("广告"))) {
+                      iconElem = (
                         <div style={{ border: "1.5px solid #6144e8", borderRadius: 4, padding: "1px 2px", fontSize: 9.5, fontWeight: 900, lineHeight: 1 }}>
                           Ad
                         </div>
-                      ),
-                    },
-                  ].map((it, i) => (
-                    <div key={i} className="ht-privilege-item" style={{ padding: "6px 2px" }}>
-                      <div className="ht-privilege-icon-box">
-                        {it.icon}
+                      );
+                    } else if (it.icon === "crown") {
+                      iconElem = (
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
+                          <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V17H19V19Z" />
+                        </svg>
+                      );
+                    } else if (it.icon && it.icon !== "文A") {
+                      iconElem = <span style={{ fontSize: 16 }}>{it.icon}</span>;
+                    }
+                    return (
+                      <div key={i} className="ht-privilege-item" style={{ padding: "6px 2px" }}>
+                        <div className="ht-privilege-icon-box">
+                          {iconElem}
+                        </div>
+                        <div className="ht-privilege-info">
+                          <strong>{it.title}</strong>
+                          <span>{it.desc}</span>
+                        </div>
                       </div>
-                      <div className="ht-privilege-info">
-                        <strong>{it.title}</strong>
-                        <span>{it.desc}</span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </>
             )}
@@ -3892,41 +3955,25 @@ function PreviewElement({
             {curSlide === 1 && (
               <>
                 <h4 className="ht-carousel-title">
-                  到期前提醒
+                  {s2Title}
                 </h4>
                 <div style={{ display: "flex", flexDirection: "column", gap: 14, padding: "8px 4px 6px" }}>
-                  {[
-                    {
-                      day: "Day 1",
-                      desc: "成为HelloTalk会员，享受学习与交流的乐趣",
-                      icon: (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
-                          <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V17H19V19Z" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      day: "Day 2",
-                      desc: "收到体验即将结束的通知",
-                      icon: (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
-                          <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" />
-                        </svg>
-                      ),
-                    },
-                    {
-                      day: "Day 3",
-                      desc: "24小时前取消则无需支付任何费用，否则当日扣款",
-                      icon: (
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
-                          <path d="M11.99 2C6.47 2 2 6.48 2 12C2 17.52 6.47 22 11.99 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 11.99 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" />
-                        </svg>
-                      ),
-                    },
-                  ].map((step, idx) => (
+                  {s2Timeline.map((step, idx) => (
                     <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
                       <div className="ht-privilege-icon-box">
-                        {step.icon}
+                        {step.icon === "crown" ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
+                            <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V17H19V19Z" />
+                          </svg>
+                        ) : step.icon === "bell" ? (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
+                            <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" />
+                          </svg>
+                        ) : (
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="#6144E8">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12C2 17.52 6.47 22 11.99 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 11.99 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" />
+                          </svg>
+                        )}
                       </div>
                       <div style={{ flex: 1 }}>
                         <div style={{ fontSize: 14.5, fontWeight: 800, color: "#1f2937", lineHeight: 1.3 }}>
@@ -3945,7 +3992,7 @@ function PreviewElement({
             {curSlide === 2 && (
               <>
                 <h4 className="ht-carousel-title">
-                  选择试用结束后的套餐
+                  {s3Title}
                 </h4>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: "8px 2px 4px" }}>
                   {/* Option 1: 12 个月 */}
@@ -3956,15 +4003,15 @@ function PreviewElement({
                       onSelectOnboardingTier?.(0);
                     }}
                   >
-                    <div className="ht-tier-badge-pill">免费试用</div>
+                    {s3Yearly.badge && <div className="ht-tier-badge-pill">{s3Yearly.badge}</div>}
                     <div className="ht-tier-content-row">
                       <div className="ht-tier-col-left">
-                        <span className="ht-tier-title-main">12 个月</span>
-                        <span className="ht-tier-price-sub">¥488</span>
+                        <span className="ht-tier-title-main">{s3Yearly.name || "12 个月"}</span>
+                        {s3Yearly.total && <span className="ht-tier-price-sub">{s3Yearly.total}</span>}
                       </div>
                       <div className="ht-tier-col-right">
-                        <span className="ht-tier-price-main">¥40.67/ 月</span>
-                        <span className="ht-tier-discount-pill">48% OFF</span>
+                        <span className="ht-tier-price-main">{s3Yearly.monthly || "¥40.67/ 月"}</span>
+                        {s3Yearly.discount && <span className="ht-tier-discount-pill">{s3Yearly.discount}</span>}
                       </div>
                     </div>
                   </div>
@@ -3979,13 +4026,19 @@ function PreviewElement({
                   >
                     <div className="ht-tier-content-row">
                       <div className="ht-tier-col-left">
-                        <span className="ht-tier-title-main">1 个月</span>
+                        <span className="ht-tier-title-main">{s3Monthly.name || "1 个月"}</span>
                       </div>
                       <div className="ht-tier-col-right">
-                        <span className="ht-tier-price-main">¥78/ 月</span>
+                        <span className="ht-tier-price-main">{s3Monthly.monthly || "¥78/ 月"}</span>
                       </div>
                     </div>
                   </div>
+
+                  {s3SafetyNote && (
+                    <div style={{ textAlign: "center", fontSize: 11.5, color: "#9ca3af", marginTop: 2 }}>
+                      {s3SafetyNote}
+                    </div>
+                  )}
                 </div>
               </>
             )}
@@ -4008,16 +4061,66 @@ function PreviewElement({
       );
     }
 
+    const privilegeMode = node.config?.privilegeMode || "carousel";
     const activePrivileges = node.config?.privileges
-      ? node.config.privileges.filter((p) => p.show && p.carousel)
+      ? (privilegeMode === "list"
+          ? node.config.privileges.filter((p) => p.show)
+          : node.config.privileges.filter((p) => p.show && p.carousel))
       : [];
-    const cards = activePrivileges.length > 0
+    const allItems = activePrivileges.length > 0
       ? activePrivileges.map((p) => ({ title: p.name, desc: p.desc, icon: p.icon }))
       : (node.content || "").split("\n").filter(Boolean).map((line) => {
           const [title, desc] = line.split("|");
           return { title, desc, icon: "✨" };
         });
 
+    if (privilegeMode === "list") {
+      return wrap(
+        <div
+          className="preview-privilege-list-wrap"
+          style={{
+            background: "#ffffff",
+            borderRadius: 14,
+            padding: "12px 14px",
+            margin: "4px 0 12px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.06)",
+          }}
+        >
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {allItems.slice(0, 5).map((item, idx) => (
+              <div key={idx} style={{ display: "flex", alignItems: "flex-start", gap: 10 }}>
+                <span style={{ fontSize: 16, lineHeight: 1.2, marginTop: 1 }}>{item.icon || "💎"}</span>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 12.5, fontWeight: 700, color: "#1e293b", lineHeight: 1.3 }}>
+                    {item.title}
+                  </div>
+                  <div style={{ fontSize: 10.5, color: "#64748b", lineHeight: 1.4, marginTop: 2 }}>
+                    {item.desc}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          {allItems.length > 5 && (
+            <div
+              style={{
+                textAlign: "center",
+                fontSize: 11,
+                color: "#6366f1",
+                fontWeight: 600,
+                paddingTop: 8,
+                marginTop: 6,
+                borderTop: "1px solid #f1f5f9",
+              }}
+            >
+              查看全部 {allItems.length} 项特权 &gt;
+            </div>
+          )}
+        </div>
+      );
+    }
+
+    const cards = allItems;
     const safeIndex = cards.length > 0 ? carouselIndex % cards.length : 0;
     const currentCard = cards[safeIndex] || { title: "暂无轮播特权", desc: "请在右侧属性面板勾选开启特权轮播", icon: "✨" };
 
@@ -4618,42 +4721,52 @@ function PreviewElement({
   }
 
   if (node.type === "Toggle") {
-    if (node.config?.variant === "trial-timeline" || node.id === "trial-t1-timeline") {
-      const steps = [
-        {
-          title: "开始试用",
-          day: "今天",
-          icon: (
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
-              <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V17H19V19Z" />
-            </svg>
-          ),
-        },
-        {
-          title: "即将结束通知",
-          day: "第2天",
-          icon: (
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
-              <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" />
-            </svg>
-          ),
-        },
-        {
-          title: "试用结束",
-          day: "第3天",
-          icon: (
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
-              <path d="M11.99 2C6.47 2 2 6.48 2 12C2 17.52 6.47 22 11.99 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 11.99 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" />
-            </svg>
-          ),
-        },
+    if (node.config?.variant === "trial-timeline" || node.id === "trial-t1-timeline" || node.label === "3天试用时间轴" || node.label?.includes("试用时间轴")) {
+      let steps = [
+        { day: "今天", title: "开始试用", icon: "crown" },
+        { day: "第2天", title: "即将结束通知", icon: "bell" },
+        { day: "第3天", title: "试用结束", icon: "clock" },
       ];
+      if (Array.isArray(node.config?.steps) && node.config.steps.length > 0) {
+        steps = node.config.steps;
+      } else if (node.content) {
+        const lines = node.content.split("\n").filter(Boolean);
+        if (lines.length >= 3) {
+          steps = lines.slice(0, 3).map((l, idx) => {
+            const [day = `第${idx + 1}阶段`, title = `阶段${idx + 1}`] = l.split("|");
+            return {
+              day: day.trim(),
+              title: title.trim(),
+              icon: idx === 0 ? "crown" : idx === 1 ? "bell" : "clock",
+            };
+          });
+        }
+      }
+
       return wrap(
         <div className="ht-trial-timeline">
           {steps.map((step, idx) => (
             <React.Fragment key={idx}>
               <div className="ht-timeline-step">
-                <div className="ht-timeline-step-icon">{step.icon}</div>
+                <div className="ht-timeline-step-icon">
+                  {step.icon === "bell" ? (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
+                      <path d="M12 22C13.1 22 14 21.1 14 20H10C10 21.1 10.9 22 12 22ZM18 16V11C18 7.93 16.37 5.36 13.5 4.68V4C13.5 3.17 12.83 2.5 12 2.5C11.17 2.5 10.5 3.17 10.5 4V4.68C7.64 5.36 6 7.92 6 11V16L4 18V19H20V18L18 16ZM16 17H8V11C8 8.52 9.51 6.5 12 6.5C14.49 6.5 16 8.52 16 11V17Z" />
+                    </svg>
+                  ) : step.icon === "clock" ? (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
+                      <path d="M11.99 2C6.47 2 2 6.48 2 12C2 17.52 6.47 22 11.99 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 11.99 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12.5 7H11V13L16.25 16.15L17 14.92L12.5 12.25V7Z" />
+                    </svg>
+                  ) : step.icon === "check" ? (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                    </svg>
+                  ) : (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="#6144e8">
+                      <path d="M5 16L3 5L8.5 10L12 4L15.5 10L21 5L19 16H5ZM19 19C19 19.5523 18.5523 20 18 20H6C5.44772 20 5 19.5523 5 19V17H19V19Z" />
+                    </svg>
+                  )}
+                </div>
                 <div className="ht-timeline-step-title">{step.title}</div>
                 <div className="ht-timeline-step-day">{step.day}</div>
               </div>
@@ -5591,12 +5704,29 @@ function BuilderProperties({
               notify={notify}
               themeConfig={activeSubTemplate?.theme || null}
             />
+          ) : (active.config?.variant === "onboarding-3slides" || active.id === "trial-t2-carousel" || active.label === "多张轮播图" || active.label?.includes("多张轮播图")) ? (
+            <OnboardingMultiSlidesManager
+              node={active}
+              updateNode={updateNode}
+              notify={notify}
+              activeSlide={onboardingCarouselSlide}
+              onSlideChange={(idx) => {
+                setOnboardingCarouselSlide?.(idx);
+                setCarouselIndex?.(idx);
+              }}
+            />
+          ) : (active.config?.variant === "trial-timeline" || active.id === "trial-t1-timeline" || active.label === "3天试用时间轴" || active.label?.includes("试用时间轴")) ? (
+            <TrialTimelineManager
+              node={active}
+              updateNode={updateNode}
+              notify={notify}
+            />
           ) : type === "Carousel Cards" ? (
             <PrivilegeSwitchManager
               node={active}
               updateNode={updateNode}
               notify={notify}
-              defaultMode="carousel"
+              defaultMode={active.config?.privilegeMode || "carousel"}
             />
           ) : type === "Comparison Table" ? (
             <ComparisonTableManager
@@ -5605,7 +5735,7 @@ function BuilderProperties({
               notify={notify}
               onSwitchCompareTab={setActiveCompareTab}
             />
-          ) : (type === "Products" || type === "Dismiss Button" || type === "Header" || type === "Subhead" || type === "Hero Image" || type === "Timer" || type === "Purchase Button" || type === "Switch Tabs" || type === "User Profile" || type === "Dynamic Metrics" || type === "Mascot Illustration") ? null : (
+          ) : (type === "Products" || type === "Dismiss Button" || type === "Header" || type === "Subhead" || type === "Hero Image" || type === "Timer" || type === "Purchase Button" || type === "Switch Tabs" || type === "User Profile" || type === "Dynamic Metrics" || type === "Mascot Illustration" || type === "Toggle") ? null : (
             <Field label="文本内容">
               <textarea
                 rows={4}
