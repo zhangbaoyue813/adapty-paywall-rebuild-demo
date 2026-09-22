@@ -3171,7 +3171,7 @@ function TimerPreview({ node, themeConfig, isDarkTheme = false }) {
   const label = rawLabel.replace(/[：:]/g, "").trim();
 
   // 1. 极简纯文本 (原版) - clean-text
-  if (node.config?.variant === "clean-text" || (themeConfig?.subTemplate === "tpl-1" && !node.config?.variant) || node.id === "t1-timer") {
+  if (node.config?.variant === "clean-text" || (!node.config?.variant && (themeConfig?.subTemplate === "tpl-1" || node.id === "t1-timer"))) {
     return (
       <div style={{ textAlign: "center", padding: "8px 0 6px" }}>
         <span style={{ fontSize: 15, fontWeight: 700, color: mainFontColor, letterSpacing: "0.02em" }}>
@@ -3765,7 +3765,7 @@ function PreviewElement({
     if (node.id?.includes("cp") || currentTemplate?.id === "ht-content-paywall") {
       return wrap(
         <div style={{ textAlign: "left", margin: "2px 0 8px", padding: "0 2px" }}>
-          <p style={{ fontSize: 13, color: "#475569", fontWeight: 500, margin: 0 }}>
+          <p style={{ fontSize: 13, color: node.config?.color || "#475569", fontWeight: 500, margin: 0 }}>
             {renderInterpolated(node.content)}
           </p>
         </div>
@@ -3803,7 +3803,7 @@ function PreviewElement({
     }
 
     return wrap(
-      <p className="preview-ht-subhead" style={{ textAlign: "center", margin: "2px 0 8px", color: "#64748b" }}>
+      <p className="preview-ht-subhead" style={{ textAlign: "center", margin: "2px 0 8px", color: node.config?.color || "#64748b" }}>
         {renderInterpolated(node.content)}
       </p>
     );
@@ -4606,8 +4606,9 @@ function PreviewElement({
       const priceNow = node.config?.priceNow || themeConfig?.priceNow || "折扣价 ¥388/年";
       const priceOriginal = node.config?.priceOriginal || themeConfig?.priceOriginal || "原价 ¥488/年";
 
+      const isCardMode = node.config?.displayMode === "card";
       // 模板 1 (全屏平铺版 / 极简纯文本): 极简纯文本，左对齐，无外框卡片
-      if (node.config?.displayMode === "clean-text" || (themeConfig?.subTemplate === "tpl-1" && node.config?.displayMode !== "card") || node.id === "t1-products") {
+      if (!isCardMode && (node.config?.displayMode === "clean-text" || themeConfig?.subTemplate === "tpl-1" || node.id === "t1-products")) {
         return wrap(
           <div style={{ textAlign: "left", margin: "6px 0 16px" }}>
             <div style={{ fontSize: 17, fontWeight: 700, color: "#3D2E3F", marginBottom: 3, letterSpacing: "-0.01em" }}>
@@ -4828,7 +4829,14 @@ function PreviewElement({
               boxShadow: `0 4px 14px ${color}40`,
             }}
           >
-            {text}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
+              <span>{text}</span>
+              {node.config?.subtitle && (
+                <span style={{ fontSize: 10, fontWeight: 500, opacity: 0.9 }}>
+                  {node.config.subtitle}
+                </span>
+              )}
+            </div>
           </button>
         </div>
       );
@@ -4838,7 +4846,7 @@ function PreviewElement({
       const btnText = isTrialTier
         ? (node.content || themeConfig?.btnText || "开启3天 VIP免费试用")
         : (themeConfig?.btnTextAlt || "继续");
-      const btnColor = themeConfig?.btnColor || "#6144e8";
+      const btnColor = node.config?.color || themeConfig?.btnColor || "#6144e8";
       const btnTextColor = themeConfig?.btnTextColor || "#FFFFFF";
 
       return wrap(
@@ -4971,49 +4979,15 @@ function PreviewElement({
     if (isOnboardingPage && themeConfig?.showDismissBtn === false) {
       return null;
     }
-    if (node.config?.position === "top-left" || node.id?.includes("cp")) {
-      return (
-        <div
-          className={`preview-node ${active ? "selected" : ""}`}
-          onClick={select}
-          style={{
-            display: "flex",
-            justifyContent: "flex-start",
-            margin: "0 0 6px",
-            padding: "0 2px",
-          }}
-        >
-          <button
-            type="button"
-            style={{
-              background: "transparent",
-              border: "none",
-              padding: 2,
-              cursor: "pointer",
-              color: "#1E293B",
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-            title="关闭弹窗"
-          >
-            <X size={18} strokeWidth={2.4} />
-          </button>
-        </div>
-      );
-    }
-    if (node.config?.variant === "circle-close") {
-      return (
-        <div
-          className={`preview-node ${active ? "selected" : ""}`}
-          onClick={select}
-          style={{
-            position: "absolute",
-            top: 14,
-            right: 14,
-            zIndex: 20,
-          }}
-        >
+
+    const variant = node.config?.variant || (node.content === "✕" ? "close-icon" : "text-link");
+    const pos = node.config?.position || (variant === "circle-close" ? "top-right" : (variant === "text-link" ? "center" : "top-left"));
+    const justify = pos === "top-right" ? "flex-end" : pos === "center" ? "center" : "flex-start";
+
+    // 1. ✕ 圆形 (半窗)
+    if (variant === "circle-close") {
+      return wrap(
+        <div style={{ display: "flex", justifyContent: justify, margin: "0 0 6px", padding: "0 2px" }}>
           <button
             type="button"
             style={{
@@ -5022,26 +4996,26 @@ function PreviewElement({
               borderRadius: "50%",
               background: "#F1F5F9",
               color: "#64748B",
-              border: "none",
+              border: "1px solid rgba(0,0,0,0.06)",
               padding: 0,
               cursor: "pointer",
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
+              boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
             }}
-            title="关闭页面"
+            title="关闭"
           >
             <X size={15} strokeWidth={2.4} />
           </button>
         </div>
       );
     }
-    const isCloseIcon = node.config?.variant === "close-icon" || node.content === "✕" || node.id === "t1-close" || node.id?.includes("close");
-    if (isCloseIcon) {
-      const pos = node.config?.position || "top-left";
-      const justify = pos === "top-right" ? "flex-end" : pos === "center" ? "center" : "flex-start";
+
+    // 2. ✕ 图标 (全屏)
+    if (variant === "close-icon" || node.content === "✕") {
       return wrap(
-        <div style={{ display: "flex", justifyContent: justify, padding: "2px 2px 8px" }}>
+        <div style={{ display: "flex", justifyContent: justify, margin: "0 0 6px", padding: "0 2px" }}>
           <button
             type="button"
             style={{
@@ -5049,20 +5023,22 @@ function PreviewElement({
               border: "none",
               padding: 4,
               cursor: "pointer",
-              color: node.config?.color || themeConfig?.mainFontColor || ((currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare") ? (activeCompareTab === 1 ? "#FFFFFF" : "#111827") : "#2D1832"),
+              color: node.config?.color || themeConfig?.mainFontColor || "#1E293B",
               display: "inline-flex",
               alignItems: "center",
               justifyContent: "center",
             }}
-            title="关闭页面"
+            title="关闭"
           >
-            <X size={22} strokeWidth={2.4} />
+            <X size={20} strokeWidth={2.4} />
           </button>
         </div>
       );
     }
+
+    // 3. 纯文本链接
     return wrap(
-      <div style={{ textAlign: "center", padding: "4px 0 8px" }}>
+      <div style={{ display: "flex", justifyContent: justify, padding: "4px 2px 8px" }}>
         <button
           type="button"
           onClick={(e) => {
@@ -5164,8 +5140,10 @@ function PreviewElement({
   }
 
   if (node.type === "Hero Image") {
-    if (currentTemplate?.id === "ht-vip-pop" || node.config?.variant === "media-placeholder" || node.id === "pop-hero") {
-      const customImg = node.config?.imageUrl;
+    const bgMode = node.config?.bgMode;
+
+    if (bgMode === "image" || node.config?.customBgImage || node.config?.variant === "media-placeholder" || node.id === "pop-hero") {
+      const customImg = node.config?.customBgImage || node.config?.imageUrl;
       return wrap(
         <div
           style={{
@@ -5182,12 +5160,86 @@ function PreviewElement({
             fontWeight: 600,
             border: customImg ? "none" : "1px solid #CBD5E1",
             overflow: "hidden",
+            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
           }}
         >
           {!customImg && <span>媒体 / 背景图展示区</span>}
         </div>
       );
     }
+
+    if (bgMode === "gradient" || node.config?.gradientBg) {
+      const grad = node.config?.gradientBg || "linear-gradient(135deg, #0284c7 0%, #0369a1 100%)";
+      return wrap(
+        <div
+          style={{
+            width: "100%",
+            height: 110,
+            borderRadius: 12,
+            background: grad,
+            margin: "4px 0 10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "#ffffff",
+            fontWeight: 700,
+            fontSize: 13,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          }}
+        >
+          <Sparkles size={16} style={{ marginRight: 6 }} />
+          <span>{node.config?.sloganText || node.content || "HelloTalk VIP 特权俱乐部"}</span>
+        </div>
+      );
+    }
+
+    if (bgMode === "illustration" || node.config?.sloganText || node.config?.themeColor || node.config?.bubbleBg) {
+      const slogan = node.config?.sloganText || "寻找身边母语者";
+      const bubbleBg = node.config?.bubbleBg || "#2563eb";
+      const themeKey = node.config?.themeColor || "orange";
+      const themeGradientMap = {
+        orange: "linear-gradient(135deg, #ea580c 0%, #f97316 100%)",
+        gold: "linear-gradient(135deg, #1e1b4b 0%, #312e81 100%)",
+        blue: "linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)",
+        purple: "linear-gradient(135deg, #831843 0%, #ec4899 100%)",
+      };
+      const cardBg = themeGradientMap[themeKey] || themeGradientMap.orange;
+
+      return wrap(
+        <div
+          style={{
+            width: "100%",
+            padding: "16px 14px",
+            borderRadius: 12,
+            background: cardBg,
+            margin: "4px 0 10px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 4px 12px rgba(0,0,0,0.08)",
+          }}
+        >
+          <div
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "6px 14px",
+              background: bubbleBg,
+              borderRadius: 20,
+              color: "#ffffff",
+              fontSize: 12,
+              fontWeight: 700,
+              boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+            }}
+          >
+            <span style={{ fontSize: 14 }}>🌍</span>
+            <span>{slogan}</span>
+          </div>
+        </div>
+      );
+    }
+
     if (themeConfig) {
       const isTpl2 = themeConfig.subTemplate === "tpl-2";
       const otherColor = themeConfig.otherColor || (isTpl2 ? "#F59E0B" : "#FF4D6D");
