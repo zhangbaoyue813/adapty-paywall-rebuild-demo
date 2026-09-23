@@ -621,9 +621,10 @@ const getNodeSubRole = (node) => {
   }
 
   // 对比与时间轴
-  if (type === "Dynamic Metrics" || raw.includes("指标") || node.id?.includes("metrics")) return "动态指标";
-  if (node.config?.variant === "trial-timeline" || (type === "Toggle" && node.id?.includes("timeline")) || raw.includes("试用时间轴") || (raw.includes("时间轴") && !raw.startsWith("对比与时间轴"))) return "3天试用时间轴";
-  if (type === "Comparison Table" || raw.includes("对比表格") || raw.includes("对比矩阵") || (raw.includes("对比") && !raw.startsWith("对比与时间轴"))) return "对比表格";
+  if (type === "Comparison Table" || raw.includes("对比表格") || raw.includes("对比矩阵") || raw.includes("(对比表格)")) return "对比表格";
+  if (type === "Dynamic Metrics" || raw.includes("动态指标") || raw.includes("(动态指标)") || raw.includes("指标")) return "动态指标";
+  if (node.config?.variant === "trial-timeline" || type === "Toggle" || raw.includes("试用时间轴") || raw.includes("时间轴")) return "3天试用时间轴";
+  if (raw.startsWith("对比与时间轴")) return "对比表格";
 
   // 文本与排版
   if (type === "Subhead" || raw.includes("副标题")) return "副标题";
@@ -3170,6 +3171,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                             <PreviewElement
                               key={node.id}
                               node={node}
+                              allNodes={currentEffectiveNodes}
                               active={node.id === activeNode}
                               onSelect={(id) => {
                                 setActiveNode(id);
@@ -3215,6 +3217,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                             <PreviewElement
                               key={node.id}
                               node={node}
+                              allNodes={currentEffectiveNodes}
                               active={node.id === activeNode}
                               onSelect={(id) => {
                                 setActiveNode(id);
@@ -3262,6 +3265,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                         <PreviewElement
                           key={node.id}
                           node={node}
+                          allNodes={currentEffectiveNodes}
                           active={node.id === activeNode}
                           onSelect={(id) => {
                             setActiveNode(id);
@@ -3353,6 +3357,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
             ) : (
               <BuilderProperties
                 active={active}
+                allNodes={currentEffectiveNodes}
                 setBuilderTab={setBuilderTab}
                 markUnknown={markUnknown}
                 boundary={builderBoundary}
@@ -3594,7 +3599,12 @@ function PreviewElement({
   activeCompareTab = 0,
   setActiveCompareTab,
   currentSimulatedUser,
+  allNodes = [],
 }) {
+  const dismissNode = (allNodes || []).find((n) => n.type === "Dismiss Button" || n.label?.includes("关闭"));
+  const heroNode = (allNodes || []).find((n) => n.type === "Hero Image" || n.label?.includes("背景图"));
+  const effectiveClosePos = dismissNode?.config?.position || heroNode?.config?.closePosition || node.config?.position || node.config?.closePosition || "top-left";
+  const isCloseTopRight = effectiveClosePos === "top-right";
 
   const [selectedTier, setSelectedTier] = useState(0);
   const [toggleOn, setToggleOn] = useState(node.config?.defaultState === "On" || true);
@@ -3781,19 +3791,38 @@ function PreviewElement({
     const title = renderInterpolated(node.content || themeConfig?.titleText || "3天会员免费试用");
     return wrap(
       <div className="ht-wave-hero-container">
-        <div className="ht-hero-nav-bar">
+        <div className="ht-hero-nav-bar" style={{ display: "flex", alignItems: "center", position: "relative", justifyContent: isCloseTopRight ? "flex-end" : "space-between" }}>
           <button
             type="button"
             className="ht-hero-close-btn"
             title="关闭 (触发挽留弹窗)"
+            style={{
+              position: "relative",
+              zIndex: 5,
+              marginLeft: isCloseTopRight ? "auto" : 0,
+              marginRight: isCloseTopRight ? 0 : "auto",
+            }}
             onClick={(e) => {
               e.stopPropagation();
+              if (dismissNode) {
+                onSelect(dismissNode.id);
+              }
               onTriggerRetainModal?.();
             }}
           >
             <X size={18} strokeWidth={2.4} />
           </button>
-          <div className="ht-mascot-star-wrap">
+          <div className="ht-mascot-star-wrap" style={{
+            position: "absolute",
+            top: 6,
+            left: isCloseTopRight ? 14 : "auto",
+            right: isCloseTopRight ? "auto" : 14,
+            width: 78,
+            height: 78,
+            pointerEvents: "none",
+            zIndex: 3,
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}>
             <HelloTalkStarMascot size={72} />
           </div>
         </div>
@@ -3814,19 +3843,38 @@ function PreviewElement({
     const lines = raw.split("\n");
     return wrap(
       <div className="ht-wave-hero-container">
-        <div className="ht-hero-nav-bar">
+        <div className="ht-hero-nav-bar" style={{ display: "flex", alignItems: "center", position: "relative", justifyContent: isCloseTopRight ? "flex-end" : "space-between" }}>
           <button
             type="button"
             className="ht-hero-close-btn"
             title="关闭 (触发挽留弹窗)"
+            style={{
+              position: "relative",
+              zIndex: 5,
+              marginLeft: isCloseTopRight ? "auto" : 0,
+              marginRight: isCloseTopRight ? 0 : "auto",
+            }}
             onClick={(e) => {
               e.stopPropagation();
+              if (dismissNode) {
+                onSelect(dismissNode.id);
+              }
               onTriggerRetainModal?.();
             }}
           >
             <X size={18} strokeWidth={2.4} />
           </button>
-          <div className="ht-mascot-star-wrap">
+          <div className="ht-mascot-star-wrap" style={{
+            position: "absolute",
+            top: 6,
+            left: isCloseTopRight ? 14 : "auto",
+            right: isCloseTopRight ? "auto" : 14,
+            width: 78,
+            height: 78,
+            pointerEvents: "none",
+            zIndex: 3,
+            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
+          }}>
             <HelloTalkStarMascot size={72} />
           </div>
         </div>
@@ -4912,11 +4960,13 @@ function PreviewElement({
     }
 
     if (effectiveVariant === "3-column-tiers") {
-      const tiers = node.config?.tiers || [
-        { name: "1 个月", monthly: "¥78", total: "¥78/ 月", badge: "", save: "", isRecommended: false },
-        { name: "12 个月", monthly: "¥388", originalPrice: "¥488", total: "¥388", badge: "🔥 8折", save: "节省 59%", isRecommended: true },
-        { name: "终身", monthly: "¥798", originalPrice: "¥1698", total: "¥798", badge: "🔥 4.8折", save: "永久会员权益", isRecommended: false },
-      ];
+      const tiers = (Array.isArray(node.config?.tiers) && node.config.tiers.length >= 3)
+        ? node.config.tiers
+        : [
+            { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", badge: "", save: "", isRecommended: false },
+            { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", badge: "推荐", save: "省54%", isRecommended: true },
+            { name: "终身", monthly: "¥798", total: "一次性购买", badge: "", save: "永久有效", isRecommended: false },
+          ];
       const curSelected = selectedTier < tiers.length ? selectedTier : (tiers.findIndex(t => t.isRecommended) >= 0 ? tiers.findIndex(t => t.isRecommended) : 1);
       const isPurpleTheme = currentTemplate?.id === "ht-vip-pop" || node.config?.themeColor === "purple" || (!themeConfig?.primaryColor && !themeConfig?.subTemplate);
       const themePrimary = isPurpleTheme ? "#7C5CFC" : (themeConfig?.primaryColor || (themeConfig?.subTemplate === "pkg-tpl-2" ? "#F59E0B" : "#0284C7"));
@@ -5086,7 +5136,7 @@ function PreviewElement({
   }
 
   if (node.type === "Toggle") {
-    if (node.config?.variant === "trial-timeline" || node.id === "trial-t1-timeline" || node.label === "3天试用时间轴" || node.label?.includes("试用时间轴")) {
+    if (node.config?.variant === "trial-timeline" || node.label?.includes("试用时间轴") || node.label?.includes("时间轴") || !node.config?.variant) {
       let steps = [
         { day: "今天", title: "开始试用", icon: "crown" },
         { day: "第2天", title: "即将结束通知", icon: "bell" },
@@ -5693,6 +5743,7 @@ function PreviewElement({
 
 function BuilderProperties({
   active,
+  allNodes = [],
   setBuilderTab,
   markUnknown,
   boundary,
@@ -5763,10 +5814,10 @@ function BuilderProperties({
 
   // 2. 对比与时间轴 (Comparison, Timeline & Metrics)
   const currentCompareRole = (() => {
-    if (active.type === "Dynamic Metrics" || active.id?.includes("metrics") || subRole === "动态指标") return "Dynamic Metrics";
-    if (active.config?.variant === "trial-timeline" || active.id?.includes("timeline") || subRole === "3天试用时间轴") return "Trial Timeline";
-    if (active.type === "Comparison Table" || subRole === "对比表格") return "Comparison Table";
-    return "Dynamic Metrics";
+    if (active.type === "Comparison Table" || active.config?.variant === "comparison-table" || subRole === "对比表格") return "Comparison Table";
+    if (active.type === "Dynamic Metrics" || subRole === "动态指标") return "Dynamic Metrics";
+    if (active.config?.variant === "trial-timeline" || active.type === "Toggle" || subRole === "3天试用时间轴") return "Trial Timeline";
+    return "Comparison Table";
   })();
 
   const currentCompareRoleLabel = {
@@ -5853,25 +5904,31 @@ function BuilderProperties({
       ...(active.config || {}),
       variant: targetVariant,
     };
-    if (targetVariant === "3-column-tiers" && !nextConfig.tiers) {
-      nextConfig.tiers = [
-        { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
-        { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
-        { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },
-      ];
-    } else if (targetVariant === "onboarding-dual-tiers" && !nextConfig.tiers) {
-      nextConfig.tiers = [
-        { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
-        { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
-      ];
+    if (targetVariant === "3-column-tiers") {
+      if (!nextConfig.tiers || nextConfig.tiers.length !== 3) {
+        nextConfig.tiers = [
+          { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "", isRecommended: false },
+          { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
+          { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效", isRecommended: false },
+        ];
+      }
+    } else if (targetVariant === "onboarding-dual-tiers") {
+      if (!nextConfig.tiers || nextConfig.tiers.length !== 2) {
+        nextConfig.tiers = [
+          { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true, ctaText: "开启3天 VIP免费试用" },
+          { name: "月费会员", monthly: "¥78.00/月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false, ctaText: "继续" },
+        ];
+      }
     } else if (targetVariant === "entry-price-tier") {
       if (!nextConfig.priceNow) nextConfig.priceNow = "折扣价 ¥388/年";
       if (!nextConfig.priceOriginal) nextConfig.priceOriginal = "原价 ¥488/年";
-    } else if (targetVariant === "vertical-list-tiers" && !nextConfig.listTiers) {
-      nextConfig.listTiers = [
-        { name: "连续包年 VIP", price: "¥198/年", daily: "¥0.54/天", tag: "推荐", isDefault: true },
-        { name: "连续包月 VIP", price: "¥28/月", daily: "¥0.93/天", tag: "月付", isDefault: false },
-      ];
+    } else if (targetVariant === "vertical-list-tiers") {
+      if (!nextConfig.listTiers || nextConfig.listTiers.length < 2) {
+        nextConfig.listTiers = [
+          { name: "连续包年 VIP", price: "¥198/年", daily: "¥0.54/天", tag: "推荐", isDefault: true },
+          { name: "连续包月 VIP", price: "¥28/月", daily: "¥0.93/天", tag: "月付", isDefault: false },
+        ];
+      }
     }
     updateNode(active.id, {
       config: nextConfig,
@@ -6629,6 +6686,48 @@ function BuilderProperties({
                   </Field>
                 </div>
               )}
+
+              {/* 全屏/模版背景图关闭按钮位置快速配置 */}
+              {(isOnboardingPage || active.config?.closeBtn || active.config?.variant?.includes("wave") || active.config?.variant?.includes("carousel")) && (
+                <div style={{ marginTop: 6, paddingTop: 8, borderTop: "1px dashed #cbd5e1" }}>
+                  <Field label="顶部关闭按钮显示位置">
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                      {[
+                        { id: "top-left", label: "左上角" },
+                        { id: "top-right", label: "右上角" },
+                      ].map((pos) => {
+                        const curPos = active.config?.closePosition || (allNodes?.find(n => n.type === "Dismiss Button")?.config?.position) || "top-left";
+                        const isPosActive = curPos === pos.id;
+                        return (
+                          <button
+                            key={pos.id}
+                            type="button"
+                            style={{
+                              fontSize: 10.5,
+                              padding: "5px 6px",
+                              borderRadius: 4,
+                              border: isPosActive ? "2px solid #0284c7" : "1px solid #cbd5e1",
+                              background: isPosActive ? "#F0F9FF" : "#fff",
+                              color: isPosActive ? "#0284c7" : "#334155",
+                              fontWeight: 600,
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              updateNode(active.id, { config: { ...active.config, closePosition: pos.id } });
+                              const dismiss = allNodes?.find(n => n.type === "Dismiss Button" || n.label?.includes("关闭"));
+                              if (dismiss) {
+                                updateNode(dismiss.id, { config: { ...(dismiss.config || {}), position: pos.id } });
+                              }
+                            }}
+                          >
+                            {pos.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </Field>
+                </div>
+              )}
             </div>
           )}
 
@@ -6792,7 +6891,13 @@ function BuilderProperties({
                               fontWeight: 600,
                               cursor: "pointer",
                             }}
-                            onClick={() => updateNode(active.id, { config: { ...active.config, position: pos } })}
+                            onClick={() => {
+                              updateNode(active.id, { config: { ...active.config, position: pos } });
+                              const hero = (allNodes || []).find((n) => n.type === "Hero Image" || n.label?.includes("背景图"));
+                              if (hero) {
+                                updateNode(hero.id, { config: { ...(hero.config || {}), closePosition: pos } });
+                              }
+                            }}
                           >
                             {pos === "top-left" ? "左上角" : "右上角"}
                           </button>
@@ -7407,7 +7512,7 @@ function BuilderProperties({
               {effectiveProductsVariant === "3-column-tiers" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>横向套餐卡片配置</span>
-                  {(active.config?.tiers || [
+                  {((active.config?.tiers && active.config.tiers.length >= 3) ? active.config.tiers : [
                     { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
                     { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
                     { name: "终身", monthly: "¥798", total: "一次性购买", period: "终身", badge: "", save: "永久有效" },

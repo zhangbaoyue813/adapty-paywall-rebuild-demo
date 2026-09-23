@@ -416,71 +416,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 12, padding: "2px 0 16px" }}>
-      {/* 1. 展现版式切换（打勾清单 / 大卡片流 / 双列网格） */}
-      <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
-        <div style={{ fontSize: 11.5, fontWeight: 700, color: "#1e293b", display: "flex", alignItems: "center", gap: 6, marginBottom: 8 }}>
-          <Layers size={13} color="#6366f1" />
-          <span>特权展现版式（一键切换落地页形态）</span>
-        </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
-          {[
-            {
-              id: "carousel",
-              label: "卡片轮播",
-              sub: "大卡滑动",
-              icon: <SlidersHorizontal size={13} />,
-            },
-            {
-              id: "checklist",
-              label: "打勾清单",
-              sub: "单列打勾",
-              icon: <LayoutList size={13} />,
-            },
-            {
-              id: "grid",
-              label: "双列网格",
-              sub: "蓝色特权",
-              icon: <LayoutGrid size={13} />,
-            },
-            {
-              id: "cards",
-              label: "圆角大卡",
-              sub: "试用引导",
-              icon: <CreditCard size={13} />,
-            },
-          ].map((item) => {
-            const isActive = currentStyleVariant === item.id;
-            return (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => handleStyleChange(item.id)}
-                style={{
-                  padding: "8px 4px",
-                  borderRadius: 6,
-                  border: isActive ? "1.5px solid #6366f1" : "1px solid #e2e8f0",
-                  background: isActive ? "#f5f3ff" : "#f8fafc",
-                  color: isActive ? "#4f46e5" : "#64748b",
-                  boxShadow: isActive ? "0 1px 3px rgba(99,102,241,0.15)" : "none",
-                  cursor: "pointer",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  gap: 3,
-                  transition: "all 0.15s",
-                }}
-              >
-                <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11.5, fontWeight: isActive ? 700 : 600 }}>
-                  {item.icon} {item.label}
-                </span>
-                <span style={{ fontSize: 9.5, opacity: 0.8 }}>{item.sub}</span>
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* 2. 核心特权与权益配置（图三需求：彻底合并原已选展示与官方特权库，做成单一统一面板，清晰直观易懂） */}
+      {/* 核心特权与权益配置 */}
       <div style={{ background: "#ffffff", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
         {/* 顶部标题栏与添加按钮 */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
