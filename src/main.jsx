@@ -992,7 +992,7 @@ function createComponentNode(rawType, index) {
     };
     content = "HelloTalk VIP 会员专享";
   } else if (rawType === "操作按钮") {
-    label = "购买按钮";
+    label = "操作按钮";
     config = {
       label: "购买按钮",
       subtitle: "订阅可随时取消，无需支付任何费用",
@@ -1000,7 +1000,7 @@ function createComponentNode(rawType, index) {
     };
     content = "立即升级 VIP";
   } else if (rawType === "对比与时间轴") {
-    label = "对比表格";
+    label = "对比与时间轴";
     config = {
       variant: "comparison-table",
       compareMode: "free-vs-vip",
@@ -1042,7 +1042,7 @@ function createComponentNode(rawType, index) {
     };
     content = "3个月|¥37.33/月|¥112\n12个月|¥24.99/月|¥298|省54%|推荐\n终身|¥798|一次性购买";
   } else if (rawType === "纵向套餐列表" || rawType === "产品套餐" || type === "Products") {
-    label = "纵向套餐列表";
+    label = rawType === "产品套餐" ? "产品套餐" : "纵向套餐列表";
     config = {
       variant: "vertical-list-tiers",
       listTiers: [
@@ -2784,7 +2784,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                 const isEnabled = node.enabled !== false;
                 const cat = getNodeCategory(node);
                 const sub = getNodeSubRole(node);
-                const titleText = sub && sub !== cat ? `${cat} · ${sub}` : cat;
+                const displayName = node.customName || cat;
                 return (
                   <div
                     role="button"
@@ -2845,7 +2845,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                     )}
                     <div className="node-title" style={{ display: "flex", alignItems: "center", gap: 5, flex: 1, minWidth: 0, overflow: "hidden" }}>
                       <strong style={{ fontSize: 12, color: "#1e293b", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {(node.label && !node.label.includes("(") && node.label !== node.type) ? node.label : cat}
+                        {displayName}
                       </strong>
                     </div>
 
@@ -2866,11 +2866,11 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                       <button
                         type="button"
                         className="node-action-btn delete"
-                        title={`删除 ${titleText} 组件`}
+                        title={`删除 ${displayName} 组件`}
                         onClick={(e) => {
                           e.stopPropagation();
                           removeEffectiveNode(node.id);
-                          notify?.(`已删除组件: ${titleText}`);
+                          notify?.(`已删除组件: ${displayName}`);
                         }}
                       >
                         <Trash2 size={12} />
@@ -5694,7 +5694,7 @@ function BuilderProperties({
                     onChange={(e) => setTempName(e.target.value)}
                     onBlur={() => {
                       if (tempName.trim()) {
-                        updateNode(active.id, { label: tempName.trim() });
+                        updateNode(active.id, { customName: tempName.trim(), label: tempName.trim() });
                         notify?.(`已重命名为: ${tempName.trim()}`);
                       }
                       setIsEditingName(false);
@@ -5702,7 +5702,7 @@ function BuilderProperties({
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         if (tempName.trim()) {
-                          updateNode(active.id, { label: tempName.trim() });
+                          updateNode(active.id, { customName: tempName.trim(), label: tempName.trim() });
                           notify?.(`已重命名为: ${tempName.trim()}`);
                         }
                         setIsEditingName(false);
@@ -5724,13 +5724,13 @@ function BuilderProperties({
               ) : (
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                   <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#0f172a" }}>
-                    {(active.label && !active.label.includes("(") && active.label !== active.type) ? active.label : category}
+                    {active.customName || category}
                   </h3>
                   <button
                     type="button"
                     title="编辑组件名称"
                     onClick={() => {
-                      setTempName((active.label && !active.label.includes("(") && active.label !== active.type) ? active.label : category);
+                      setTempName(active.customName || category);
                       setIsEditingName(true);
                     }}
                     style={{
@@ -5753,10 +5753,10 @@ function BuilderProperties({
           </div>
           <button
             type="button"
-            title={`删除 ${category} 组件`}
+            title={`删除 ${active.customName || category} 组件`}
             onClick={() => {
               removeNode(active.id);
-              notify?.(`已删除组件: ${category}`);
+              notify?.(`已删除组件: ${active.customName || category}`);
             }}
             style={{
               display: "inline-flex",
