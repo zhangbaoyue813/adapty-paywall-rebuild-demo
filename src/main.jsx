@@ -312,6 +312,57 @@ const sourceTreeObserved = new Set([
   "family",
 ]);
 
+export const SIMULATED_USERS = [
+  {
+    id: "user-linfan",
+    name: "林凡",
+    avatar: "👤",
+    targetLang: "英语",
+    nativeLang: "中文",
+    nearbyCount: 24,
+    visitorsCount: 36,
+    todayTranslations: 15,
+    vipExpireDays: 3,
+    vipExpireDate: "2026-05-18",
+    discount: "8折",
+    saveAmount: "¥100",
+    vipMax: "无限制",
+    description: "英语进阶学员 · 深圳",
+  },
+  {
+    id: "user-sakura",
+    name: "Sakura",
+    avatar: "🌸",
+    targetLang: "日语",
+    nativeLang: "中文",
+    nearbyCount: 42,
+    visitorsCount: 58,
+    todayTranslations: 28,
+    vipExpireDays: 0,
+    vipExpireDate: "已过期",
+    discount: "7折",
+    saveAmount: "¥138",
+    vipMax: "无限制",
+    description: "日语N1备考 · 上海",
+  },
+  {
+    id: "user-carlos",
+    name: "Carlos",
+    avatar: "🌎",
+    targetLang: "西班牙语",
+    nativeLang: "中文",
+    nearbyCount: 18,
+    visitorsCount: 19,
+    todayTranslations: 8,
+    vipExpireDays: 7,
+    vipExpireDate: "2026-06-01",
+    discount: "85折",
+    saveAmount: "¥88",
+    vipMax: "无限制",
+    description: "西语新手 · 北京",
+  },
+];
+
 const componentTypeLabelsZh = {
   "Header": "标题",
   "Subhead": "副标题",
@@ -575,8 +626,8 @@ const getNodeSubRole = (node) => {
   if (type === "Dynamic Metrics" || raw.includes("指标")) return "动态指标";
 
   // 文本与排版
-  if (type === "Header" || raw.includes("主标题") || raw.includes("标题")) return "主标题";
   if (type === "Subhead" || raw.includes("副标题")) return "副标题";
+  if (type === "Header" || raw.includes("主标题") || (raw.includes("标题") && !raw.includes("副标题"))) return "主标题";
   if (type === "Badge Tag" || raw.includes("徽标")) return "徽标标签";
   if (type === "User Profile" || raw.includes("用户画像")) return "用户画像";
   if (type === "Language Chips" || raw.includes("语言标签")) return "语言标签";
@@ -2147,6 +2198,8 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
 
   const currentTemplate = templates[appliedTemplate] ?? templates[0];
   const [activeCompareTab, setActiveCompareTab] = useState(() => (currentTemplate?.id === "ht-tier-compare" ? 1 : 0));
+  const [simulatedUserId, setSimulatedUserId] = useState("user-linfan");
+  const currentSimulatedUser = SIMULATED_USERS.find((u) => u.id === simulatedUserId) || SIMULATED_USERS[0];
 
   useEffect(() => {
     if (currentTemplate?.id === "ht-tier-compare") {
@@ -2891,6 +2944,38 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
 
           {/* Column 3: Centered iPhone 15 Pro Canvas */}
           <div className="canvas-area">
+            {/* Quick Live Visitor Persona Switcher */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 auto 8px", width: 330, background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "4px 8px", borderRadius: 6, fontSize: 10, color: "#166534" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 4, fontWeight: 700 }}>
+                <span>👤 模拟访问用户：</span>
+                <span style={{ color: "#15803d" }}>{currentSimulatedUser.name} ({currentSimulatedUser.targetLang})</span>
+              </div>
+              <div style={{ display: "flex", gap: 3 }}>
+                {SIMULATED_USERS.map((u) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    onClick={() => {
+                      setSimulatedUserId(u.id);
+                      notify?.(`已切换模拟访客画像为：${u.name}（${u.targetLang}）`);
+                    }}
+                    style={{
+                      padding: "1px 6px",
+                      fontSize: 9.5,
+                      borderRadius: 3,
+                      cursor: "pointer",
+                      fontWeight: simulatedUserId === u.id ? 700 : 500,
+                      background: simulatedUserId === u.id ? "#15803d" : "#fff",
+                      color: simulatedUserId === u.id ? "#fff" : "#166534",
+                      border: simulatedUserId === u.id ? "1px solid #15803d" : "1px solid #86efac",
+                    }}
+                  >
+                    {u.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Authentic iPhone Frame */}
             <div className="iphone-frame-wrapper">
               <div className={`iphone-inner-screen ${isModalMode ? "modal-view-mode" : isBottomSheetMode ? "bottom-sheet-mode" : ""}`}>
@@ -3093,6 +3178,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                               updateNode={updateEffectiveNode}
                               themeConfig={hasSubTemplates ? effectiveTheme : null}
                               currentTemplate={currentTemplate}
+                              currentSimulatedUser={currentSimulatedUser}
                             />
                           ))}
                       </div>
@@ -3137,6 +3223,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                               updateNode={updateEffectiveNode}
                               themeConfig={hasSubTemplates ? effectiveTheme : null}
                               currentTemplate={currentTemplate}
+                              currentSimulatedUser={currentSimulatedUser}
                             />
                           ))}
                       </div>
@@ -3191,6 +3278,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                           setOnboardingCarouselSlide={setOnboardingCarouselSlide}
                           activeCompareTab={activeCompareTab}
                           setActiveCompareTab={setActiveCompareTab}
+                          currentSimulatedUser={currentSimulatedUser}
                         />
                       ))}
                   </div>
@@ -3286,6 +3374,9 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                 setActiveCompareTab={setActiveCompareTab}
                 onboardingCarouselSlide={onboardingCarouselSlide}
                 setOnboardingCarouselSlide={setOnboardingCarouselSlide}
+                simulatedUserId={simulatedUserId}
+                setSimulatedUserId={setSimulatedUserId}
+                currentSimulatedUser={currentSimulatedUser}
               />
             )}
           </aside>
@@ -3502,6 +3593,7 @@ function PreviewElement({
   currentTemplate,
   activeCompareTab = 0,
   setActiveCompareTab,
+  currentSimulatedUser,
 }) {
 
   const [selectedTier, setSelectedTier] = useState(0);
@@ -3518,13 +3610,44 @@ function PreviewElement({
 
   const renderInterpolated = (text) => {
     if (!text) return "";
+    const u = currentSimulatedUser || SIMULATED_USERS[0];
     return text
-      .replace(/\{\{\s*nick_name\s*\}\}/g, "林凡")
-      .replace(/\{\{\s*vip_expired_days\s*\}\}/g, "3")
-      .replace(/\{\{\s*vip_expire_time\s*\}\}/g, "2026-05-18")
-      .replace(/\{\{\s*vip_privilege_model_v2_max\s*\}\}/g, "无限制")
-      .replace(/\{\{\s*visitor_count\s*\}\}/g, "12")
-      .replace(/\{\{\s*vip_chat_translate_count\s*\}\}/g, "28");
+      // Chinese real-time variable tags:
+      .replace(/\{{1,2}\s*用户昵称\s*\}{1,2}/g, u.name)
+      .replace(/\{{1,2}\s*学习语言\s*\}{1,2}/g, u.targetLang)
+      .replace(/\{{1,2}\s*母语\s*\}{1,2}/g, u.nativeLang)
+      .replace(/\{{1,2}\s*附近语伴数\s*\}{1,2}/g, `${u.nearbyCount}`)
+      .replace(/\{{1,2}\s*谁看过我\s*\}{1,2}/g, `${u.visitorsCount}`)
+      .replace(/\{{1,2}\s*访客人数\s*\}{1,2}/g, `${u.visitorsCount}`)
+      .replace(/\{{1,2}\s*今日消耗翻译\s*\}{1,2}/g, `${u.todayTranslations}`)
+      .replace(/\{{1,2}\s*今日已用翻译\s*\}{1,2}/g, `${u.todayTranslations}`)
+      .replace(/\{{1,2}\s*消耗翻译\s*\}{1,2}/g, `${u.todayTranslations}`)
+      .replace(/\{{1,2}\s*VIP到期天数\s*\}{1,2}/g, `${u.vipExpireDays}`)
+      .replace(/\{{1,2}\s*到期天数\s*\}{1,2}/g, `${u.vipExpireDays}`)
+      .replace(/\{{1,2}\s*VIP到期日期\s*\}{1,2}/g, u.vipExpireDate)
+      .replace(/\{{1,2}\s*到期日期\s*\}{1,2}/g, u.vipExpireDate)
+      .replace(/\{{1,2}\s*特权上限\s*\}{1,2}/g, u.vipMax)
+      .replace(/\{{1,2}\s*实时折扣\s*\}{1,2}/g, u.discount)
+      .replace(/\{{1,2}\s*实时立省金额\s*\}{1,2}/g, u.saveAmount)
+      .replace(/\{{1,2}\s*实时立省\s*\}{1,2}/g, u.saveAmount)
+      // English / Jinja tags compatibility:
+      .replace(/\{\{\s*nick_name\s*\}\}/g, u.name)
+      .replace(/\{\{\s*user_name\s*\}\}/g, u.name)
+      .replace(/\{\{\s*target_lang\s*\}\}/g, u.targetLang)
+      .replace(/\{\{\s*learn_lang\s*\}\}/g, u.targetLang)
+      .replace(/\{\{\s*nearby_count\s*\}\}/g, `${u.nearbyCount}`)
+      .replace(/\{\{\s*visitor_count\s*\}\}/g, `${u.visitorsCount}`)
+      .replace(/\{\{\s*visitor_count_7d\s*\}\}/g, `${u.visitorsCount}`)
+      .replace(/\{\{\s*vip_chat_translate_count\s*\}\}/g, `${u.todayTranslations}`)
+      .replace(/\{\{\s*vip_expired_days\s*\}\}/g, `${u.vipExpireDays}`)
+      .replace(/\{\{\s*vip_expire_time\s*\}\}/g, u.vipExpireDate)
+      .replace(/\{\{\s*vip_privilege_model_v2_max\s*\}\}/g, u.vipMax)
+      .replace(/\{\{\s*realtime_discount\s*\}\}/g, u.discount)
+      .replace(/\{\{\s*save_amount\s*\}\}/g, u.saveAmount)
+      .replace(/\{\{\s*user_stats\.matrix\s*\}\}/g, `${u.visitorsCount}`)
+      .replace(/\{\{\s*study_days\s*\}\}/g, "48")
+      .replace(/\{\{\s*expire_hours\s*\}\}/g, "20")
+      .replace(/\{\{\s*discount_countdown\s*\}\}/g, "19:59:02");
   };
 
   if (node.type === "User Profile" || node.id?.includes("user")) {
@@ -5560,7 +5683,7 @@ function PreviewElement({
     }
     return wrap(
       <div style={{ textAlign: "center", fontSize: 11, color: "#64748b", margin: "4px 0" }}>
-        {node.content}
+        {renderInterpolated(node.content)}
       </div>
     );
   }
@@ -5588,6 +5711,9 @@ function BuilderProperties({
   setActiveCompareTab,
   onboardingCarouselSlide = 0,
   setOnboardingCarouselSlide,
+  simulatedUserId,
+  setSimulatedUserId,
+  currentSimulatedUser,
 }) {
 
   const [tab, setTab] = useState("content");
@@ -5613,6 +5739,27 @@ function BuilderProperties({
   const type = active.type;
   const category = getNodeCategory(active);
   const subRole = getNodeSubRole(active);
+
+  const currentTextRole = (() => {
+    if (active.type === "Subhead" || subRole === "副标题") return "Subhead";
+    if (active.type === "Header" || subRole === "主标题") return "Header";
+    if (active.type === "Badge Tag" || subRole === "徽标标签") return "Badge Tag";
+    if (active.type === "User Profile" || subRole === "用户画像") return "User Profile";
+    if (active.type === "Language Chips" || subRole === "语言标签") return "Language Chips";
+    if (active.type === "Legal Footer" || active.type === "Links" || subRole === "免责声明") return "Legal Footer";
+    if (active.type === "Text" || subRole === "正文段落") return "Text";
+    return active.type || "Text";
+  })();
+
+  const currentTextRoleLabel = {
+    Header: "主标题",
+    Subhead: "副标题",
+    Text: "正文段落",
+    "Badge Tag": "徽标标签",
+    "User Profile": "用户画像",
+    "Language Chips": "语言标签",
+    "Legal Footer": "免责声明",
+  }[currentTextRole] || subRole;
 
   const effectiveProductsVariant =
     active.config?.variant ||
@@ -5656,9 +5803,10 @@ function BuilderProperties({
     notify?.(`已切换产品套餐形态为：${targetVariant === "3-column-tiers" ? "横向三列" : targetVariant === "onboarding-dual-tiers" ? "双套餐" : targetVariant === "vertical-list-tiers" ? "纵向列表" : "特惠价格"}`);
   };
 
-  const insertJinja = (variable) => {
-    updateNode(active.id, { content: (active.content ?? "") + ` ${variable} ` });
+  const insertVariable = (variable) => {
+    updateNode(active.id, { content: (active.content ?? "") + `${variable}` });
   };
+  const insertJinja = insertVariable;
 
   return (
     <div className="property-scroll">
@@ -5792,7 +5940,7 @@ function BuilderProperties({
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>文本与排版角色预设切换</span>
-                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentTextRoleLabel}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 5 }}>
                 {[
@@ -5804,7 +5952,7 @@ function BuilderProperties({
                   { id: "Language Chips", label: "语言标签" },
                   { id: "Legal Footer", label: "免责声明" },
                 ].map((r) => {
-                  const isActiveRole = subRole === r.label || active.type === r.id;
+                  const isActiveRole = currentTextRole === r.id;
                   return (
                     <button
                       key={r.id}
@@ -5857,23 +6005,98 @@ function BuilderProperties({
                 })}
               </div>
 
-              {/* Jinja Variable Chips */}
-              <div style={{ marginTop: 4 }}>
-                <span style={{ fontSize: 10.5, fontWeight: 700, color: "#475569", display: "block", marginBottom: 4 }}>
-                  插入动态业务变量 (Jinja)
-                </span>
-                <div className="jinja-chips-container">
-                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ nick_name }}")}>+ 用户昵称</button>
-                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_expired_days }}")}>+ 到期天数</button>
-                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_expire_time }}")}>+ 到期日期</button>
-                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_privilege_model_v2_max }}")}>+ 特权上限</button>
-                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ visitor_count }}")}>+ 访客人数</button>
-                  <button type="button" className="jinja-chip-btn" onClick={() => insertJinja("{{ vip_chat_translate_count }}")}>+ 消耗翻译</button>
+              {/* 用户实时动态变量 (根据当前访问用户实时匹配) */}
+              <div style={{ marginTop: 4, padding: "8px 10px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#166534" }}>
+                    ⚡ 用户实时动态变量 (根据当前访问用户实时匹配)
+                  </span>
+                  <span style={{ fontSize: 9.5, background: "#dcfce7", color: "#15803d", padding: "1px 6px", borderRadius: 4, fontWeight: 600 }}>
+                    实时千人千面
+                  </span>
+                </div>
+
+                {/* 模拟访客画像切换 */}
+                <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 8 }}>
+                  <span style={{ fontSize: 10, color: "#15803d", fontWeight: 700, flexShrink: 0 }}>模拟访客:</span>
+                  <div style={{ display: "flex", gap: 4, flex: 1 }}>
+                    {SIMULATED_USERS.map((u) => {
+                      const isSelected = (currentSimulatedUser?.id || "user-linfan") === u.id;
+                      return (
+                        <button
+                          key={u.id}
+                          type="button"
+                          onClick={() => {
+                            setSimulatedUserId?.(u.id);
+                            notify?.(`已切换模拟访客画像为：${u.name}（${u.targetLang}）`);
+                          }}
+                          style={{
+                            flex: 1,
+                            padding: "3px 4px",
+                            fontSize: 9.5,
+                            borderRadius: 4,
+                            cursor: "pointer",
+                            fontWeight: isSelected ? 700 : 500,
+                            background: isSelected ? "#15803d" : "#ffffff",
+                            color: isSelected ? "#ffffff" : "#166534",
+                            border: isSelected ? "1px solid #15803d" : "1px solid #86efac",
+                            whiteSpace: "nowrap",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            gap: 3,
+                          }}
+                        >
+                          <span>{u.avatar}</span>
+                          <span>{u.name} · {u.targetLang}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 实时变量注入按钮 */}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+                  {[
+                    { label: "用户昵称", token: "{用户昵称}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).name },
+                    { label: "学习语言", token: "{学习语言}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).targetLang },
+                    { label: "附近语伴数", token: "{附近语伴数}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).nearbyCount}位` },
+                    { label: "谁看过我", token: "{谁看过我}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).visitorsCount}人` },
+                    { label: "今日消耗翻译", token: "{今日消耗翻译}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).todayTranslations}次` },
+                    { label: "VIP到期天数", token: "{VIP到期天数}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).vipExpireDays}天` },
+                    { label: "实时折扣", token: "{实时折扣}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).discount },
+                    { label: "实时立省金额", token: "{实时立省金额}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).saveAmount },
+                  ].map((v) => (
+                    <button
+                      key={v.token}
+                      type="button"
+                      onClick={() => insertVariable(v.token)}
+                      title={`点击插入 ${v.token}，当前访客解析为：${v.preview}`}
+                      style={{
+                        fontSize: 10,
+                        padding: "3px 6px",
+                        borderRadius: 4,
+                        cursor: "pointer",
+                        background: "#ffffff",
+                        border: "1px solid #86efac",
+                        color: "#166534",
+                        fontWeight: 600,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 3,
+                      }}
+                    >
+                      <span>+ {v.label}</span>
+                      <span style={{ fontSize: 9, color: "#15803d", opacity: 0.85, background: "#dcfce7", padding: "0 3px", borderRadius: 3 }}>
+                        {v.preview}
+                      </span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
               {/* Sub-role specific forms */}
-              {(subRole === "主标题" || active.type === "Header") && (
+              {currentTextRole === "Header" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="顶部前缀 / VIP 标识">
                     <input
@@ -5935,7 +6158,7 @@ function BuilderProperties({
                 </div>
               )}
 
-              {(subRole === "副标题" || active.type === "Subhead") && (
+              {currentTextRole === "Subhead" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="副标题文案">
                     <input
@@ -5966,7 +6189,7 @@ function BuilderProperties({
                 </div>
               )}
 
-              {(subRole === "正文段落" || active.type === "Text") && (
+              {currentTextRole === "Text" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="正文段落内容">
                     <textarea
@@ -5979,7 +6202,7 @@ function BuilderProperties({
                 </div>
               )}
 
-              {(subRole === "徽标标签" || active.type === "Badge Tag") && (
+              {currentTextRole === "Badge Tag" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="徽标文本文案">
                     <input
@@ -6010,7 +6233,7 @@ function BuilderProperties({
                 </div>
               )}
 
-              {(subRole === "用户画像" || active.type === "User Profile") && (
+              {currentTextRole === "User Profile" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>用户画像配置 (Avatar & Badge)</span>
                   <Field label="用户昵称 (nick_name)">
@@ -6044,7 +6267,7 @@ function BuilderProperties({
                 </div>
               )}
 
-              {(subRole === "语言标签" || active.type === "Language Chips") && (
+              {currentTextRole === "Language Chips" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="语言标签列表 (竖线 | 分隔)">
                     <input
@@ -6071,7 +6294,7 @@ function BuilderProperties({
                 </div>
               )}
 
-              {(subRole === "免责声明" || active.type === "Legal Footer") && (
+              {currentTextRole === "Legal Footer" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="免责声明 / 条款文案">
                     <textarea
@@ -6477,8 +6700,8 @@ function BuilderProperties({
                     </Field>
                   ) : (
                     <Field label="显示位置">
-                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                        {["top-left", "top-right", "center"].map((pos) => (
+                      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
+                        {["top-left", "top-right"].map((pos) => (
                           <button
                             key={pos}
                             type="button"
@@ -6494,7 +6717,7 @@ function BuilderProperties({
                             }}
                             onClick={() => updateNode(active.id, { config: { ...active.config, position: pos } })}
                           >
-                            {pos === "top-left" ? "左上角" : pos === "top-right" ? "右上角" : "居中"}
+                            {pos === "top-left" ? "左上角" : "右上角"}
                           </button>
                         ))}
                       </div>
@@ -6854,24 +7077,28 @@ function BuilderProperties({
                         />
                       </Field>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 2 }}>
-                        <span style={{ fontSize: 10, color: "#64748b", width: "100%", fontWeight: 600 }}>快捷插入动态变量：</span>
-                        {["{{ user_stats.matrix }}", "{{ visitor_count_7d }}", "{{ study_days }}"].map((v) => (
+                        <span style={{ fontSize: 10, color: "#166534", width: "100%", fontWeight: 700 }}>快捷插入用户实时变量：</span>
+                        {[
+                          { label: "谁看过我", val: "{谁看过我}" },
+                          { label: "附近语伴数", val: "{附近语伴数}" },
+                          { label: "今日消耗翻译", val: "{今日消耗翻译}" },
+                        ].map((item) => (
                           <button
-                            key={v}
+                            key={item.val}
                             type="button"
-                            onClick={() => insertJinja(v)}
+                            onClick={() => insertVariable(item.val)}
                             style={{
                               fontSize: 10,
-                              background: "#f1f5f9",
-                              border: "1px solid #cbd5e1",
+                              background: "#f0fdf4",
+                              border: "1px solid #86efac",
                               borderRadius: 4,
                               padding: "2px 6px",
                               cursor: "pointer",
-                              color: "#334155",
-                              fontFamily: "monospace",
+                              color: "#166534",
+                              fontWeight: 600,
                             }}
                           >
-                            + {v}
+                            + {item.label}
                           </button>
                         ))}
                       </div>
