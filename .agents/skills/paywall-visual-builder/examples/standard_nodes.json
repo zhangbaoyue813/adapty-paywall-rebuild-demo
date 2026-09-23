@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HelloTalk Paywall Node AST Standards",
+  "components": {
+    "Header": {
+      "id": "node-header-sample",
+      "type": "Header",
+      "role": "Header",
+      "config": {
+        "text": "开启 3天 VIP 免费试用",
+        "fontSize": 26,
+        "fontWeight": "bold",
+        "color": "#1E293B",
+        "align": "center"
+      }
+    },
+    "DismissButton": {
+      "id": "node-dismiss-sample",
+      "type": "Dismiss Button",
+      "role": "Dismiss Button",
+      "config": {
+        "label": "✕",
+        "position": "top-left",
+        "color": "#94A3B8"
+      }
+    },
+    "ComparisonTable": {
+      "id": "node-compare-sample",
+      "type": "Comparison Table",
+      "role": "Comparison Table",
+      "config": {
+        "mode": "free-vs-vip",
+        "titleCol": "特权功能",
+        "freeCol": "普通会员",
+        "vipCol": "VIP会员",
+        "showChevron": true,
+        "features": [
+          { "name": "无限翻译", "free": "10次/天", "vip": "无限制" },
+          { "name": "搜索全球语伴", "free": "🔒", "vip": "✓" },
+          { "name": "无广告体验", "free": "🔒", "vip": "✓" }
+        ]
+      }
+    },
+    "Products3Column": {
+      "id": "node-products-sample",
+      "type": "Products",
+      "role": "Products",
+      "config": {
+        "variant": "3-column-tiers",
+        "selectedTierIndex": 1,
+        "tiers": [
+          { "id": "tier-3m", "period": "3个月", "price": "¥198", "badge": "" },
+          { "id": "tier-12m", "period": "12个月", "price": "¥488", "unitPrice": "¥40.67/月", "badge": "48% OFF", "popular": true },
+          { "id": "tier-lifetime", "period": "终身", "price": "¥998", "badge": "超值" }
+        ]
+      }
+    },
+    "Timer": {
+      "id": "node-timer-sample",
+      "type": "Timer",
+      "role": "Timer",
+      "config": {
+        "variant": "card",
+        "label": "⚡ 限时特惠倒计时",
+        "durationSeconds": 86400,
+        "isDark": false
+      }
+    }
+  }
+}

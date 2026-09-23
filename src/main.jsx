@@ -2201,6 +2201,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
   const [activeCompareTab, setActiveCompareTab] = useState(() => (currentTemplate?.id === "ht-tier-compare" ? 1 : 0));
   const [simulatedUserId, setSimulatedUserId] = useState("user-linfan");
   const currentSimulatedUser = SIMULATED_USERS.find((u) => u.id === simulatedUserId) || SIMULATED_USERS[0];
+  const [jsonModal, setJsonModal] = useState(null);
 
   useEffect(() => {
     if (currentTemplate?.id === "ht-tier-compare") {
@@ -3388,10 +3389,122 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         </div>
 
         {/* Builder Footer */}
-        <div className="builder-footer">
+        <div className="builder-footer" style={{ display: "flex", gap: "10px", alignItems: "center", justifyContent: "flex-end", flexWrap: "wrap" }}>
           <button className="secondary" onClick={() => notify("已放弃未保存的本地修改。")}>放弃更改</button>
+          <button
+            type="button"
+            className="secondary"
+            style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+            onClick={() => setJsonModal({ mode: "export", text: JSON.stringify(currentEffectiveNodes, null, 2) })}
+            title="导出当前画布的完整 AST JSON 结构"
+          >
+            <span>📥</span> 导出配置 JSON
+          </button>
+          <button
+            type="button"
+            className="secondary"
+            style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+            onClick={() => setJsonModal({ mode: "import", text: "" })}
+            title="粘贴 AST JSON 快速还原或载入页面"
+          >
+            <span>📤</span> 导入草稿 JSON
+          </button>
           <button className="primary" onClick={() => setModal({ kind: "builder-save" })}>保存配置</button>
         </div>
+
+        {/* JSON Import/Export Modal */}
+        {jsonModal && (
+          <div className="modal-backdrop" onClick={() => setJsonModal(null)}>
+            <div
+              className="modal-card"
+              style={{ maxWidth: 680, width: "90%", maxHeight: "85vh", display: "flex", flexDirection: "column" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #E2E8F0", paddingBottom: 12, marginBottom: 16 }}>
+                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#1E293B" }}>
+                  {jsonModal.mode === "export" ? "📥 导出当前页面 AST 配置 (JSON)" : "📤 导入草稿 AST 配置 (JSON)"}
+                </h3>
+                <button type="button" onClick={() => setJsonModal(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "#64748B" }}>✕</button>
+              </div>
+              <p style={{ margin: "0 0 12px", fontSize: 13, color: "#64748B" }}>
+                {jsonModal.mode === "export"
+                  ? "以下为当前付费墙画布生成的标准 Node AST 数据。可直接复制用于客户端 SDK 加载或服务端下发："
+                  : "请粘贴符合规范的 Node AST 数组 JSON，导入后将立即解析并替换当前画布内容："}
+              </p>
+              <textarea
+                value={jsonModal.text}
+                onChange={(e) => setJsonModal({ ...jsonModal, text: e.target.value })}
+                readOnly={jsonModal.mode === "export"}
+                placeholder='[\n  { "id": "custom-1", "type": "Header", "config": { ... } }\n]'
+                style={{
+                  width: "100%",
+                  height: 320,
+                  fontFamily: "monospace",
+                  fontSize: 12,
+                  lineHeight: 1.5,
+                  padding: 12,
+                  borderRadius: 8,
+                  border: "1px solid #CBD5E1",
+                  background: jsonModal.mode === "export" ? "#F8FAFC" : "#FFFFFF",
+                  color: "#0F172A",
+                  resize: "vertical",
+                  boxSizing: "border-box"
+                }}
+              />
+              <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, marginTop: 16 }}>
+                {jsonModal.mode === "export" ? (
+                  <button
+                    type="button"
+                    className="primary"
+                    onClick={() => {
+                      navigator.clipboard.writeText(jsonModal.text);
+                      notify("✅ 页面 AST JSON 已成功复制到剪贴板！");
+                    }}
+                  >
+                    📋 复制到剪贴板
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    className="primary"
+                    onClick={() => {
+                      try {
+                        const parsed = JSON.parse(jsonModal.text);
+                        if (!Array.isArray(parsed) || parsed.length === 0) {
+                          alert("导入失败：JSON 必须是非空节点数组 [{ id, type, ... }]");
+                          return;
+                        }
+                        if (hasSubTemplates) {
+                          setTemplatePresetsMap((prev) => ({
+                            ...prev,
+                            [currentTemplate.id]: (prev[currentTemplate.id] || []).map((t) => {
+                              if (t.id === activeSubTemplateId) {
+                                return { ...t, nodes: parsed };
+                              }
+                              return t;
+                            }),
+                          }));
+                        } else {
+                          setBuilderNodes(parsed);
+                        }
+                        setActiveNode(parsed[0]?.id || null);
+                        setJsonModal(null);
+                        notify("✅ 成功导入草稿 JSON，画布已实时更新！");
+                      } catch (err) {
+                        alert("JSON 语法解析错误，请检查输入格式：" + err.message);
+                      }
+                    }}
+                  >
+                    🚀 应用并加载到画布
+                  </button>
+                )}
+                <button type="button" className="secondary" onClick={() => setJsonModal(null)}>
+                  关闭
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </section>
     );
   }
