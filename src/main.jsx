@@ -621,9 +621,9 @@ const getNodeSubRole = (node) => {
   }
 
   // 对比与时间轴
-  if (type === "Comparison Table" || raw.includes("对比")) return "对比表格";
-  if (node.config?.variant === "trial-timeline" || raw.includes("时间轴")) return "3天试用时间轴";
-  if (type === "Dynamic Metrics" || raw.includes("指标")) return "动态指标";
+  if (type === "Dynamic Metrics" || raw.includes("指标") || node.id?.includes("metrics")) return "动态指标";
+  if (node.config?.variant === "trial-timeline" || (type === "Toggle" && node.id?.includes("timeline")) || raw.includes("试用时间轴") || (raw.includes("时间轴") && !raw.startsWith("对比与时间轴"))) return "3天试用时间轴";
+  if (type === "Comparison Table" || raw.includes("对比表格") || raw.includes("对比矩阵") || (raw.includes("对比") && !raw.startsWith("对比与时间轴"))) return "对比表格";
 
   // 文本与排版
   if (type === "Subhead" || raw.includes("副标题")) return "副标题";
@@ -5761,6 +5761,76 @@ function BuilderProperties({
     "Legal Footer": "免责声明",
   }[currentTextRole] || subRole;
 
+  // 2. 对比与时间轴 (Comparison, Timeline & Metrics)
+  const currentCompareRole = (() => {
+    if (active.type === "Dynamic Metrics" || active.id?.includes("metrics") || subRole === "动态指标") return "Dynamic Metrics";
+    if (active.config?.variant === "trial-timeline" || active.id?.includes("timeline") || subRole === "3天试用时间轴") return "Trial Timeline";
+    if (active.type === "Comparison Table" || subRole === "对比表格") return "Comparison Table";
+    return "Dynamic Metrics";
+  })();
+
+  const currentCompareRoleLabel = {
+    "Comparison Table": "对比表格",
+    "Trial Timeline": "3天试用时间轴",
+    "Dynamic Metrics": "动态指标",
+  }[currentCompareRole] || "动态指标";
+
+  // 3. 操作按钮 (Action Buttons)
+  const currentActionRole = (() => {
+    if (active.type === "Dismiss Button" || subRole === "关闭按钮") return "Dismiss Button";
+    if (active.type === "Purchase Button" || subRole === "购买按钮") return "Purchase Button";
+    if (active.type === "Switch Tabs" || subRole === "切换标签") return "Switch Tabs";
+    if (active.type === "Toggle" || subRole === "开关选项") return "Toggle";
+    return active.type || "Purchase Button";
+  })();
+
+  const currentActionRoleLabel = {
+    "Purchase Button": "购买按钮",
+    "Dismiss Button": "关闭按钮",
+    "Switch Tabs": "切换标签",
+    "Toggle": "开关选项",
+  }[currentActionRole] || subRole;
+
+  // 4. 核心特权 (Benefit List)
+  const currentBenefitRole = (() => {
+    if (active.config?.variant === "onboarding-3slides" || active.id === "trial-t2-carousel" || subRole === "3页引导轮播") return "onboarding-3slides";
+    if (active.type === "Carousel Cards" || active.config?.variant === "carousel" || subRole === "卡片轮播") return "carousel";
+    if (active.config?.variant === "grid-matrix" || active.config?.styleVariant === "grid" || subRole === "双列网格") return "grid-matrix";
+    if (active.config?.variant === "onboarding-privilege-card" || active.config?.styleVariant === "cards" || subRole === "圆角大卡") return "onboarding-privilege-card";
+    return "entry-checks";
+  })();
+
+  const currentBenefitRoleLabel = {
+    "carousel": "卡片轮播",
+    "onboarding-3slides": "3页引导轮播",
+    "entry-checks": "打勾清单",
+    "grid-matrix": "双列网格",
+    "onboarding-privilege-card": "圆角大卡",
+  }[currentBenefitRole] || "打勾清单";
+
+  // 5. 背景图 (Hero Image & Mascot)
+  const currentBgRole = (() => {
+    if (active.type === "Mascot Illustration" || active.config?.bgMode === "mascot" || subRole === "吉祥物插画") return "mascot";
+    if (active.config?.bgMode === "image" || subRole === "自定义图片") return "image";
+    if (active.config?.bgMode === "gradient" || subRole === "渐变底色") return "gradient";
+    return "illustration";
+  })();
+
+  const currentBgRoleLabel = {
+    illustration: "原生插画",
+    mascot: "吉祥物插画",
+    image: "自定义图片",
+    gradient: "渐变底色",
+  }[currentBgRole] || "原生插画";
+
+  // 6. 倒计时 (Timer)
+  const currentTimerRole = active.config?.variant || (subRole === "极简纯文本" ? "clean-text" : subRole === "胶囊提示条" ? "badge-pill" : "card");
+  const currentTimerRoleLabel = {
+    "clean-text": "极简纯文本",
+    "card": "色块数字框",
+    "badge-pill": "胶囊提示条",
+  }[currentTimerRole] || "色块数字框";
+
   const effectiveProductsVariant =
     active.config?.variant ||
     (active.config?.listTiers || active.label === "纵向套餐列表"
@@ -5770,6 +5840,13 @@ function BuilderProperties({
       : (active.label === "特惠价格" || active.id === "t1-products" || active.id === "t2-products")
       ? "entry-price-tier"
       : "3-column-tiers");
+
+  const currentProductsRoleLabel = {
+    "3-column-tiers": "横向三列",
+    "onboarding-dual-tiers": "双套餐",
+    "vertical-list-tiers": "纵向列表",
+    "entry-price-tier": "特惠价格",
+  }[effectiveProductsVariant] || "横向三列";
 
   const handleProductVariantSwitch = (targetVariant) => {
     const nextConfig = {
@@ -6340,7 +6417,7 @@ function BuilderProperties({
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>背景图形态与插画风格</span>
-                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentBgRoleLabel}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
                 {[
@@ -6349,7 +6426,7 @@ function BuilderProperties({
                   { key: "image", label: "自定义图片", type: "Hero Image" },
                   { key: "gradient", label: "渐变底色", type: "Hero Image" },
                 ].map((m) => {
-                  const isSelected = subRole === m.label || (m.key === "mascot" ? active.type === "Mascot Illustration" : (active.config?.bgMode || "illustration") === m.key);
+                  const isSelected = currentBgRole === m.key;
                   return (
                     <button
                       key={m.key}
@@ -6392,7 +6469,7 @@ function BuilderProperties({
               </div>
 
               {/* Sub-role controls for 背景图 */}
-              {(subRole === "吉祥物插画" || active.type === "Mascot Illustration") ? (
+              {currentBgRole === "mascot" ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="官方吉祥物形态">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
@@ -6447,7 +6524,7 @@ function BuilderProperties({
                     </div>
                   </Field>
                 </div>
-              ) : active.config?.bgMode === "image" ? (
+              ) : currentBgRole === "image" ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="自定义背景图片 URL">
                     <input
@@ -6485,7 +6562,7 @@ function BuilderProperties({
                     </div>
                   </Field>
                 </div>
-              ) : active.config?.bgMode === "gradient" ? (
+              ) : currentBgRole === "gradient" ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="预设渐变底色">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
@@ -6562,7 +6639,7 @@ function BuilderProperties({
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>操作按钮角色切换</span>
-                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentActionRoleLabel}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
                 {[
@@ -6571,7 +6648,7 @@ function BuilderProperties({
                   { id: "Switch Tabs", label: "切换标签" },
                   { id: "Toggle", label: "开关选项" },
                 ].map((btnRole) => {
-                  const isBtnActive = subRole === btnRole.label || active.type === btnRole.id;
+                  const isBtnActive = currentActionRole === btnRole.id;
                   return (
                     <button
                       key={btnRole.id}
@@ -6616,7 +6693,7 @@ function BuilderProperties({
               </div>
 
               {/* Purchase Button Controls */}
-              {(subRole === "购买按钮" || active.type === "Purchase Button") && (
+              {currentActionRole === "Purchase Button" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="按钮主文案">
                     <input
@@ -6661,7 +6738,7 @@ function BuilderProperties({
               )}
 
               {/* Dismiss Button Controls */}
-              {(subRole === "关闭按钮" || active.type === "Dismiss Button") && (
+              {currentActionRole === "Dismiss Button" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="按钮形态">
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
@@ -6727,7 +6804,7 @@ function BuilderProperties({
               )}
 
               {/* Switch Tabs Controls */}
-              {(subRole === "切换标签" || active.type === "Switch Tabs") && (
+              {currentActionRole === "Switch Tabs" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>VIP / VIP+ 标签联动</span>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 6 }}>
@@ -6774,7 +6851,7 @@ function BuilderProperties({
               )}
 
               {/* Toggle Controls */}
-              {(subRole === "开关选项" || active.type === "Toggle") && (
+              {currentActionRole === "Toggle" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="开关主标题文案">
                     <input
@@ -6807,7 +6884,7 @@ function BuilderProperties({
               <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>核心特权表现形态</span>
-                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentBenefitRoleLabel}</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 4 }}>
                   {[
@@ -6817,10 +6894,7 @@ function BuilderProperties({
                     { id: "Benefit List", label: "双列网格", variant: "grid-matrix", styleVariant: "grid" },
                     { id: "Benefit List", label: "圆角大卡", variant: "onboarding-privilege-card", styleVariant: "cards" },
                   ].map((role) => {
-                    const isSelected = subRole === role.label ||
-                      (role.variant === "onboarding-3slides" && (active.config?.variant === "onboarding-3slides" || active.id === "trial-t2-carousel")) ||
-                      (role.variant === "carousel" && active.type === "Carousel Cards" && active.config?.variant !== "onboarding-3slides" && active.id !== "trial-t2-carousel") ||
-                      (role.variant === active.config?.variant || role.styleVariant === active.config?.styleVariant);
+                    const isSelected = currentBenefitRole === role.variant;
                     return (
                       <button
                         key={role.label}
@@ -6885,7 +6959,7 @@ function BuilderProperties({
                 </div>
               </div>
 
-              {(subRole === "3页引导轮播" || active.config?.variant === "onboarding-3slides" || active.id === "trial-t2-carousel" || active.label?.includes("多张轮播图")) ? (
+              {currentBenefitRole === "onboarding-3slides" ? (
                 <OnboardingMultiSlidesManager
                   node={active}
                   updateNode={updateNode}
@@ -6915,7 +6989,7 @@ function BuilderProperties({
               <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>对比与时间轴角色切换</span>
-                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentCompareRoleLabel}</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
                   {[
@@ -6923,21 +6997,23 @@ function BuilderProperties({
                     { id: "Trial Timeline", label: "3天试用时间轴" },
                     { id: "Dynamic Metrics", label: "动态指标" },
                   ].map((role) => {
-                    const isSelected = subRole === role.label ||
-                      (role.id === "Comparison Table" && active.type === "Comparison Table") ||
-                      (role.id === "Trial Timeline" && (active.config?.variant === "trial-timeline" || active.id?.includes("timeline"))) ||
-                      (role.id === "Dynamic Metrics" && active.type === "Dynamic Metrics");
+                    const isSelected = currentCompareRole === role.id;
                     return (
                       <button
                         key={role.id}
                         type="button"
                         onClick={() => {
                           if (role.id === "Comparison Table") {
+                            const nextConfig = { ...(active.config || {}) };
+                            delete nextConfig.steps;
+                            delete nextConfig.metricValues;
+                            delete nextConfig.visitorCount;
+                            delete nextConfig.styleType;
                             updateNode(active.id, {
                               type: "Comparison Table",
                               label: "对比与时间轴 (对比表格)",
                               config: {
-                                ...(active.config || {}),
+                                ...nextConfig,
                                 variant: "comparison-table",
                                 compareMode: "free-vs-vip",
                                 featureColTitle: "特权功能",
@@ -6947,11 +7023,18 @@ function BuilderProperties({
                               content: active.type === "Comparison Table" ? active.content : "特权对比|普通VIP|VIP+旗舰\n每日翻译|50次/天|无限制\n全球漫游|2个城市|无限制",
                             });
                           } else if (role.id === "Trial Timeline") {
+                            const nextConfig = { ...(active.config || {}) };
+                            delete nextConfig.featureColTitle;
+                            delete nextConfig.col1Title;
+                            delete nextConfig.col2Title;
+                            delete nextConfig.metricValues;
+                            delete nextConfig.visitorCount;
+                            delete nextConfig.styleType;
                             updateNode(active.id, {
                               type: "Toggle",
                               label: "对比与时间轴 (3天试用时间轴)",
                               config: {
-                                ...(active.config || {}),
+                                ...nextConfig,
                                 variant: "trial-timeline",
                                 steps: [
                                   { day: "今天", title: "开始试用", icon: "crown" },
@@ -6962,11 +7045,18 @@ function BuilderProperties({
                               content: "今天|开始试用\n第2天|即将结束通知\n第3天|试用结束",
                             });
                           } else if (role.id === "Dynamic Metrics") {
+                            const nextConfig = { ...(active.config || {}) };
+                            delete nextConfig.variant;
+                            delete nextConfig.steps;
+                            delete nextConfig.featureColTitle;
+                            delete nextConfig.col1Title;
+                            delete nextConfig.col2Title;
+                            delete nextConfig.compareMode;
                             updateNode(active.id, {
                               type: "Dynamic Metrics",
                               label: "对比与时间轴 (动态指标)",
                               config: {
-                                ...(active.config || {}),
+                                ...nextConfig,
                                 styleType: "VIP失效样式",
                                 metricValues: [972, 762, 487, 673, 837, 899, 116, 156, 939, 446, 650, 442],
                                 visitorCount: 21,
@@ -6997,7 +7087,7 @@ function BuilderProperties({
                 </div>
               </div>
 
-              {(subRole === "对比表格" || active.type === "Comparison Table") && (
+              {currentCompareRole === "Comparison Table" && (
                 <ComparisonTableManager
                   node={active}
                   updateNode={updateNode}
@@ -7006,7 +7096,7 @@ function BuilderProperties({
                 />
               )}
 
-              {(subRole === "3天试用时间轴" || active.config?.variant === "trial-timeline" || active.id?.includes("timeline")) && active.type !== "Comparison Table" && active.type !== "Dynamic Metrics" && (
+              {currentCompareRole === "Trial Timeline" && (
                 <TrialTimelineManager
                   node={active}
                   updateNode={updateNode}
@@ -7014,7 +7104,7 @@ function BuilderProperties({
                 />
               )}
 
-              {(subRole === "动态指标" || active.type === "Dynamic Metrics") && (
+              {currentCompareRole === "Dynamic Metrics" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#f8fafc", padding: 12, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>动态指标数据源配置</span>
                   <Field label="展示版式形态">
@@ -7117,7 +7207,7 @@ function BuilderProperties({
               <div style={{ display: "flex", flexDirection: "column", gap: 8, background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>产品套餐展现版式</span>
-                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+                  <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentProductsRoleLabel}</span>
                 </div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
                   {[
@@ -7520,7 +7610,7 @@ function BuilderProperties({
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>倒计时形态切换</span>
-                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{subRole}</span>
+                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentTimerRoleLabel}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
                 {[
@@ -7528,7 +7618,7 @@ function BuilderProperties({
                   { id: "card", label: "色块数字框" },
                   { id: "badge-pill", label: "胶囊提示条" },
                 ].map((item) => {
-                  const isCur = (active.config?.variant || "card") === item.id || (item.id === "clean-text" && subRole === "极简纯文本") || (item.id === "badge-pill" && subRole === "胶囊提示条");
+                  const isCur = currentTimerRole === item.id;
                   return (
                     <button
                       key={item.id}
