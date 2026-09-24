@@ -1428,6 +1428,29 @@ function App() {
             )}
           </div>
           <div className="top-actions">
+            <a
+              href="./v1/"
+              target="_blank"
+              rel="noreferrer"
+              style={{
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                background: "#EFF6FF",
+                border: "1px solid #BFDBFE",
+                color: "#1D4ED8",
+                padding: "5px 12px",
+                borderRadius: 6,
+                fontSize: 12,
+                fontWeight: 700,
+                boxShadow: "0 1px 3px rgba(29, 78, 216, 0.08)",
+                cursor: "pointer",
+              }}
+              title="新窗口打开最初的第 1 版极简原型 (2026-08-25 原版 1787行代码)"
+            >
+              <span>📜</span> 对比第一版原型 (V1)
+            </a>
             <div className="language-console" data-no-translate>
               <span>{locale === "zh-CN" ? "界面语言" : "Interface language"}</span>
               <button className={locale === "zh-CN" ? "active" : ""} onClick={() => setLocale("zh-CN")}>中文</button>
@@ -7956,6 +7979,25 @@ function WorkspaceHeader({ selected, setView, duplicate, setModal, markUnknown, 
           <h1 className="compact-workspace-title">{cleanTitle}</h1>
         </div>
         <div className="workspace-actions">
+          <a
+            href="./v1/"
+            target="_blank"
+            rel="noreferrer"
+            className="secondary compact-action-btn"
+            style={{
+              textDecoration: "none",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 4,
+              background: "#EFF6FF",
+              borderColor: "#BFDBFE",
+              color: "#1D4ED8",
+              fontWeight: 600,
+            }}
+            title="新窗口打开最初的第 1 版极简原型进行对比"
+          >
+            <span>📜</span> 对比第一版 (V1)
+          </a>
           <button className="secondary compact-action-btn" onClick={duplicate}><Copy size={14} /> 复制</button>
           <button className="primary compact-action-btn" onClick={() => notify?.("配置保存成功")}>保存配置</button>
         </div>
