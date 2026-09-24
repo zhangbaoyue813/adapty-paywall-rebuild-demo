@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 /**
  * Automated static validation script for Paywall Visual Builder
+ * Searches process.cwd() and multiple relative locations for src/main.jsx
  */
 import fs from 'fs';
 import path from 'path';
@@ -9,9 +10,18 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const mainJsxPath = path.resolve(__dirname, '../../../../src/main.jsx');
-if (!fs.existsSync(mainJsxPath)) {
-  console.error("❌ Cannot find src/main.jsx at:", mainJsxPath);
+const candidatePaths = [
+  path.resolve(process.cwd(), 'src/main.jsx'),
+  path.resolve(__dirname, '../../../../src/main.jsx'),
+  path.resolve(__dirname, '../../../src/main.jsx'),
+  path.resolve(__dirname, '../../src/main.jsx'),
+  path.resolve(__dirname, '../src/main.jsx')
+];
+
+const mainJsxPath = candidatePaths.find(p => fs.existsSync(p));
+if (!mainJsxPath) {
+  console.error("❌ Cannot find src/main.jsx in current directory or relative paths.");
+  console.error("Searched paths:", candidatePaths);
   process.exit(1);
 }
 
@@ -37,6 +47,7 @@ if (content.includes('targetVariant === "3-column-tiers"') && !content.includes(
 
 console.log("==========================================");
 console.log("🛡️ Paywall Visual Builder Defensive Audit");
+console.log(`🔍 Audited file: ${mainJsxPath}`);
 console.log("==========================================");
 
 if (errors.length > 0) {
