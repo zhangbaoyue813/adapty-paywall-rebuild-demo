@@ -5097,6 +5097,7 @@ function PreviewElement({
                 onClick={(e) => {
                   e.stopPropagation();
                   setSelectedTier(idx);
+                  onSelectOnboardingTier && onSelectOnboardingTier(idx);
                 }}
               >
                 {t.badge && (
@@ -5369,7 +5370,16 @@ function PreviewElement({
       );
     }
     if (isOnboardingPage) {
-      const isTrialTier = selectedOnboardingTier === 0;
+      const activeProductsNode = allNodes?.find((n) => n.type === "Products");
+      const isDualTiers = !activeProductsNode || activeProductsNode.config?.variant === "onboarding-dual-tiers";
+      const isTrialTier = isDualTiers
+        ? selectedOnboardingTier === 0
+        : Boolean(
+            activeProductsNode?.config?.tiers?.[selectedOnboardingTier]?.hasTrial ||
+            activeProductsNode?.config?.tiers?.[selectedOnboardingTier]?.badge?.includes("试用") ||
+            activeProductsNode?.config?.tiers?.[selectedOnboardingTier]?.badge?.includes("免费") ||
+            selectedOnboardingTier === 1
+          );
       const btnText = isTrialTier
         ? (node.content || themeConfig?.btnText || "开启3天 VIP免费试用")
         : (themeConfig?.btnTextAlt || "继续");
