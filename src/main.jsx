@@ -48,6 +48,11 @@ import {
   Type,
   CreditCard,
   MousePointer,
+  ZoomIn,
+  ZoomOut,
+  User,
+  GitBranch,
+  History,
 } from "lucide-react";
 import "./styles.css";
 import "./paywall-components.css";
@@ -1449,7 +1454,7 @@ function App() {
               }}
               title="新窗口打开最初的第 1 版极简原型 (2026-08-25 原版 1787行代码)"
             >
-              <span>📜</span> 对比第一版原型 (V1)
+              <History size={13} style={{ marginRight: 5, verticalAlign: -1 }} /> 对比第一版原型 (V1)
             </a>
             <div className="language-console" data-no-translate>
               <span>{locale === "zh-CN" ? "界面语言" : "Interface language"}</span>
@@ -1885,6 +1890,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
   const [showRetainModal, setShowRetainModal] = useState(false);
   const [selectedOnboardingTier, setSelectedOnboardingTier] = useState(0);
   const [onboardingCarouselSlide, setOnboardingCarouselSlide] = useState(0);
+  const [canvasZoom, setCanvasZoom] = useState(1);
 
   // HelloTalk Multi-template Presets Map (Both Entry Price & VIP Package)
   const [templatePresetsMap, setTemplatePresetsMap] = useState(() => ({
@@ -2969,10 +2975,49 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
 
           {/* Column 3: Centered iPhone 15 Pro Canvas */}
           <div className="canvas-area">
+            {/* Viewport Zoom & Scaling Control Capsule */}
+            <div className="canvas-viewport-toolbar">
+              <div className="canvas-zoom-capsule">
+                <button
+                  type="button"
+                  className="zoom-btn"
+                  onClick={() => setCanvasZoom((z) => Math.max(0.7, Number((z - 0.1).toFixed(1))))}
+                  title="缩小画布"
+                >
+                  <ZoomOut size={13} />
+                </button>
+                <span className="zoom-text">{Math.round(canvasZoom * 100)}%</span>
+                <button
+                  type="button"
+                  className="zoom-btn"
+                  onClick={() => setCanvasZoom((z) => Math.min(1.3, Number((z + 0.1).toFixed(1))))}
+                  title="放大画布"
+                >
+                  <ZoomIn size={13} />
+                </button>
+                <button
+                  type="button"
+                  className={`zoom-btn-pill ${canvasZoom === 1 ? "active" : ""}`}
+                  onClick={() => setCanvasZoom(1)}
+                  title="100% 原始尺寸"
+                >
+                  100%
+                </button>
+                <button
+                  type="button"
+                  className={`zoom-btn-pill ${canvasZoom === 0.85 ? "active" : ""}`}
+                  onClick={() => setCanvasZoom(0.85)}
+                  title="85% 适合小屏幕"
+                >
+                  85% 适配
+                </button>
+              </div>
+            </div>
+
             {/* Quick Live Visitor Persona Switcher */}
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 auto 8px", width: 330, background: "#f0fdf4", border: "1px solid #bbf7d0", padding: "4px 8px", borderRadius: 6, fontSize: 10, color: "#166534" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 4, fontWeight: 700 }}>
-                <span>👤 模拟访问用户：</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><User size={12} /> 模拟访客画像：</span>
                 <span style={{ color: "#15803d" }}>{currentSimulatedUser.name} ({currentSimulatedUser.targetLang})</span>
               </div>
               <div style={{ display: "flex", gap: 3 }}>
@@ -3002,7 +3047,14 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
             </div>
 
             {/* Authentic iPhone Frame */}
-            <div className="iphone-frame-wrapper">
+            <div
+              className="iphone-frame-wrapper"
+              style={{
+                transform: `scale(${canvasZoom})`,
+                transformOrigin: "top center",
+                transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
+              }}
+            >
               <div className={`iphone-inner-screen ${isModalMode ? "modal-view-mode" : isBottomSheetMode ? "bottom-sheet-mode" : ""}`}>
                 {/* Simulated App Background (When in Modal Mode only) */}
                 {isModalMode && (
@@ -3317,7 +3369,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                   <div className="ht-retain-modal-overlay" onClick={() => setShowRetainModal(false)}>
                     <div className="ht-retain-modal-card" onClick={(e) => e.stopPropagation()}>
                       <div className="ht-retain-modal-badge">
-                        <span>🎁 限时新客特权挽留</span>
+                        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><Gift size={12} /> 限时新客特权挽留</span>
                       </div>
                       <h3 className="ht-retain-modal-title">
                         {effectiveTheme?.retainModal?.title || "确定要放弃 3 天免费试用吗？"}
@@ -3417,20 +3469,20 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           <button
             type="button"
             className="secondary"
-            style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
             onClick={() => setJsonModal({ mode: "export", text: JSON.stringify(currentEffectiveNodes, null, 2) })}
             title="导出当前画布的完整 AST JSON 结构"
           >
-            <span>📥</span> 导出配置 JSON
+            <Download size={14} /> 导出配置 (JSON)
           </button>
           <button
             type="button"
             className="secondary"
-            style={{ display: "inline-flex", alignItems: "center", gap: "5px" }}
+            style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}
             onClick={() => setJsonModal({ mode: "import", text: "" })}
             title="粘贴 AST JSON 快速还原或载入页面"
           >
-            <span>📤</span> 导入草稿 JSON
+            <Upload size={14} /> 导入草稿 (JSON)
           </button>
           <button className="primary" onClick={() => setModal({ kind: "builder-save" })}>保存配置</button>
         </div>
@@ -3444,10 +3496,15 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
               onClick={(e) => e.stopPropagation()}
             >
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #E2E8F0", paddingBottom: 12, marginBottom: 16 }}>
-                <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: "#1E293B" }}>
-                  {jsonModal.mode === "export" ? "📥 导出当前页面 AST 配置 (JSON)" : "📤 导入草稿 AST 配置 (JSON)"}
-                </h3>
-                <button type="button" onClick={() => setJsonModal(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 18, color: "#64748B" }}>✕</button>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  {jsonModal.mode === "export" ? <Download size={18} color="#0284c7" /> : <Upload size={18} color="#0284c7" />}
+                  <h3 style={{ margin: 0, fontSize: 16, fontWeight: 700, color: "#1E293B" }}>
+                    {jsonModal.mode === "export" ? "导出页面 AST 配置 (JSON)" : "导入草稿 AST 配置 (JSON)"}
+                  </h3>
+                </div>
+                <button type="button" onClick={() => setJsonModal(null)} style={{ background: "none", border: "none", cursor: "pointer", fontSize: 16, color: "#64748B" }}>
+                  <X size={16} />
+                </button>
               </div>
               <p style={{ margin: "0 0 12px", fontSize: 13, color: "#64748B" }}>
                 {jsonModal.mode === "export"
@@ -3479,17 +3536,19 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                   <button
                     type="button"
                     className="primary"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
                     onClick={() => {
                       navigator.clipboard.writeText(jsonModal.text);
-                      notify("✅ 页面 AST JSON 已成功复制到剪贴板！");
+                      notify("页面 AST JSON 已成功复制到剪贴板");
                     }}
                   >
-                    📋 复制到剪贴板
+                    <Copy size={14} /> 复制到剪贴板
                   </button>
                 ) : (
                   <button
                     type="button"
                     className="primary"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
                     onClick={() => {
                       try {
                         const parsed = JSON.parse(jsonModal.text);
@@ -3512,13 +3571,13 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                         }
                         setActiveNode(parsed[0]?.id || null);
                         setJsonModal(null);
-                        notify("✅ 成功导入草稿 JSON，画布已实时更新！");
+                        notify("成功导入草稿 JSON，画布已实时更新");
                       } catch (err) {
                         alert("JSON 语法解析错误，请检查输入格式：" + err.message);
                       }
                     }}
                   >
-                    🚀 应用并加载到画布
+                    <Check size={14} /> 应用并加载到画布
                   </button>
                 )}
                 <button type="button" className="secondary" onClick={() => setJsonModal(null)}>
@@ -3654,7 +3713,7 @@ function TimerPreview({ node, themeConfig, isDarkTheme = false }) {
   return (
     <div className="preview-timer-container" style={{ margin: "4px 0 10px" }}>
       <div className="preview-timer-badge">
-        ⚡ <span>{label}</span>
+        <Zap size={11} fill="currentColor" style={{ marginRight: 3, verticalAlign: -1 }} /><span>{label}</span>
       </div>
       <div className="preview-timer-digits">
         <div className="digit-box"><span>{h}</span><small>时</small></div>
@@ -4228,7 +4287,7 @@ function PreviewElement({
           {kicker && (
             <div style={{ fontSize: 26, fontWeight: 800, color: mainFontColor, display: "flex", alignItems: "center", gap: 6, letterSpacing: "-0.01em" }}>
               <span>{kicker.replace("👑", "").trim()}</span>
-              <span style={{ fontSize: 23 }}>👑</span>
+              <Crown size={22} color="#D97706" fill="#FBBF24" style={{ filter: "drop-shadow(0 1px 2px rgba(217,119,6,0.3))" }} />
             </div>
           )}
           <h2
@@ -5793,7 +5852,7 @@ function PreviewElement({
               boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
             }}
           >
-            <span style={{ fontSize: 14 }}>🌍</span>
+            <Globe size={14} style={{ flexShrink: 0 }} />
             <span>{slogan}</span>
           </div>
         </div>
@@ -6288,8 +6347,8 @@ function BuilderProperties({
               {/* 用户实时动态变量 (根据当前访问用户实时匹配) */}
               <div style={{ marginTop: 4, padding: "8px 10px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#166534" }}>
-                    ⚡ 用户实时动态变量 (根据当前访问用户实时匹配)
+                  <span style={{ fontSize: 11, fontWeight: 700, color: "#166534", display: "inline-flex", alignItems: "center", gap: 4 }}>
+                    <Zap size={13} style={{ flexShrink: 0 }} /> 用户实时动态变量 (根据当前访问用户实时匹配)
                   </span>
                   <span style={{ fontSize: 9.5, background: "#dcfce7", color: "#15803d", padding: "1px 6px", borderRadius: 4, fontWeight: 600 }}>
                     实时千人千面
@@ -7996,7 +8055,7 @@ function WorkspaceHeader({ selected, setView, duplicate, setModal, markUnknown, 
             }}
             title="新窗口打开最初的第 1 版极简原型进行对比"
           >
-            <span>📜</span> 对比第一版 (V1)
+            <History size={13} /> 对比第一版 (V1)
           </a>
           <button className="secondary compact-action-btn" onClick={duplicate}><Copy size={14} /> 复制</button>
           <button className="primary compact-action-btn" onClick={() => notify?.("配置保存成功")}>保存配置</button>

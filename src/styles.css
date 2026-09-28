@@ -1141,3 +1141,180 @@ textarea { min-height: 80px; resize: vertical; }
 }
 
 
+
+/* ==========================================================================
+   Hyper-Smooth Fluid Transitions & Industrial Software Polish
+   ========================================================================== */
+
+:root {
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Toast Floating Pill */
+.toast {
+  position: fixed !important;
+  z-index: 9999 !important;
+  top: 24px !important;
+  right: 28px !important;
+  left: auto !important;
+  transform: none !important;
+  padding: 10px 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  border-radius: 999px !important;
+  background: rgba(15, 23, 42, 0.92) !important;
+  color: #f8fafc !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35), 0 0 15px rgba(56, 189, 248, 0.15) !important;
+  backdrop-filter: blur(16px) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  animation: toastSpringIn 0.32s var(--ease-spring) forwards !important;
+}
+
+@keyframes toastSpringIn {
+  from {
+    opacity: 0;
+    transform: translateY(-14px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Canvas Viewport Zoom Capsule */
+.canvas-viewport-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 10px;
+  width: 100%;
+}
+
+.canvas-zoom-capsule {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  backdrop-filter: blur(8px);
+}
+
+.zoom-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.zoom-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.zoom-text {
+  font-size: 11px;
+  font-weight: 700;
+  color: #334155;
+  min-width: 36px;
+  text-align: center;
+  font-family: ui-monospace, SFMono-Regular, monospace;
+}
+
+.zoom-btn-pill {
+  padding: 3px 9px;
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  color: #64748b;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.zoom-btn-pill:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.zoom-btn-pill.active {
+  background: #0284c7;
+  color: #ffffff;
+}
+
+/* Modal Spring Popup */
+.modal-backdrop {
+  backdrop-filter: blur(8px);
+  background: rgba(15, 23, 42, 0.6) !important;
+}
+
+.modal-card {
+  animation: modalCardPop 0.28s var(--ease-spring) forwards !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35) !important;
+  border-radius: 14px !important;
+}
+
+@keyframes modalCardPop {
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Smooth Button & Tab Transitions */
+button.primary, button.secondary, .btn-action {
+  transition: transform 0.15s var(--ease-spring), background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+button.primary:active, button.secondary:active {
+  transform: scale(0.975);
+}
+
+/* Smooth Tier Cards */
+.tier-col-card {
+  transition: transform 0.22s var(--ease-spring),
+              border-color 0.22s var(--ease-spring),
+              background 0.22s var(--ease-spring),
+              box-shadow 0.22s var(--ease-spring) !important;
+}
+
+.tier-col-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08) !important;
+}
+
+.tier-col-card:active {
+  transform: scale(0.975) !important;
+}
+
+.tier-col-card.selected {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.22) !important;
+}
+
+/* Node List Smooth Hover */
+.node {
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.node.selected {
+  box-shadow: inset 3px 0 0 #6124e9;
+}
