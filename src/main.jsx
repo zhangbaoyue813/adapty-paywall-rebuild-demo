@@ -53,6 +53,13 @@ import {
   User,
   GitBranch,
   History,
+  TrendingUp,
+  Split,
+  Maximize2,
+  Minimize2,
+  Activity,
+  HelpCircle,
+  ShieldCheck,
 } from "lucide-react";
 import "./styles.css";
 import "./paywall-components.css";
@@ -1891,6 +1898,12 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
   const [selectedOnboardingTier, setSelectedOnboardingTier] = useState(0);
   const [onboardingCarouselSlide, setOnboardingCarouselSlide] = useState(0);
   const [canvasZoom, setCanvasZoom] = useState(1);
+  const [deviceType, setDeviceType] = useState("iphone-16-pro");
+  const [showFoldLine, setShowFoldLine] = useState(true);
+  const [abVariant, setAbVariant] = useState("A");
+  const [abSplitRatio, setAbSplitRatio] = useState(50);
+  const [showGrowthBreakdown, setShowGrowthBreakdown] = useState(false);
+  const [presentationMode, setPresentationMode] = useState(false);
 
   // HelloTalk Multi-template Presets Map (Both Entry Price & VIP Package)
   const [templatePresetsMap, setTemplatePresetsMap] = useState(() => ({
@@ -2708,7 +2721,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
 
     return (
       <section className="builder-page">
-        <WorkspaceHeader selected={selected} setView={setView} duplicate={duplicate} setModal={setModal} markUnknown={markUnknown} notify={notify} />
+        <WorkspaceHeader selected={selected} setView={setView} duplicate={duplicate} setModal={setModal} markUnknown={markUnknown} notify={notify} presentationMode={presentationMode} setPresentationMode={setPresentationMode} />
         <div className="detail-tabs">
           <button onClick={() => setView("general")}>基础设置</button>
           <button className="active">构建器</button>
@@ -2787,7 +2800,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         )}
 
         {/* Builder Layout: Standard Spacious 3 Columns */}
-        <div className="builder">
+        <div className={`builder ${presentationMode ? "presentation-mode" : ""}`}>
           {/* Column 1: Matching Components / Node Tree Panel */}
           <aside className="node-panel">
             {hasSubTemplates ? (
@@ -2973,10 +2986,48 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
             </div>
           </aside>
 
-          {/* Column 3: Centered iPhone 15 Pro Canvas */}
+          {/* Column 3: Centered Mobile Device Canvas */}
           <div className="canvas-area">
-            {/* Viewport Zoom & Scaling Control Capsule */}
-            <div className="canvas-viewport-toolbar">
+            {/* Viewport & Device Switcher Toolbar */}
+            <div className="canvas-viewport-toolbar" style={{ flexWrap: "wrap", gap: 8, justifyContent: "center" }}>
+              {/* Multi-Device Morphing Capsule */}
+              <div className="canvas-zoom-capsule">
+                <button
+                  type="button"
+                  className={`zoom-btn-pill ${deviceType === "iphone-16-pro" ? "active" : ""}`}
+                  onClick={() => {
+                    setDeviceType("iphone-16-pro");
+                    notify("已切换真机视口：iPhone 16 Pro (灵动岛 393×852)");
+                  }}
+                  title="iPhone 16 Pro 灵动岛视口"
+                >
+                  <Smartphone size={12} style={{ marginRight: 3, verticalAlign: -1 }} /> 16 Pro
+                </button>
+                <button
+                  type="button"
+                  className={`zoom-btn-pill ${deviceType === "iphone-se" ? "active" : ""}`}
+                  onClick={() => {
+                    setDeviceType("iphone-se");
+                    notify("已切换真机视口：iPhone SE (紧凑小屏 375×667)");
+                  }}
+                  title="iPhone SE (紧凑小屏适配与截断测试)"
+                >
+                  SE 小屏
+                </button>
+                <button
+                  type="button"
+                  className={`zoom-btn-pill ${deviceType === "android" ? "active" : ""}`}
+                  onClick={() => {
+                    setDeviceType("android");
+                    notify("已切换真机视口：Android 旗舰机 (居中挖孔)");
+                  }}
+                  title="Android 旗舰机型视口"
+                >
+                  Android
+                </button>
+              </div>
+
+              {/* Viewport Zoom & Scaling Control Capsule */}
               <div className="canvas-zoom-capsule">
                 <button
                   type="button"
@@ -3011,7 +3062,110 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                 >
                   85% 适配
                 </button>
+                <div style={{ width: 1, height: 14, background: "#cbd5e1", margin: "0 2px" }} />
+                <button
+                  type="button"
+                  className={`zoom-btn-pill ${showFoldLine ? "active" : ""}`}
+                  onClick={() => setShowFoldLine((s) => !s)}
+                  title="开启/隐藏首屏折叠临界线 (Above the Fold)"
+                >
+                  <Eye size={12} style={{ marginRight: 3, verticalAlign: -1 }} /> 首屏线
+                </button>
               </div>
+            </div>
+
+            {/* A/B Testing Experiment Suite Bar */}
+            <div className="ab-test-suite-bar">
+              <div className="ab-suite-left">
+                <span className="ab-tag-badge">
+                  <Split size={11} style={{ marginRight: 3, verticalAlign: -1 }} /> A/B 实验流转
+                </span>
+                <div className="ab-variant-tabs">
+                  <button
+                    type="button"
+                    className={`ab-variant-btn ${abVariant === "A" ? "active" : ""}`}
+                    onClick={() => {
+                      setAbVariant("A");
+                      if (hasSubTemplates && subTemplates[0]) {
+                        setActiveSubTemplateByPage((prev) => ({ ...prev, [currentTemplate.id]: subTemplates[0].id }));
+                      }
+                      notify("已切至对照组方案 A：59% 折扣锚定 + 紧迫倒计时");
+                    }}
+                  >
+                    Variant A (对照组)
+                  </button>
+                  <button
+                    type="button"
+                    className={`ab-variant-btn ${abVariant === "B" ? "active" : ""}`}
+                    onClick={() => {
+                      setAbVariant("B");
+                      if (hasSubTemplates && subTemplates[1]) {
+                        setActiveSubTemplateByPage((prev) => ({ ...prev, [currentTemplate.id]: subTemplates[1].id }));
+                      }
+                      notify("已切至实验组方案 B：7天无阻力试用 + 动态新客挽留");
+                    }}
+                  >
+                    Variant B (实验组)
+                  </button>
+                </div>
+                <span className="ab-diff-capsule">
+                  <TrendingUp size={11} /> 预期增益 +18.4%
+                </span>
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 11, color: "#64748b" }}>
+                <span>分流:</span>
+                <div style={{ display: "inline-flex", alignItems: "center", gap: 4, background: "#f1f5f9", padding: "2px 7px", borderRadius: 4, fontWeight: 700, color: "#334155" }}>
+                  <span>50%</span>
+                  <span style={{ color: "#94a3b8" }}>:</span>
+                  <span>50%</span>
+                </div>
+                <button
+                  type="button"
+                  style={{
+                    border: "none",
+                    background: "transparent",
+                    color: "#4f46e5",
+                    fontSize: 11,
+                    fontWeight: 700,
+                    cursor: "pointer",
+                    padding: "2px 4px",
+                  }}
+                  onClick={() => setShowGrowthBreakdown(true)}
+                >
+                  差异对比 →
+                </button>
+              </div>
+            </div>
+
+            {/* Growth & CVR Predictor HUD Capsule */}
+            <div className="growth-hud-capsule">
+              <div className="growth-stat-item">
+                <Activity size={12} color="#4f46e5" />
+                <span>预估付费 CVR:</span>
+                <span className="growth-stat-value">{abVariant === "B" ? "5.42%" : "4.85%"}</span>
+                <span className="growth-badge-green">{abVariant === "B" ? "+126% vs 基准" : "+102% vs 基准"}</span>
+              </div>
+              <div style={{ width: 1, height: 12, background: "#cbd5e1" }} />
+              <div className="growth-stat-item">
+                <span>预期单客贡献 (ARPU):</span>
+                <span className="growth-stat-value">{abVariant === "B" ? "¥42.6" : "¥38.2"}</span>
+              </div>
+              <div style={{ width: 1, height: 12, background: "#cbd5e1" }} />
+              <div className="growth-stat-item">
+                <span>决策摩擦:</span>
+                <span style={{ fontSize: 10, fontWeight: 700, color: "#059669" }}>
+                  {abVariant === "B" ? "极低 (无阻力试用)" : "适中 (折扣紧迫)"}
+                </span>
+              </div>
+              <button
+                type="button"
+                className="growth-breakdown-btn"
+                onClick={() => setShowGrowthBreakdown(true)}
+                title="查看商业化增长因数与模型归因拆解"
+              >
+                <Sparkles size={11} /> 增长归因拆解
+              </button>
             </div>
 
             {/* Quick Live Visitor Persona Switcher */}
@@ -3046,15 +3200,22 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
               </div>
             </div>
 
-            {/* Authentic iPhone Frame */}
+            {/* Authentic Mobile Device Frame */}
             <div
-              className="iphone-frame-wrapper"
+              className={`iphone-frame-wrapper device-${deviceType}`}
               style={{
                 transform: `scale(${canvasZoom})`,
                 transformOrigin: "top center",
                 transition: "transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)",
               }}
             >
+              {showFoldLine && (
+                <div className="canvas-fold-line-guide" style={{ top: deviceType === "iphone-se" ? 430 : 510 }}>
+                  <div className="canvas-fold-line-tag">
+                    <Eye size={10} /> 首屏折叠线 (Above the Fold)
+                  </div>
+                </div>
+              )}
               <div className={`iphone-inner-screen ${isModalMode ? "modal-view-mode" : isBottomSheetMode ? "bottom-sheet-mode" : ""}`}>
                 {/* Simulated App Background (When in Modal Mode only) */}
                 {isModalMode && (
@@ -3587,6 +3748,195 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
             </div>
           </div>
         )}
+
+        {/* Growth Attribution & Funnel Insights Modal */}
+        {showGrowthBreakdown && (
+          <div className="modal-backdrop" onClick={() => setShowGrowthBreakdown(false)}>
+            <div
+              className="modal-card"
+              style={{ maxWidth: 740, width: "92%", maxHeight: "88vh", display: "flex", flexDirection: "column" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderBottom: "1px solid #E2E8F0", paddingBottom: 14, marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <TrendingUp size={20} color="#4F46E5" />
+                  <div>
+                    <h3 style={{ margin: 0, fontSize: 16, fontWeight: 800, color: "#1E293B" }}>
+                      商业化增长预测与归因拆解 (Monetization Insights)
+                    </h3>
+                    <div style={{ fontSize: 11, color: "#64748B", marginTop: 2 }}>
+                      基于 Adapty 行业基准与 HelloTalk 商业化增长模型测算
+                    </div>
+                  </div>
+                </div>
+                <button type="button" onClick={() => setShowGrowthBreakdown(false)} style={{ background: "none", border: "none", cursor: "pointer", color: "#64748B" }}>
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div style={{ overflowY: "auto", paddingRight: 4, display: "flex", flexDirection: "column", gap: 16 }}>
+                {/* 1. 转化漏斗拆解 */}
+                <div style={{ background: "#F8FAFC", border: "1px solid #E2E8F0", borderRadius: 10, padding: "14px 16px" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, fontSize: 13, color: "#1E293B", marginBottom: 10 }}>
+                    <Activity size={14} color="#6366F1" />
+                    <span>全链路转化漏斗表现估算 (Funnel Simulation)</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+                    <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "10px 12px" }}>
+                      <div style={{ fontSize: 10.5, color: "#64748B" }}>① 触发拦截曝光</div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: "#0F172A", marginTop: 4 }}>100.0%</div>
+                      <div style={{ fontSize: 9.5, color: "#10B981", marginTop: 2 }}>基准曝光数</div>
+                    </div>
+                    <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "10px 12px" }}>
+                      <div style={{ fontSize: 10.5, color: "#64748B" }}>② 核心权益感知</div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: "#0F172A", marginTop: 4 }}>79.4%</div>
+                      <div style={{ fontSize: 9.5, color: "#10B981", marginTop: 2 }}>停留超过 3.5s</div>
+                    </div>
+                    <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "10px 12px" }}>
+                      <div style={{ fontSize: 10.5, color: "#64748B" }}>③ CTA 支付激活</div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: "#4F46E5", marginTop: 4 }}>23.8%</div>
+                      <div style={{ fontSize: 9.5, color: "#6366F1", marginTop: 2 }}>点击购买/试用</div>
+                    </div>
+                    <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "10px 12px" }}>
+                      <div style={{ fontSize: 10.5, color: "#64748B" }}>④ 最终付费 CVR</div>
+                      <div style={{ fontSize: 17, fontWeight: 900, color: "#166534", marginTop: 4 }}>
+                        {abVariant === "B" ? "5.42%" : "4.85%"}
+                      </div>
+                      <div style={{ fontSize: 9.5, color: "#15803D", marginTop: 2 }}>高出行业基准 +102%</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. 增长杠杆与策略 */}
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div style={{ border: "1px solid #E0E7FF", background: "#EEF2FF", borderRadius: 10, padding: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, fontSize: 12.5, color: "#3730A3", marginBottom: 6 }}>
+                      <Activity size={14} />
+                      <span>价格锚定与高客单转化</span>
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "#4338CA", lineHeight: 1.5 }}>
+                      年卡标价 ¥388（原价 ¥488），折合每天仅 ¥1.06。通过与月卡（¥78/月，折合年费 ¥936）强烈锚定对比，推动 <strong>82.4%</strong> 的付费用户主动选购高客单年卡，极大提升 LTV。
+                    </div>
+                  </div>
+
+                  <div style={{ border: "1px solid #DCFCE7", background: "#F0FDF4", borderRadius: 10, padding: 14 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, fontWeight: 700, fontSize: 12.5, color: "#166534", marginBottom: 6 }}>
+                      <CheckCircle2 size={14} />
+                      <span>动态千人千面与社交认同</span>
+                    </div>
+                    <div style={{ fontSize: 11.5, color: "#15803D", lineHeight: 1.5 }}>
+                      利用 Jinja 插槽动态注入访客动态（如“21 位母语者在过去 7 天浏览了你”），激发社交好奇心与错失恐惧（FOMO），实测在非促销期带动转化率提升 <strong>+34.2%</strong>。
+                    </div>
+                  </div>
+                </div>
+
+                {/* 3. A/B 方案差异归因 */}
+                <div style={{ border: "1px solid #E2E8F0", borderRadius: 10, padding: "12px 16px", background: "#FFFFFF" }}>
+                  <div style={{ fontWeight: 700, fontSize: 12.5, color: "#1E293B", marginBottom: 8, display: "flex", alignItems: "center", gap: 6 }}>
+                    <Split size={14} color="#6366F1" />
+                    <span>当前分流对比：方案 A (59% 折扣) vs 方案 B (7天试用+挽留)</span>
+                  </div>
+                  <table style={{ width: "100%", fontSize: 11.5, borderCollapse: "collapse" }}>
+                    <thead>
+                      <tr style={{ background: "#F8FAFC", color: "#64748B", textAlign: "left" }}>
+                        <th style={{ padding: "6px 10px" }}>维度</th>
+                        <th style={{ padding: "6px 10px" }}>方案 A (对照组)</th>
+                        <th style={{ padding: "6px 10px" }}>方案 B (实验组)</th>
+                        <th style={{ padding: "6px 10px" }}>建议应用场景</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderTop: "1px solid #F1F5F9" }}>
+                        <td style={{ padding: "8px 10px", fontWeight: 700 }}>核心心智</td>
+                        <td style={{ padding: "8px 10px" }}>限时紧迫感 (倒计时+8折)</td>
+                        <td style={{ padding: "8px 10px", color: "#4F46E5", fontWeight: 700 }}>零心理负担试用 (7天免费)</td>
+                        <td style={{ padding: "8px 10px", color: "#64748B" }}>新注册首日用 B，破冰用 A</td>
+                      </tr>
+                      <tr style={{ borderTop: "1px solid #F1F5F9" }}>
+                        <td style={{ padding: "8px 10px", fontWeight: 700 }}>退订/流失风险</td>
+                        <td style={{ padding: "8px 10px" }}>极低 (即时买断生效)</td>
+                        <td style={{ padding: "8px 10px" }}>需靠第5天通知控制在 14%</td>
+                        <td style={{ padding: "8px 10px", color: "#64748B" }}>配合挽留弹窗实现双保险</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 16 }}>
+                <button type="button" className="primary" onClick={() => setShowGrowthBreakdown(false)}>
+                  完成分析
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Floating Pitch Bar when in Presentation Mode */}
+        {presentationMode && (
+          <div className="pitch-floating-bar">
+            <div style={{ display: "flex", alignItems: "center", gap: 7, fontWeight: 700, fontSize: 12 }}>
+              <span className="live-pulse-dot" />
+              <span>沉浸演示中 · {selected.name}</span>
+            </div>
+            <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.2)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
+              <span style={{ opacity: 0.8 }}>机型:</span>
+              <button
+                type="button"
+                style={{ background: deviceType === "iphone-16-pro" ? "#4f46e5" : "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 4, padding: "2px 7px", fontSize: 11, cursor: "pointer" }}
+                onClick={() => setDeviceType("iphone-16-pro")}
+              >
+                16 Pro
+              </button>
+              <button
+                type="button"
+                style={{ background: deviceType === "iphone-se" ? "#4f46e5" : "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 4, padding: "2px 7px", fontSize: 11, cursor: "pointer" }}
+                onClick={() => setDeviceType("iphone-se")}
+              >
+                SE 小屏
+              </button>
+              <button
+                type="button"
+                style={{ background: deviceType === "android" ? "#4f46e5" : "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 4, padding: "2px 7px", fontSize: 11, cursor: "pointer" }}
+                onClick={() => setDeviceType("android")}
+              >
+                Android
+              </button>
+            </div>
+            <div style={{ width: 1, height: 16, background: "rgba(255,255,255,0.2)" }} />
+            <div style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 11 }}>
+              <span style={{ opacity: 0.8 }}>方案:</span>
+              <button
+                type="button"
+                style={{ background: abVariant === "A" ? "#4f46e5" : "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 4, padding: "2px 7px", fontSize: 11, cursor: "pointer" }}
+                onClick={() => {
+                  setAbVariant("A");
+                  if (hasSubTemplates && subTemplates[0]) setActiveSubTemplateByPage((prev) => ({ ...prev, [currentTemplate.id]: subTemplates[0].id }));
+                }}
+              >
+                方案 A
+              </button>
+              <button
+                type="button"
+                style={{ background: abVariant === "B" ? "#4f46e5" : "transparent", color: "#fff", border: "1px solid rgba(255,255,255,0.3)", borderRadius: 4, padding: "2px 7px", fontSize: 11, cursor: "pointer" }}
+                onClick={() => {
+                  setAbVariant("B");
+                  if (hasSubTemplates && subTemplates[1]) setActiveSubTemplateByPage((prev) => ({ ...prev, [currentTemplate.id]: subTemplates[1].id }));
+                }}
+              >
+                方案 B
+              </button>
+            </div>
+            <button
+              type="button"
+              style={{ background: "#ef4444", color: "#fff", border: "none", borderRadius: 4, padding: "4px 12px", fontSize: 11, fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 5, marginLeft: 4 }}
+              onClick={() => { setPresentationMode(false); notify("已退出演示模式"); }}
+            >
+              <Minimize2 size={12} /> 退出演示
+            </button>
+          </div>
+        )}
       </section>
     );
   }
@@ -3594,7 +3944,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
   // General View
   return (
     <section>
-      <WorkspaceHeader selected={selected} setView={setView} duplicate={duplicate} setModal={setModal} markUnknown={markUnknown} notify={notify} />
+      <WorkspaceHeader selected={selected} setView={setView} duplicate={duplicate} setModal={setModal} markUnknown={markUnknown} notify={notify} presentationMode={presentationMode} setPresentationMode={setPresentationMode} />
       <div className="detail-tabs">
         <button className="active">基础设置</button>
         <button onClick={() => setView("builder")}>构建器</button>
@@ -8028,16 +8378,38 @@ function BuilderProperties({
   );
 }
 
-function WorkspaceHeader({ selected, setView, duplicate, setModal, markUnknown, notify }) {
+function WorkspaceHeader({ selected, setView, duplicate, setModal, markUnknown, notify, presentationMode, setPresentationMode }) {
   const cleanTitle = selected.name ? selected.name.replace(/\s*\([^)]*\)/g, "").trim() : "";
   return (
     <>
       <button className="back" onClick={() => setView("list")}><ArrowLeft size={16} /> 返回列表</button>
       <div className="workspace-heading">
-        <div className="workspace-title-wrap">
+        <div className="workspace-title-wrap" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <span className="live-pulse-dot" title="实时在线运行中 (Production Live)" />
           <h1 className="compact-workspace-title">{cleanTitle}</h1>
+          <span style={{ fontSize: 10, background: "#ecfdf5", color: "#059669", border: "1px solid #a7f3d0", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>
+            Live
+          </span>
         </div>
         <div className="workspace-actions">
+          <button
+            type="button"
+            className="secondary compact-action-btn"
+            style={{
+              background: presentationMode ? "#4f46e5" : "#f8fafc",
+              color: presentationMode ? "#ffffff" : "#4338ca",
+              borderColor: presentationMode ? "#4338ca" : "#c7d2fe",
+              fontWeight: 700,
+            }}
+            onClick={() => {
+              setPresentationMode?.((p) => !p);
+              notify?.(presentationMode ? "已退出演示模式" : "已进入沉浸演示模式 (Pitch Mode)");
+            }}
+            title="一键收起侧边栏，居中展示高保真真机供答辩演示"
+          >
+            {presentationMode ? <Minimize2 size={13} /> : <Maximize2 size={13} />}
+            <span>{presentationMode ? "退出演示" : "沉浸演示"}</span>
+          </button>
           <a
             href="./v1/"
             target="_blank"
