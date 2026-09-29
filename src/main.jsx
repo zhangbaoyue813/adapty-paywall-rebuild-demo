@@ -97,7 +97,7 @@ const originalPaywalls = [
 ];
 
 const nav = [
-  ["Paywalls", Smartphone, "list"],
+  ["购买页", Smartphone, "list"],
 ];
 
 const missingItems = [
@@ -296,7 +296,7 @@ const templates = [
     theme: "violet",
     visual: "content-paywall",
   },
-  // Adapty 国际化模版库
+  // 国际化购买页模版库
   { id: "knowledge", title: "Unlock the World of Knowledge", subtitle: "Premium learning library", tags: ["1 product", "Trial timeline", "Reviews"], productCount: 1, media: "image", category: "Popular", theme: "lavender", visual: "knowledge" },
   { id: "trial", title: "What to expect during your free trial", subtitle: "Day-by-day trial guide", tags: ["1 product", "Trial timeline"], productCount: 1, media: "image", category: "Popular", theme: "violet", visual: "trial" },
   { id: "family", title: "Unlock fluency for the whole family", subtitle: "Speak Easy with Family Plan", tags: ["1 product", "Image"], productCount: 1, media: "image", category: "Popular", theme: "night", visual: "family" },
@@ -1428,11 +1428,11 @@ function App() {
         <header className="topbar">
           <div className="app-switcher-wrap">
             <button className="app-switcher" onClick={() => setAppMenuOpen((open) => !open)}>
-              <b style={{ background: "#1ECA92" }}>HT</b> HelloTalk VIP 商业化中心 <ChevronDown size={15} />
+              <b style={{ background: "#1ECA92" }}>PB</b> 购买页配置工作台 <ChevronDown size={15} />
             </button>
             {appMenuOpen && (
               <div className="app-menu">
-                <button className="app-menu-current"><b style={{ background: "#1ECA92" }}>HT</b><span>HelloTalk VIP 商业化</span><Check size={15} /></button>
+                <button className="app-menu-current"><b style={{ background: "#1ECA92" }}>PB</b><span>购买页配置工作台</span><Check size={15} /></button>
                 <button onClick={() => { setAppMenuOpen(false); setModal({ kind: "add-app" }); }}><Plus size={16} /> 新建业务线</button>
               </div>
             )}
@@ -1450,6 +1450,7 @@ function App() {
         </header>
 
         <div className="content">
+          {(view === "builder" || view === "list") && <ProjectIntro />}
           {view === "backend" && <BackendArchitectureDocs />}
           {view === "content-paywall" && (
             <ContentPaywallManager
@@ -1534,7 +1535,7 @@ function App() {
         </button>
         {unknownOpen && (
           <div className="evidence-body">
-            <p>基于海外顶级订阅中台（Adapty）深度逆向与实测验证，已标明商业化行为边界与系统缺口。</p>
+            <p>基于订阅类购买页配置流程的研究与实测整理，已标明商业化行为边界与系统缺口。</p>
             {missingItems.map((item) => (
               <button className="gap-card" key={item.id} onClick={() => markUnknown(item)}>
                 <small>{item.id}</small>
@@ -1599,6 +1600,23 @@ function App() {
   );
 }
 
+function ProjectIntro() {
+  return (
+    <div className="project-intro">
+      <div>
+        <span className="project-intro-kicker">PROJECT DEMO · PURCHASE PAGE BUILDER</span>
+        <h2>购买页可视化搭建工具</h2>
+        <p>针对购买页文案、卖点、价格、权益等内容调整频繁依赖开发的问题，从 0-1 设计的可视化搭建工具 Demo。</p>
+      </div>
+      <div className="project-intro-points" aria-label="工具能力">
+        <span>组件化配置</span>
+        <span>实时预览</span>
+        <span>多页面方案</span>
+      </div>
+    </div>
+  );
+}
+
 function PaywallList({
   paywalls,
   search,
@@ -1631,15 +1649,15 @@ function PaywallList({
     <section>
       <div className="page-heading">
         <div>
-          <h1>HelloTalk Paywalls <span>↗</span></h1>
-          <p>涵盖新客破冰、功能阻断、节日大促、到期挽留与双阶对比等 {paywalls.length} 套全场景模版</p>
+          <h1>购买页配置 <span>↗</span></h1>
+          <p>覆盖新客引导、功能解锁、活动促销、到期挽留与会员方案对比等 {paywalls.length} 套页面方案</p>
         </div>
-        <button className="primary" onClick={() => setView("create")}>创建付费墙</button>
+        <button className="primary" onClick={() => setView("create")}>创建购买页</button>
       </div>
       <div className="list-controls">
         <label className="search">
           <Search size={18} />
-          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="搜索付费墙名称或业务场景..." />
+          <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="搜索购买页名称或业务场景..." />
         </label>
         <div className="placement-filter">
           <button className="select" onClick={() => { setPlacementDraft(placementFilter); setPlacementMenuOpen((open) => !open); }}>
@@ -1716,16 +1734,16 @@ function PaywallList({
 function CreatePaywall({ draft, setDraft, setView, setModal, createDraft, markUnknown }) {
   return (
     <section className="create">
-      <button className="back" onClick={() => setView("list")}><ArrowLeft size={18} /> 返回付费墙列表</button>
+      <button className="back" onClick={() => setView("list")}><ArrowLeft size={18} /> 返回购买页列表</button>
       <div className="create-header">
-        <div><h1>新建付费墙</h1><p>创建草稿并直接进入 iPhone 15 Pro 实时无代码构建器。</p></div>
+        <div><h1>新建购买页</h1><p>创建草稿并直接进入 iPhone 15 Pro 实时可视化构建器。</p></div>
         <button className="primary" onClick={() => setModal({ kind: "compliance" })}>创建为草稿</button>
       </div>
       <div className="create-grid">
         <div className="form-card">
           <h2>基础信息</h2>
-          <Field label="付费墙名称"><input value={draft.name} onChange={(event) => setDraft((state) => ({ ...state, name: event.target.value }))} /></Field>
-          <Field label="关联合约套餐">
+          <Field label="购买页名称"><input value={draft.name} onChange={(event) => setDraft((state) => ({ ...state, name: event.target.value }))} /></Field>
+          <Field label="关联产品套餐">
             {draft.products.map((product, index) => (
               <ProductRow
                 key={`${product}-${index}`}
@@ -1742,9 +1760,9 @@ function CreatePaywall({ draft, setDraft, setView, setModal, createDraft, markUn
         </div>
         <div className="start-card">
           <span className="eyebrow">Builder & Generator</span><h2>选择创建方式</h2>
-          <button onClick={() => setView("builder")}><Blocks size={22} /><span><strong>进入可视化构建器</strong><small>3 栏式元素图层与真机预览。</small></span><ChevronRight size={18} /></button>
-          <button onClick={() => setModal({ kind: "templates" })}><LayoutTemplate size={22} /><span><strong>从官方模版库选择</strong><small>12 套 HelloTalk 现网全场景模版。</small></span><ChevronRight size={18} /></button>
-          <button onClick={() => setModal({ kind: "ai" })}><WandSparkles size={22} /><span><strong>AI 智能生成付费墙</strong><small>根据提示词自动拼装模版。</small></span><ChevronRight size={18} /></button>
+          <button onClick={() => setView("builder")}><Blocks size={22} /><span><strong>进入可视化构建器</strong><small>三栏式元素图层与真机预览。</small></span><ChevronRight size={18} /></button>
+          <button onClick={() => setModal({ kind: "templates" })}><LayoutTemplate size={22} /><span><strong>从模版库选择方案</strong><small>覆盖会员、促销与新客引导等页面场景。</small></span><ChevronRight size={18} /></button>
+          <button onClick={() => setModal({ kind: "ai" })}><WandSparkles size={22} /><span><strong>AI 智能生成购买页</strong><small>根据提示词自动拼装页面方案。</small></span><ChevronRight size={18} /></button>
           <button onClick={() => setModal({ kind: "migration" })}><Copy size={22} /><span><strong>从其他应用复制设计</strong><small>复用已有视觉 Builder 配置。</small></span><ChevronRight size={18} /></button>
         </div>
       </div>
@@ -8224,7 +8242,7 @@ function WorkspaceHeader({ selected, setView, duplicate, setModal, markUnknown, 
   const cleanTitle = selected.name ? selected.name.replace(/\s*\([^)]*\)/g, "").trim() : "";
   return (
     <>
-      <button className="back" onClick={() => setView("list")}><ArrowLeft size={16} /> 返回列表</button>
+      <button className="back" onClick={() => setView("list")}><ArrowLeft size={16} /> 返回购买页列表</button>
       <div className="workspace-heading">
         <div className="workspace-title-wrap">
           <h1 className="compact-workspace-title">{cleanTitle}</h1>
@@ -8240,19 +8258,23 @@ function WorkspaceHeader({ selected, setView, duplicate, setModal, markUnknown, 
 
 function TemplatesModal({ selected, setSelected, onClose, onOpenAi, onOpenBuilder }) {
   const [pendingSelected, setPendingSelected] = useState(selected);
-  const [categoryFilter, setCategoryFilter] = useState("HelloTalk 官方");
+  const [categoryFilter, setCategoryFilter] = useState("member");
 
-  const filteredTemplates = templates.filter((t) => categoryFilter === "All" || t.category === categoryFilter);
+  const filteredTemplates = templates.filter((t) => (
+    categoryFilter === "All"
+      || (categoryFilter === "member" && t.category !== "Popular")
+      || t.category === categoryFilter
+  ));
   const pendingTemplate = pendingSelected !== null ? templates[pendingSelected] : null;
 
   return (
-    <Modal title="选择付费墙模版 (Choose a template)" onClose={onClose} wide>
+    <Modal title="选择购买页模版 (Choose a template)" onClose={onClose} wide>
       <div className="template-modal">
         <aside>
           <div className="filter-heading"><strong>模版分类</strong><span className="filter-count">{filteredTemplates.length}</span></div>
           <p>业务类别</p>
           <label className="filter-option">
-            <input type="radio" checked={categoryFilter === "HelloTalk 官方"} onChange={() => setCategoryFilter("HelloTalk 官方")} /> HelloTalk 官方 (12)
+            <input type="radio" checked={categoryFilter === "member"} onChange={() => setCategoryFilter("member")} /> 会员购买页与营销方案
           </label>
           <label className="filter-option">
             <input type="radio" checked={categoryFilter === "Popular"} onChange={() => setCategoryFilter("Popular")} /> 国际流行 (Popular)
