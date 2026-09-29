@@ -2934,24 +2934,10 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                         />
                       </div>
                     )}
-                    <div className="node-title" style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 0, overflow: "hidden" }}>
+                    <div className="node-title">
                       <strong style={{ fontSize: 12, color: "#1e293b", fontWeight: 600, whiteSpace: "nowrap" }}>
                         {displayName}
                       </strong>
-                      {sub && sub !== displayName && (
-                        <span style={{
-                          fontSize: 9.5,
-                          color: "#64748b",
-                          background: "#f1f5f9",
-                          padding: "1px 5px",
-                          borderRadius: 4,
-                          fontWeight: 500,
-                          whiteSpace: "nowrap",
-                          border: "1px solid #e2e8f0",
-                        }}>
-                          {sub}
-                        </span>
-                      )}
                     </div>
 
                     <div className="node-actions" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
@@ -3830,19 +3816,44 @@ function PreviewElement({
 
   const cat = getNodeCategory(node);
   const sub = getNodeSubRole(node);
-  const tagLabel = sub && sub !== cat ? sub : cat;
+  const tagLabel = cat;
 
   const select = () => onSelect(node.id);
-  const wrap = (content, className = "") => (
-    <div className={`preview-node ${active ? "selected" : ""} ${className}`} onClick={select}>
-      {active && (
-        <div className="preview-node-active-badge">
-          <span>{tagLabel}</span>
-        </div>
-      )}
-      {content}
-    </div>
-  );
+
+  const formatUnit = (v) => {
+    if (v === undefined || v === null || v === "") return undefined;
+    const s = String(v).trim();
+    if (/^\d+(\.\d+)?$/.test(s)) return `${s}px`;
+    return s;
+  };
+
+  const userFontSize = formatUnit(node.config?.fontSize);
+  const userTextAlign = node.config?.textAlign || node.config?.align;
+  const userPadding = formatUnit(node.config?.padding);
+  const userMargin = formatUnit(node.config?.margin);
+  const userMaxWidth = formatUnit(node.config?.maxWidth);
+
+  const wrap = (content, className = "") => {
+    const wrapStyle = {
+      ...(userTextAlign ? { textAlign: userTextAlign } : {}),
+      ...(userPadding ? { padding: userPadding } : {}),
+      ...(userMargin ? { margin: userMargin } : {}),
+      ...(userMaxWidth ? { maxWidth: userMaxWidth, width: "100%", marginLeft: "auto", marginRight: "auto", boxSizing: "border-box" } : {}),
+      ...(userFontSize ? { fontSize: userFontSize } : {}),
+      ...(node.style || {}),
+    };
+
+    return (
+      <div className={`preview-node ${active ? "selected" : ""} ${className}`} onClick={select} style={wrapStyle}>
+        {active && (
+          <div className="preview-node-active-badge">
+            <span>{tagLabel}</span>
+          </div>
+        )}
+        {content}
+      </div>
+    );
+  };
 
   const renderInterpolated = (text) => {
     if (!text) return "";
@@ -4323,12 +4334,13 @@ function PreviewElement({
           )}
           <h2
             style={{
-              fontSize: 28,
+              fontSize: userFontSize || 28,
               fontWeight: 900,
               color: mainFontColor,
               margin: "6px 0 2px",
               lineHeight: 1.22,
               letterSpacing: "-0.02em",
+              textAlign: userTextAlign || "left",
             }}
           >
             {renderInterpolated(node.content)}
@@ -4339,15 +4351,16 @@ function PreviewElement({
 
     if (currentTemplate?.id === "ht-vip-pop" || node.config?.variant === "pop-headline" || node.config?.align === "left") {
       return wrap(
-        <div style={{ textAlign: "left", padding: "2px 36px 2px 0" }}>
+        <div style={{ textAlign: userTextAlign || "left", padding: "2px 36px 2px 0" }}>
           <h2
             style={{
-              fontSize: 18,
+              fontSize: userFontSize || 18,
               fontWeight: 800,
               color: "#0f172a",
               margin: 0,
               lineHeight: 1.3,
               letterSpacing: "-0.01em",
+              textAlign: userTextAlign || "left",
             }}
           >
             {renderInterpolated(node.content)}
@@ -4359,7 +4372,12 @@ function PreviewElement({
     return wrap(
       <h2
         className="preview-ht-headline"
-        style={mainFontColor ? { color: mainFontColor, textAlign: "center", margin: "4px 0 2px" } : {}}
+        style={{
+          ...(mainFontColor ? { color: mainFontColor } : {}),
+          textAlign: userTextAlign || "center",
+          margin: "4px 0 2px",
+          ...(userFontSize ? { fontSize: userFontSize } : {}),
+        }}
       >
         {renderInterpolated(node.content)}
       </h2>
@@ -4369,8 +4387,8 @@ function PreviewElement({
   if (node.type === "Subhead") {
     if (node.id?.includes("cp") || currentTemplate?.id === "ht-content-paywall") {
       return wrap(
-        <div style={{ textAlign: "left", margin: "2px 0 8px", padding: "0 2px" }}>
-          <p style={{ fontSize: 13, color: node.config?.color || "#475569", fontWeight: 500, margin: 0 }}>
+        <div style={{ textAlign: userTextAlign || "left", margin: "2px 0 8px", padding: "0 2px" }}>
+          <p style={{ fontSize: userFontSize || 13, color: node.config?.color || "#475569", fontWeight: 500, margin: 0, textAlign: userTextAlign || "left" }}>
             {renderInterpolated(node.content)}
           </p>
         </div>
@@ -4381,8 +4399,8 @@ function PreviewElement({
     if (themeConfig?.subTemplate === "tpl-1" || node.id === "t1-subhead") {
       const subColor = node.config?.color || themeConfig?.otherColor || "#DE6876";
       return wrap(
-        <div style={{ textAlign: "left", margin: "2px 0 14px" }}>
-          <span style={{ fontSize: 21, fontWeight: 800, color: subColor, letterSpacing: "0.01em" }}>
+        <div style={{ textAlign: userTextAlign || "left", margin: "2px 0 14px" }}>
+          <span style={{ fontSize: userFontSize || 21, fontWeight: 800, color: subColor, letterSpacing: "0.01em", textAlign: userTextAlign || "left" }}>
             {renderInterpolated(node.content)}
           </span>
         </div>
@@ -4391,14 +4409,15 @@ function PreviewElement({
 
     if (currentTemplate?.id === "ht-vip-pop" || node.config?.align === "left") {
       return wrap(
-        <div style={{ textAlign: "left", margin: "3px 0 8px" }}>
+        <div style={{ textAlign: userTextAlign || "left", margin: "3px 0 8px" }}>
           <p
             style={{
-              fontSize: 12,
+              fontSize: userFontSize || 12,
               fontWeight: 600,
               color: node.config?.color || "#0f172a",
               margin: 0,
               lineHeight: 1.35,
+              textAlign: userTextAlign || "left",
             }}
           >
             {renderInterpolated(node.content)}
@@ -4408,7 +4427,7 @@ function PreviewElement({
     }
 
     return wrap(
-      <p className="preview-ht-subhead" style={{ textAlign: "center", margin: "2px 0 8px", color: node.config?.color || "#64748b" }}>
+      <p className="preview-ht-subhead" style={{ textAlign: userTextAlign || "center", margin: "2px 0 8px", color: node.config?.color || "#64748b", ...(userFontSize ? { fontSize: userFontSize } : {}) }}>
         {renderInterpolated(node.content)}
       </p>
     );
@@ -5512,7 +5531,7 @@ function PreviewElement({
               color: btnTextColor,
               border: "none",
               borderRadius: 26,
-              fontSize: 16,
+              fontSize: userFontSize || 16,
               fontWeight: 800,
               boxShadow: `0 6px 18px rgba(97, 68, 232, 0.32)`,
               display: "flex",
@@ -5554,7 +5573,7 @@ function PreviewElement({
               color: btnTextColor,
               border: "none",
               borderRadius: 24,
-              fontSize: 17,
+              fontSize: userFontSize || 17,
               fontWeight: 800,
               boxShadow: `0 4px 14px ${otherColor}40`,
               display: "flex",
@@ -5594,7 +5613,7 @@ function PreviewElement({
               color: "#FFFFFF",
               border: "none",
               borderRadius: 24,
-              fontSize: 16.5,
+              fontSize: userFontSize || 16.5,
               fontWeight: 800,
               boxShadow: `0 6px 18px ${customBtnColor}40`,
               display: "flex",
@@ -5614,7 +5633,7 @@ function PreviewElement({
 
     return wrap(
       <div className="preview-cta-wrap">
-        <button className="preview-cta-button">
+        <button className="preview-cta-button" style={{ ...(userFontSize ? { fontSize: userFontSize } : {}) }}>
           <span className="cta-main-title">{node.content || "立即开启试用"}</span>
           {node.config?.subtitle && <span className="cta-sub-title">{node.config.subtitle}</span>}
         </button>
@@ -5968,7 +5987,7 @@ function PreviewElement({
       );
     }
     return wrap(
-      <div style={{ textAlign: "center", fontSize: 11, color: "#64748b", margin: "4px 0" }}>
+      <div style={{ textAlign: userTextAlign || "center", fontSize: userFontSize || 11, color: node.config?.color || "#64748b", margin: "4px 0" }}>
         {renderInterpolated(node.content)}
       </div>
     );
@@ -6312,7 +6331,6 @@ function BuilderProperties({
             <div style={{ display: "flex", flexDirection: "column", gap: 10, margin: "6px 0 14px", background: "#f8fafc", padding: 10, borderRadius: 8, border: "1px solid #e2e8f0" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                 <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>文本与排版角色预设切换</span>
-                <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentTextRoleLabel}</span>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 5 }}>
                 {[
@@ -6352,7 +6370,7 @@ function BuilderProperties({
                         }
                         updateNode(active.id, {
                           type: r.id,
-                          label: `文本与排版 (${r.label})`,
+                          label: "文本与排版",
                           content: newContent,
                           config: newConfig,
                         });
@@ -6396,10 +6414,10 @@ function BuilderProperties({
                       cursor: "pointer",
                       transition: "all 0.15s ease",
                     }}
-                    title="在文案中插入千人千面动态变量"
+                    title="在文案中插入动态业务变量"
                   >
                     <Zap size={11} style={{ color: "#4f46e5" }} />
-                    <span>插入千人千面变量</span>
+                    <span>插入动态业务变量</span>
                     <span style={{ fontSize: 9, background: "#eef2ff", color: "#4f46e5", padding: "1px 5px", borderRadius: 3, fontWeight: 700 }}>
                       8
                     </span>
@@ -6420,7 +6438,7 @@ function BuilderProperties({
                       }}
                     >
                       <div style={{ fontSize: 10, color: "#64748b", marginBottom: 6 }}>
-                        点击变量插入文案末尾（当前模拟访客：{currentSimulatedUser?.name || "林凡"}）：
+                        选择动态业务参数插入文案（当前解析值匹配访客：{currentSimulatedUser?.name || "林凡"}）：
                       </div>
                       <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
                         {[
@@ -6438,7 +6456,7 @@ function BuilderProperties({
                             type="button"
                             onClick={() => {
                               insertVariable(v.token);
-                              notify?.(`已在文案末尾插入变量：${v.token}`);
+                              notify?.(`已在文案中插入动态参数：${v.token}`);
                             }}
                             title={`点击插入 ${v.token}，当前访客解析为：${v.preview}`}
                             style={{
@@ -6477,7 +6495,7 @@ function BuilderProperties({
                       onChange={(e) => updateNode(active.id, { config: { ...active.config, kicker: e.target.value } })}
                     />
                   </Field>
-                  <Field label="主标题文案">
+                  <Field label="文案内容">
                     <input
                       value={active.content ?? ""}
                       placeholder="例如：首年额外 20% 优惠！"
@@ -6485,7 +6503,7 @@ function BuilderProperties({
                     />
                   </Field>
                   {active.config?.subtitle !== undefined && (
-                    <Field label="副标题说明">
+                    <Field label="说明文案">
                       <input
                         value={active.config?.subtitle ?? "畅享 16 项高阶语言学习特权"}
                         onChange={(e) => updateNode(active.id, { config: { ...active.config, subtitle: e.target.value } })}
@@ -6532,14 +6550,14 @@ function BuilderProperties({
 
               {currentTextRole === "Subhead" && (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
-                  <Field label="副标题文案">
+                  <Field label="文案内容">
                     <input
                       value={active.content ?? ""}
                       placeholder="例如：仅限今日"
                       onChange={(e) => updateNode(active.id, { content: e.target.value })}
                     />
                   </Field>
-                  <Field label="副标题文本颜色">
+                  <Field label="文本颜色">
                     <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
                       {["#DE6876", "#FF4D6D", "#F59E0B", "#64748b", "#0284C7", "#2D1832"].map((c) => (
                         <button
@@ -8049,12 +8067,178 @@ function BuilderProperties({
       )}
 
       {(tab === "style" || tab === "layout") && (
-        <div>
-          <Field label="字体大小"><input defaultValue="16px" /></Field>
-          <Field label="文本对齐"><div className="select-like">居中对齐 <ChevronDown size={14} /></div></Field>
-          <Field label="内边距"><input defaultValue="12px" /></Field>
-          <Field label="外边距"><input defaultValue="8px" /></Field>
-          <Field label="最大宽度"><input defaultValue="100%" /></Field>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* 字体大小 */}
+          <Field label="字体大小">
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <input
+                value={active.config?.fontSize ?? ""}
+                placeholder="例如：16px 或 20px"
+                onChange={(e) => updateNode(active.id, { config: { ...active.config, fontSize: e.target.value } })}
+              />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {["11px", "13px", "16px", "18px", "22px", "26px"].map((sz) => (
+                  <button
+                    key={sz}
+                    type="button"
+                    onClick={() => updateNode(active.id, { config: { ...active.config, fontSize: sz } })}
+                    style={{
+                      fontSize: 10,
+                      padding: "2px 7px",
+                      borderRadius: 4,
+                      cursor: "pointer",
+                      background: active.config?.fontSize === sz ? "#eff6ff" : "#f8fafc",
+                      border: active.config?.fontSize === sz ? "1px solid #3b82f6" : "1px solid #cbd5e1",
+                      color: active.config?.fontSize === sz ? "#1d4ed8" : "#475569",
+                      fontWeight: active.config?.fontSize === sz ? 700 : 500,
+                    }}
+                  >
+                    {sz}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Field>
+
+          {/* 文本对齐 */}
+          <Field label="文本对齐">
+            <div style={{ position: "relative" }}>
+              <select
+                value={active.config?.textAlign || active.config?.align || "center"}
+                onChange={(e) => {
+                  updateNode(active.id, {
+                    config: {
+                      ...active.config,
+                      textAlign: e.target.value,
+                      align: e.target.value,
+                    },
+                  });
+                }}
+                style={{
+                  width: "100%",
+                  padding: "8px 28px 8px 10px",
+                  borderRadius: 6,
+                  border: "1px solid #d1d5db",
+                  background: "#ffffff",
+                  fontSize: 13,
+                  color: "#1e293b",
+                  appearance: "none",
+                  cursor: "pointer",
+                }}
+              >
+                <option value="left">居左对齐</option>
+                <option value="center">居中对齐</option>
+                <option value="right">居右对齐</option>
+              </select>
+              <ChevronDown
+                size={14}
+                style={{
+                  position: "absolute",
+                  right: 10,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  pointerEvents: "none",
+                  color: "#64748b",
+                }}
+              />
+            </div>
+          </Field>
+
+          {/* 内边距 */}
+          <Field label="内边距">
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <input
+                value={active.config?.padding ?? ""}
+                placeholder="例如：12px 或 8px 16px"
+                onChange={(e) => updateNode(active.id, { config: { ...active.config, padding: e.target.value } })}
+              />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {["0px", "6px 12px", "12px", "16px 20px"].map((pd) => (
+                  <button
+                    key={pd}
+                    type="button"
+                    onClick={() => updateNode(active.id, { config: { ...active.config, padding: pd } })}
+                    style={{
+                      fontSize: 10,
+                      padding: "2px 7px",
+                      borderRadius: 4,
+                      cursor: "pointer",
+                      background: active.config?.padding === pd ? "#eff6ff" : "#f8fafc",
+                      border: active.config?.padding === pd ? "1px solid #3b82f6" : "1px solid #cbd5e1",
+                      color: active.config?.padding === pd ? "#1d4ed8" : "#475569",
+                      fontWeight: active.config?.padding === pd ? 700 : 500,
+                    }}
+                  >
+                    {pd}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Field>
+
+          {/* 外边距 */}
+          <Field label="外边距">
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <input
+                value={active.config?.margin ?? ""}
+                placeholder="例如：8px 或 4px 0 12px"
+                onChange={(e) => updateNode(active.id, { config: { ...active.config, margin: e.target.value } })}
+              />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {["0px", "4px 0", "8px", "16px 0"].map((mg) => (
+                  <button
+                    key={mg}
+                    type="button"
+                    onClick={() => updateNode(active.id, { config: { ...active.config, margin: mg } })}
+                    style={{
+                      fontSize: 10,
+                      padding: "2px 7px",
+                      borderRadius: 4,
+                      cursor: "pointer",
+                      background: active.config?.margin === mg ? "#eff6ff" : "#f8fafc",
+                      border: active.config?.margin === mg ? "1px solid #3b82f6" : "1px solid #cbd5e1",
+                      color: active.config?.margin === mg ? "#1d4ed8" : "#475569",
+                      fontWeight: active.config?.margin === mg ? 700 : 500,
+                    }}
+                  >
+                    {mg}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Field>
+
+          {/* 最大宽度 */}
+          <Field label="最大宽度">
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              <input
+                value={active.config?.maxWidth ?? ""}
+                placeholder="例如：100% 或 300px"
+                onChange={(e) => updateNode(active.id, { config: { ...active.config, maxWidth: e.target.value } })}
+              />
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                {["100%", "90%", "300px", "240px"].map((mw) => (
+                  <button
+                    key={mw}
+                    type="button"
+                    onClick={() => updateNode(active.id, { config: { ...active.config, maxWidth: mw } })}
+                    style={{
+                      fontSize: 10,
+                      padding: "2px 7px",
+                      borderRadius: 4,
+                      cursor: "pointer",
+                      background: active.config?.maxWidth === mw ? "#eff6ff" : "#f8fafc",
+                      border: active.config?.maxWidth === mw ? "1px solid #3b82f6" : "1px solid #cbd5e1",
+                      color: active.config?.maxWidth === mw ? "#1d4ed8" : "#475569",
+                      fontWeight: active.config?.maxWidth === mw ? 700 : 500,
+                    }}
+                  >
+                    {mw}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </Field>
         </div>
       )}
     </div>
