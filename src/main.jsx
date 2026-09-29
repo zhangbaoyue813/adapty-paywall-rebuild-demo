@@ -5983,10 +5983,12 @@ function BuilderProperties({
   const [tab, setTab] = useState("content");
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState("");
+  const [showDynamicVars, setShowDynamicVars] = useState(false);
 
   useEffect(() => {
     setIsEditingName(false);
     setTempName("");
+    setShowDynamicVars(false);
   }, [active?.id]);
 
   if (!active) {
@@ -6352,95 +6354,96 @@ function BuilderProperties({
                 })}
               </div>
 
-              {/* 用户实时动态变量 (根据当前访问用户实时匹配) */}
-              <div style={{ marginTop: 4, padding: "8px 10px", background: "#f0fdf4", border: "1px solid #bbf7d0", borderRadius: 8 }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
-                  <span style={{ fontSize: 11, fontWeight: 700, color: "#166534", display: "inline-flex", alignItems: "center", gap: 4 }}>
-                    <Zap size={13} style={{ flexShrink: 0 }} /> 用户实时动态变量 (根据当前访问用户实时匹配)
-                  </span>
-                  <span style={{ fontSize: 9.5, background: "#dcfce7", color: "#15803d", padding: "1px 6px", borderRadius: 4, fontWeight: 600 }}>
-                    实时千人千面
-                  </span>
-                </div>
+              {/* 仅在主标题/副标题/正文/用户画像等营销文本角色下提供优雅收纳的动态变量入口；免责声明/标签等场景下完全隐藏 */}
+              {["Header", "Subhead", "Text", "User Profile"].includes(currentTextRole) && (
+                <div style={{ margin: "2px 0 6px" }}>
+                  <button
+                    type="button"
+                    onClick={() => setShowDynamicVars((prev) => !prev)}
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      padding: "4px 9px",
+                      background: showDynamicVars ? "#f1f5f9" : "#ffffff",
+                      border: "1px solid #cbd5e1",
+                      borderRadius: 6,
+                      fontSize: 10.5,
+                      fontWeight: 600,
+                      color: "#334155",
+                      cursor: "pointer",
+                      transition: "all 0.15s ease",
+                    }}
+                    title="在文案中插入千人千面动态变量"
+                  >
+                    <Zap size={11} style={{ color: "#4f46e5" }} />
+                    <span>插入千人千面变量</span>
+                    <span style={{ fontSize: 9, background: "#eef2ff", color: "#4f46e5", padding: "1px 5px", borderRadius: 3, fontWeight: 700 }}>
+                      8
+                    </span>
+                    <span style={{ fontSize: 9, color: "#94a3b8", transform: showDynamicVars ? "rotate(180deg)" : "rotate(0deg)", transition: "transform 0.15s" }}>
+                      ▼
+                    </span>
+                  </button>
 
-                {/* 模拟访客画像切换 */}
-                <div style={{ display: "flex", alignItems: "center", gap: 5, marginBottom: 8 }}>
-                  <span style={{ fontSize: 10, color: "#15803d", fontWeight: 700, flexShrink: 0 }}>模拟访客:</span>
-                  <div style={{ display: "flex", gap: 4, flex: 1 }}>
-                    {SIMULATED_USERS.map((u) => {
-                      const isSelected = (currentSimulatedUser?.id || "user-linfan") === u.id;
-                      return (
-                        <button
-                          key={u.id}
-                          type="button"
-                          onClick={() => {
-                            setSimulatedUserId?.(u.id);
-                            notify?.(`已切换模拟访客画像为：${u.name}（${u.targetLang}）`);
-                          }}
-                          style={{
-                            flex: 1,
-                            padding: "3px 4px",
-                            fontSize: 9.5,
-                            borderRadius: 4,
-                            cursor: "pointer",
-                            fontWeight: isSelected ? 700 : 500,
-                            background: isSelected ? "#15803d" : "#ffffff",
-                            color: isSelected ? "#ffffff" : "#166534",
-                            border: isSelected ? "1px solid #15803d" : "1px solid #86efac",
-                            whiteSpace: "nowrap",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            gap: 3,
-                          }}
-                        >
-                          <span>{u.avatar}</span>
-                          <span>{u.name} · {u.targetLang}</span>
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 实时变量注入按钮 */}
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
-                  {[
-                    { label: "用户昵称", token: "{用户昵称}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).name },
-                    { label: "学习语言", token: "{学习语言}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).targetLang },
-                    { label: "附近语伴数", token: "{附近语伴数}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).nearbyCount}位` },
-                    { label: "谁看过我", token: "{谁看过我}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).visitorsCount}人` },
-                    { label: "今日消耗翻译", token: "{今日消耗翻译}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).todayTranslations}次` },
-                    { label: "VIP到期天数", token: "{VIP到期天数}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).vipExpireDays}天` },
-                    { label: "实时折扣", token: "{实时折扣}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).discount },
-                    { label: "实时立省金额", token: "{实时立省金额}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).saveAmount },
-                  ].map((v) => (
-                    <button
-                      key={v.token}
-                      type="button"
-                      onClick={() => insertVariable(v.token)}
-                      title={`点击插入 ${v.token}，当前访客解析为：${v.preview}`}
+                  {showDynamicVars && (
+                    <div
                       style={{
-                        fontSize: 10,
-                        padding: "3px 6px",
-                        borderRadius: 4,
-                        cursor: "pointer",
+                        marginTop: 6,
+                        padding: "8px 10px",
                         background: "#ffffff",
-                        border: "1px solid #86efac",
-                        color: "#166534",
-                        fontWeight: 600,
-                        display: "inline-flex",
-                        alignItems: "center",
-                        gap: 3,
+                        border: "1px solid #e2e8f0",
+                        borderRadius: 7,
+                        boxShadow: "0 2px 6px rgba(15, 23, 42, 0.04)",
                       }}
                     >
-                      <span>+ {v.label}</span>
-                      <span style={{ fontSize: 9, color: "#15803d", opacity: 0.85, background: "#dcfce7", padding: "0 3px", borderRadius: 3 }}>
-                        {v.preview}
-                      </span>
-                    </button>
-                  ))}
+                      <div style={{ fontSize: 10, color: "#64748b", marginBottom: 6 }}>
+                        点击变量插入文案末尾（当前模拟访客：{currentSimulatedUser?.name || "林凡"}）：
+                      </div>
+                      <div style={{ display: "flex", flexWrap: "wrap", gap: 4 }}>
+                        {[
+                          { label: "用户昵称", token: "{用户昵称}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).name },
+                          { label: "学习语言", token: "{学习语言}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).targetLang },
+                          { label: "附近语伴数", token: "{附近语伴数}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).nearbyCount}位` },
+                          { label: "谁看过我", token: "{谁看过我}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).visitorsCount}人` },
+                          { label: "今日消耗翻译", token: "{今日消耗翻译}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).todayTranslations}次` },
+                          { label: "VIP到期天数", token: "{VIP到期天数}", preview: `${(currentSimulatedUser || SIMULATED_USERS[0]).vipExpireDays}天` },
+                          { label: "实时折扣", token: "{实时折扣}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).discount },
+                          { label: "实时立省金额", token: "{实时立省金额}", preview: (currentSimulatedUser || SIMULATED_USERS[0]).saveAmount },
+                        ].map((v) => (
+                          <button
+                            key={v.token}
+                            type="button"
+                            onClick={() => {
+                              insertVariable(v.token);
+                              notify?.(`已在文案末尾插入变量：${v.token}`);
+                            }}
+                            title={`点击插入 ${v.token}，当前访客解析为：${v.preview}`}
+                            style={{
+                              fontSize: 10,
+                              padding: "3px 6px",
+                              borderRadius: 4,
+                              cursor: "pointer",
+                              background: "#f8fafc",
+                              border: "1px solid #cbd5e1",
+                              color: "#1e293b",
+                              fontWeight: 500,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: 3,
+                            }}
+                          >
+                            <span style={{ color: "#4f46e5", fontWeight: 700 }}>+ {v.label}</span>
+                            <span style={{ fontSize: 9, color: "#64748b", background: "#f1f5f9", padding: "0 3px", borderRadius: 3 }}>
+                              {v.preview}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
               {/* Sub-role specific forms */}
               {currentTextRole === "Header" && (
