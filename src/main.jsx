@@ -6333,7 +6333,6 @@ function BuilderProperties({
                           content: newContent,
                           config: newConfig,
                         });
-                        notify?.(`已切换文本角色为：${r.label}`);
                       }}
                       style={{
                         padding: "7px 4px",
