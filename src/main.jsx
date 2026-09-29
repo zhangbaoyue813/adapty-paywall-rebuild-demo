@@ -1554,12 +1554,12 @@ function App() {
 
       <aside className={`evidence-panel ${unknownOpen ? "open" : ""}`}>
         <button className="evidence-head" onClick={() => setUnknownOpen((open) => !open)}>
-          <span><CircleHelp size={17} /> 摸底缺口与实测边界</span>
-          <ChevronRight size={16} />
+          <span><CircleHelp size={16} /> 商业化引擎实测规范与边界</span>
+          <ChevronRight size={15} />
         </button>
         {unknownOpen && (
           <div className="evidence-body">
-            <p>基于真实后台与 Adapty 逆向证据，未验证行为均已标注。</p>
+            <p>基于海外顶级订阅中台（Adapty）深度逆向与实测验证，已标明商业化行为边界与系统缺口。</p>
             {missingItems.map((item) => (
               <button className="gap-card" key={item.id} onClick={() => markUnknown(item)}>
                 <small>{item.id}</small>
@@ -2934,10 +2934,24 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                         />
                       </div>
                     )}
-                    <div className="node-title" style={{ display: "flex", alignItems: "center", gap: 5, flex: 1, minWidth: 0, overflow: "hidden" }}>
-                      <strong style={{ fontSize: 12, color: "#1e293b", fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                    <div className="node-title" style={{ display: "flex", alignItems: "center", gap: 6, flex: 1, minWidth: 0, overflow: "hidden" }}>
+                      <strong style={{ fontSize: 12, color: "#1e293b", fontWeight: 600, whiteSpace: "nowrap" }}>
                         {displayName}
                       </strong>
+                      {sub && sub !== displayName && (
+                        <span style={{
+                          fontSize: 9.5,
+                          color: "#64748b",
+                          background: "#f1f5f9",
+                          padding: "1px 5px",
+                          borderRadius: 4,
+                          fontWeight: 500,
+                          whiteSpace: "nowrap",
+                          border: "1px solid #e2e8f0",
+                        }}>
+                          {sub}
+                        </span>
+                      )}
                     </div>
 
                     <div className="node-actions" onPointerDown={(e) => e.stopPropagation()} onClick={(e) => e.stopPropagation()}>
@@ -3814,9 +3828,18 @@ function PreviewElement({
   const [activeTab, setActiveTab] = useState(1);
   const [carouselIndex, setCarouselIndex] = useState(0);
 
+  const cat = getNodeCategory(node);
+  const sub = getNodeSubRole(node);
+  const tagLabel = sub && sub !== cat ? sub : cat;
+
   const select = () => onSelect(node.id);
   const wrap = (content, className = "") => (
     <div className={`preview-node ${active ? "selected" : ""} ${className}`} onClick={select}>
+      {active && (
+        <div className="preview-node-active-badge">
+          <span>{tagLabel}</span>
+        </div>
+      )}
       {content}
     </div>
   );
