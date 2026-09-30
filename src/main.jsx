@@ -3748,10 +3748,6 @@ function PreviewElement({
   const [activeTab, setActiveTab] = useState(1);
   const [carouselIndex, setCarouselIndex] = useState(0);
 
-  const cat = getNodeCategory(node);
-  const sub = getNodeSubRole(node);
-  const tagLabel = cat;
-
   const select = () => onSelect(node.id);
 
   const formatUnit = (v) => {
@@ -3779,11 +3775,6 @@ function PreviewElement({
 
     return (
       <div className={`preview-node ${active ? "selected" : ""} ${className}`} onClick={select} style={wrapStyle}>
-        {active && (
-          <div className="preview-node-active-badge">
-            <span>{tagLabel}</span>
-          </div>
-        )}
         {content}
       </div>
     );
