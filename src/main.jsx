@@ -87,8 +87,7 @@ const originalPaywalls = [
   { id: "ht-retain", name: "支付未完成页 (PAYMENT_UNFINISHED)", state: "Live", products: 2, startedAt: "10 May 2026", templateId: "ht-retain", scene: "支付流失挽留" },
   { id: "ht-vip-pop", name: "SKU半窗 (SKU_POPUP)", state: "Live", products: 3, startedAt: "14 Jun 2026", templateId: "ht-vip-pop", scene: "额度拦截半屏" },
   { id: "ht-send-gift", name: "赠送礼物页 (SEND_GIFT)", state: "Live", products: 2, startedAt: "18 Nov 2025", templateId: "ht-black-friday", scene: "商业化礼物赠送" },
-  { id: "ht-switch-compare", name: "VIP分级页面-默认VIP (VIP_LEVEL)", state: "Live", products: 2, startedAt: "25 May 2026", templateId: "ht-switch-compare", scene: "VIP进阶方案" },
-  { id: "ht-tier-compare", name: "VIP分级页面-默认VIPPlus (VIP_PLUS_LEVEL)", state: "Draft", products: 2, startedAt: "01 Jun 2026", templateId: "ht-tier-compare", scene: "VIP+黑金旗舰" },
+  { id: "ht-switch-compare", name: "VIP分级页面-VIP和VIP PLUS (VIP_AND_VIP_PLUS)", state: "Live", products: 2, startedAt: "25 May 2026", templateId: "ht-switch-compare", scene: "VIP与VIP+双阶方案" },
   // 高频特权阻断与营销卡片
   { id: "ht-guest-card", name: "谁看过我访客特权拦截 (GUEST_CARD)", state: "Live", products: 2, startedAt: "20 Mar 2026", templateId: "ht-guest-card", scene: "访客足迹拦截" },
   { id: "ht-nearby-city", name: "寻找语伴定位漫游拦截 (NEARBY & CITY CARD)", state: "Live", products: 2, startedAt: "15 Feb 2026", templateId: "ht-nearby-city", scene: "定位漫游拦截" },
@@ -231,25 +230,14 @@ const templates = [
   },
   {
     id: "ht-switch-compare",
-    title: "VIP / VIP+ 双档位切换模版 (SwitchComparisonStyle)",
-    subtitle: "Top tab switcher between VIP & VIP+ plans",
+    title: "VIP / VIP+ 分级对比模版 (VIP & VIP+)",
+    subtitle: "Top tab switcher between VIP & VIP+ plans with dynamic matrix",
     tags: ["2 products", "Switch Tabs", "VIP+ Perks"],
     productCount: 2,
     media: "image",
     category: "官方核心模版",
     theme: "violet",
     visual: "switch",
-  },
-  {
-    id: "ht-tier-compare",
-    title: "VIP / VIP+ 双阶特权对比矩阵 (PrivilegeComparisonStyle)",
-    subtitle: "3-column matrix comparing Free, VIP and VIP+",
-    tags: ["2 products", "Comparison Table"],
-    productCount: 2,
-    media: "none",
-    category: "官方核心模版",
-    theme: "white",
-    visual: "compare",
   },
   {
     id: "ht-vip-pop",
@@ -841,8 +829,8 @@ function createBuilderNodes(templateId = "ht-onboarding") {
     ];
   }
 
-  // 7. VIP分级页面-默认VIP (Figure 1 官方规范拆解)
-  if (template.id === "ht-switch-compare") {
+  // 7. VIP分级页面-VIP和VIP PLUS (官方双阶对比规范拆解)
+  if (template.id === "ht-switch-compare" || template.id === "ht-tier-compare") {
     return [
       node("switch-tabs", "Switch Tabs", "VIP|VIP+", 0, {
         label: "切换标签",
@@ -882,56 +870,6 @@ function createBuilderNodes(templateId = "ht-onboarding") {
         ],
       }),
       node("purchase", "Purchase Button", "升级 VIP", 0, {
-        label: "购买按钮",
-        variant: "pill-gradient",
-      }),
-      node("links", "Legal Footer", "如果当前缴费期限24小时没有取消续订，系统会自动续订，费用将从你的iTunes账户收取，你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的服务条款及隐私政策", 0, {
-        label: "免责声明",
-      }),
-    ];
-  }
-
-  // 8. VIP分级页面-默认VIPPlus (Figure 4 官方规范拆解)
-  if (template.id === "ht-tier-compare") {
-    return [
-      node("switch-tabs", "Switch Tabs", "VIP|VIP+", 0, {
-        label: "切换标签",
-        activeTab: 1,
-      }),
-      node("headline", "Header", "VIP 会员 PLUS +", 0, {
-        label: "标题",
-        variant: "brand-hero",
-        bullets: [
-          "无限翻译",
-          "查看谁喜欢了你",
-          "结识全球母语者",
-        ],
-      }),
-      node("compare-table", "Comparison Table", "", 0, {
-        label: "对比表格",
-        compareMode: "vip-vs-plus",
-        featureColTitle: "特权功能",
-        col1Title: "VIP会员",
-        col2Title: "VIP+会员",
-        items: DEFAULT_VIP_VS_PLUS_ITEMS,
-        showExpandCaret: true,
-      }),
-      node("timer", "Timer", "20% OFF 14:43:23", 0, {
-        label: "倒计时",
-        variant: "pill-capsule",
-        discount: "20% OFF",
-        time: "14:43:23",
-      }),
-      node("products", "Products", "1个月|¥78|¥78/月\n12个月|¥488|¥40.6/月|最受欢迎\n终身|¥998|原价 ¥1698", 0, {
-        label: "横向套餐卡片",
-        variant: "3-column-tiers",
-        tiers: [
-          { name: "1个月", monthly: "¥78", total: "¥78/月", isRecommended: false },
-          { name: "12个月", monthly: "¥488", total: "¥40.6/月", badge: "最受欢迎", isRecommended: true },
-          { name: "终身", monthly: "¥998", total: "原价 ¥1698", isRecommended: false },
-        ],
-      }),
-      node("purchase", "Purchase Button", "升级 VIP+", 0, {
         label: "购买按钮",
         variant: "pill-gradient",
       }),

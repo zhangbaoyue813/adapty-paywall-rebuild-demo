@@ -63,17 +63,9 @@ export default function BackendArchitectureDocs() {
     {
       sceneId: 25,
       sceneCode: "VIP_LEVEL",
-      name: "VIP分级页面-默认VIP",
+      name: "VIP分级页面-VIP和VIP PLUS",
       templates: "模板1 (TierVipPrivilege)",
-      desc: "VIP 与 VIP+ 分层进阶页，默认定位进阶版 VIP，展示基础特权对比",
-      status: "已完整组件化"
-    },
-    {
-      sceneId: 26,
-      sceneCode: "VIP_PLUS_LEVEL",
-      name: "VIP分级页面-默认VIPPlus",
-      templates: "模板1 (TierVipPrivilege)",
-      desc: "VIP 与 VIP+ 分层进阶页，默认定位黑金尊享 VIP+，突出 AI 纠错与全语种特权",
+      desc: "VIP 与 VIP+ 分层进阶对比页，支持实时切换进阶版与黑金尊享特权",
       status: "已完整组件化"
     }
   ];
@@ -431,7 +423,7 @@ export default function BackendArchitectureDocs() {
           <div style={{ padding: 16, border: "1px solid #e2e8f0", borderRadius: 8, background: "#f8fafc" }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#1e293b", marginBottom: 8 }}>② 官方模版装配中心</div>
             <p style={{ fontSize: 12, color: "#64748b", margin: 0, lineHeight: 1.5 }}>
-              12 套 精选全场景付费墙模版直接注入系统模版库，支持在构建器中一键更换（Change template），自动生成元素图层树。
+              11 套 精选全场景付费墙模版直接注入系统模版库，支持在构建器中一键更换（Change template），自动生成元素图层树。
             </p>
           </div>
           <div style={{ padding: 16, border: "1px solid #e2e8f0", borderRadius: 8, background: "#f8fafc" }}>
