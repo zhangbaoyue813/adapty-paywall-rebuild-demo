@@ -1439,7 +1439,6 @@ function App() {
         </header>
 
         <div className="content">
-          {(view === "builder" || view === "list") && <ProjectIntro />}
           {view === "backend" && <BackendArchitectureDocs />}
           {view === "content-paywall" && (
             <ContentPaywallManager
@@ -1589,22 +1588,6 @@ function App() {
   );
 }
 
-function ProjectIntro() {
-  return (
-    <div className="project-intro">
-      <div>
-        <span className="project-intro-kicker">PROJECT DEMO · PURCHASE PAGE BUILDER</span>
-        <h2>购买页可视化搭建工具</h2>
-        <p>针对购买页文案、卖点、价格、权益等内容调整频繁依赖开发的问题，从 0-1 设计的可视化搭建工具 Demo。</p>
-      </div>
-      <div className="project-intro-points" aria-label="工具能力">
-        <span>组件化配置</span>
-        <span>实时预览</span>
-        <span>多页面方案</span>
-      </div>
-    </div>
-  );
-}
 
 function PaywallList({
   paywalls,
