@@ -80,7 +80,6 @@ import {
 
 const originalPaywalls = [
   // 商业化配置后台「VIP 样式管理」核心 Paywall 商业化矩阵
-  { id: "ht-content-paywall", name: "内容Paywall样式 (CONTENT_PAYWALL)", state: "Live", products: 1, startedAt: "20 Sep 2026", templateId: "ht-content-paywall", scene: "内容弹窗/访客/失效挽留" },
   { id: "ht-vip-package", name: "会员套餐与蓝色特权页 (VIP_PACKAGE · BLUE_PRIVILEGE)", state: "Live", products: 3, startedAt: "01 Jan 2026", templateId: "ht-vip-package", scene: "会员套餐与蓝色特权主售卖" },
   { id: "ht-entry-aggregation", name: "入门价格页 (ENTRY_PRICE)", state: "Live", products: 2, startedAt: "22 Jun 2026", templateId: "ht-entry-aggregation", scene: "新手特惠 (双模板+倒计时)" },
   { id: "ht-onboarding", name: "注册引导与免费试用页 (FREE_TRIAL)", state: "Live", products: 2, startedAt: "12 Apr 2026", templateId: "ht-onboarding", scene: "0元试用与新客引导" },
@@ -271,17 +270,6 @@ const templates = [
     category: "官方核心模版",
     theme: "night",
     visual: "vipplus",
-  },
-  {
-    id: "ht-content-paywall",
-    title: "内容Paywall样式 (CONTENT_PAYWALL)",
-    subtitle: "官方三套内容弹窗 (VIP失效/非VIP访客/非订阅状态) · 动态变量插值",
-    tags: ["3套样式类型", "动态变量矩阵", "1:1官方对标"],
-    productCount: 1,
-    media: "image",
-    category: "官方核心模版 (VIP样式管理)",
-    theme: "violet",
-    visual: "content-paywall",
   },
   // 国际化购买页模版库
   { id: "knowledge", title: "Unlock the World of Knowledge", subtitle: "Premium learning library", tags: ["1 product", "Trial timeline", "Reviews"], productCount: 1, media: "image", category: "Popular", theme: "lavender", visual: "knowledge" },
