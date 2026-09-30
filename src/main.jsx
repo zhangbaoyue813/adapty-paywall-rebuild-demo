@@ -395,7 +395,6 @@ const componentTypeLabelsZh = {
   "Language Chips": "语言标签",
   "User Profile": "用户画像",
   "Dynamic Metrics": "动态指标",
-  "Mascot Illustration": "吉祥物插画",
   "Text": "文本",
   // Common aliases
   "purchase": "购买按钮",
@@ -412,7 +411,6 @@ const componentTypeLabelsZh = {
   "hero": "背景图",
   "user-profile": "用户画像",
   "metrics": "动态指标",
-  "mascot": "吉祥物插画",
 };
 
 const zhToTypeMap = {
@@ -423,7 +421,6 @@ const zhToTypeMap = {
   "背景图": "Hero Image",
   "顶部大图": "Hero Image",
   "顶部头图": "Hero Image",
-  "顶部头图与吉祥物": "Hero Image",
   "顶部头图与两行标题": "Hero Image",
   "核心特权": "Benefit List",
   "核心特权卡片": "Benefit List",
@@ -458,7 +455,6 @@ const zhToTypeMap = {
   "用户画像": "User Profile",
   "动态指标": "Dynamic Metrics",
   "动态指标矩阵": "Dynamic Metrics",
-  "吉祥物插画": "Mascot Illustration",
   "文本": "Text",
 };
 
@@ -540,7 +536,6 @@ const getNodeCategory = (node) => {
     raw.includes("背景图") ||
     raw.includes("头图") ||
     raw.includes("插画") ||
-    raw.includes("吉祥物") ||
     node.id?.includes("hero") ||
     node.id?.includes("mascot")
   ) {
@@ -612,10 +607,9 @@ const getNodeSubRole = (node) => {
   if (type === "Products" || raw.includes("套餐")) return "套餐卡片";
 
   // 背景图
-  if (type === "Mascot Illustration" || raw.includes("吉祥物") || raw.includes("插画")) return "吉祥物插画";
-  if (node.config?.bgMode === "image") return "自定义图片";
-  if (node.config?.bgMode === "gradient") return "渐变底色";
-  if (type === "Hero Image" || raw.includes("背景图") || raw.includes("头图")) return "原生插画";
+  if (node.config?.bgMode === "image" || raw.includes("自定义图片")) return "自定义图片";
+  if (node.config?.bgMode === "gradient" || raw.includes("渐变")) return "渐变底色";
+  if (type === "Hero Image" || type === "Mascot Illustration" || raw.includes("背景图") || raw.includes("头图") || raw.includes("插画")) return "原生插画";
 
   // 操作按钮
   if (type === "Purchase Button" || raw.includes("购买")) return "购买按钮";
@@ -741,7 +735,7 @@ function createBuilderNodes(templateId = "ht-onboarding") {
         highlightColor: "#6C3EDE",
         label: "文本与排版 (主标题)",
       }),
-      node("cp-mascot", "Mascot Illustration", "crown-gift", 0, { mascotType: "crown-gift", label: "背景图 (吉祥物插画)" }),
+      node("cp-hero", "Hero Image", "原生插画", 0, { bgMode: "illustration", themeColor: "purple", label: "背景图 (原生插画)" }),
       node("cp-purchase", "Purchase Button", "立即续订", 0, { label: "操作按钮 (购买按钮)", color: "#6C3EDE" }),
     ];
   }
@@ -2147,7 +2141,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           { id: "cp1-metrics", type: "Dynamic Metrics", label: "对比与时间轴 (动态指标)", content: "972、762、487、673、837、899、116、156、939、446、650、442", depth: 0, enabled: true, config: { styleType: "VIP失效样式", metricValues: [972, 762, 487, 673, 837, 899, 116, 156, 939, 446, 650, 442] } },
           { id: "cp1-subhead", type: "Subhead", label: "文本与排版 (副标题)", content: "你的进步有目共睹！", depth: 0, enabled: true, config: { variant: "body" } },
           { id: "cp1-headline", type: "Header", label: "文本与排版 (主标题)", content: "VIP现已过期\n立即续订，别让沟通速度慢下来！", depth: 0, enabled: true, config: { variant: "content-headline", highlightWord: "立即续订", highlightColor: "#6C3EDE" } },
-          { id: "cp1-mascot", type: "Mascot Illustration", label: "背景图 (吉祥物插画)", content: "crown-gift", depth: 0, enabled: true, config: { mascotType: "crown-gift" } },
+          { id: "cp1-hero", type: "Hero Image", label: "背景图", content: "原生插画", depth: 0, enabled: true, config: { bgMode: "illustration", themeColor: "purple" } },
           { id: "cp1-purchase", type: "Purchase Button", label: "操作按钮 (购买按钮)", content: "立即续订", depth: 0, enabled: true, config: { label: "操作按钮 (购买按钮)", color: "#6C3EDE" } },
         ],
       },
@@ -2169,7 +2163,6 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           subtitle: "Your profile is getting noticed",
           hook1: "Let more people know you",
           hook2: "Reach more people",
-          mascotType: "binoculars",
           disclaimer: "Upgrade to VIP to see who viewed your profile",
           btnText: "Upgrade Now",
           btnColor: "#FF6A00",
@@ -2180,7 +2173,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           { id: "cp2-metrics", type: "Dynamic Metrics", label: "对比与时间轴 (动态指标)", content: "21 new visitors in the past 7 days 👀", depth: 0, enabled: true, config: { styleType: "非VIP样式", visitorCount: 21, visitorTitle: "21 new visitors in the past 7 days 👀" } },
           { id: "cp2-subhead", type: "Subhead", label: "文本与排版 (副标题)", content: "Your profile is getting noticed", depth: 0, enabled: true, config: { variant: "body" } },
           { id: "cp2-headline", type: "Header", label: "文本与排版 (主标题)", content: "Let more people know you\nReach more people", depth: 0, enabled: true, config: { variant: "content-headline", hook1: "Let more people know you", hook2: "Reach more people" } },
-          { id: "cp2-mascot", type: "Mascot Illustration", label: "背景图 (吉祥物插画)", content: "binoculars", depth: 0, enabled: true, config: { mascotType: "binoculars" } },
+          { id: "cp2-hero", type: "Hero Image", label: "背景图", content: "原生插画", depth: 0, enabled: true, config: { bgMode: "illustration", themeColor: "orange" } },
           { id: "cp2-links", type: "Legal Footer", label: "文本与排版 (免责声明)", content: "Upgrade to VIP to see who viewed your profile", depth: 0, enabled: true, config: { variant: "clean-center" } },
           { id: "cp2-purchase", type: "Purchase Button", label: "操作按钮 (购买按钮)", content: "Upgrade Now", depth: 0, enabled: true, config: { label: "操作按钮 (购买按钮)", color: "#FF6A00", shape: "pill" } },
         ],
@@ -2202,7 +2195,6 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           headlineBold: "升级VIP",
           headlineSub: "让关系继续发生。",
           highlightWord: "升级VIP",
-          mascotType: "translate-coin",
           btnText: "升级 VIP",
           btnColor: "#FF8A00",
         },
@@ -2212,7 +2204,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           { id: "cp3-metrics", type: "Dynamic Metrics", label: "对比与时间轴 (动态指标)", content: "899、164、681、640、367、223、292、164、670、150、169、267", depth: 0, enabled: true, config: { styleType: "非订阅状态样式", metricValues: [899, 164, 681, 640, 367, 223, 292, 164, 670, 150, 169, 267] } },
           { id: "cp3-subhead", type: "Subhead", label: "文本与排版 (副标题)", content: "你已经在为交朋友认真努力了", depth: 0, enabled: true, config: { variant: "body" } },
           { id: "cp3-headline", type: "Header", label: "文本与排版 (主标题)", content: "升级VIP\n让关系继续发生。", depth: 0, enabled: true, config: { variant: "content-headline", highlightWord: "升级VIP", highlightColor: "#FF8A00" } },
-          { id: "cp3-mascot", type: "Mascot Illustration", label: "背景图 (吉祥物插画)", content: "translate-coin", depth: 0, enabled: true, config: { mascotType: "translate-coin" } },
+          { id: "cp3-hero", type: "Hero Image", label: "背景图", content: "原生插画", depth: 0, enabled: true, config: { bgMode: "illustration", themeColor: "orange" } },
           { id: "cp3-purchase", type: "Purchase Button", label: "操作按钮 (购买按钮)", content: "升级 VIP", depth: 0, enabled: true, config: { label: "操作按钮 (购买按钮)", color: "#FF8A00" } },
         ],
       },
@@ -4042,19 +4034,6 @@ function PreviewElement({
           >
             <X size={18} strokeWidth={2.4} />
           </button>
-          <div className="ht-mascot-star-wrap" style={{
-            position: "absolute",
-            top: 6,
-            left: isCloseTopRight ? 14 : "auto",
-            right: isCloseTopRight ? "auto" : 14,
-            width: 78,
-            height: 78,
-            pointerEvents: "none",
-            zIndex: 3,
-            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          }}>
-            <HelloTalkStarMascot size={72} />
-          </div>
         </div>
         <div style={{ padding: "8px 0 10px" }}>
           <h2 className="ht-hero-title-text">
@@ -4094,19 +4073,6 @@ function PreviewElement({
           >
             <X size={18} strokeWidth={2.4} />
           </button>
-          <div className="ht-mascot-star-wrap" style={{
-            position: "absolute",
-            top: 6,
-            left: isCloseTopRight ? 14 : "auto",
-            right: isCloseTopRight ? "auto" : 14,
-            width: 78,
-            height: 78,
-            pointerEvents: "none",
-            zIndex: 3,
-            transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-          }}>
-            <HelloTalkStarMascot size={72} />
-          </div>
         </div>
         <div style={{ padding: "4px 0 8px" }}>
           <h2 className="ht-hero-title-text" style={{ lineHeight: 1.25 }}>
@@ -6109,9 +6075,8 @@ function BuilderProperties({
     "onboarding-privilege-card": "圆角大卡",
   }[currentBenefitRole] || "打勾清单";
 
-  // 5. 背景图 (Hero Image & Mascot)
+  // 5. 背景图 (Hero Image)
   const currentBgRole = (() => {
-    if (active.type === "Mascot Illustration" || active.config?.bgMode === "mascot" || subRole === "吉祥物插画") return "mascot";
     if (active.config?.bgMode === "image" || subRole === "自定义图片") return "image";
     if (active.config?.bgMode === "gradient" || subRole === "渐变底色") return "gradient";
     return "illustration";
@@ -6119,7 +6084,6 @@ function BuilderProperties({
 
   const currentBgRoleLabel = {
     illustration: "原生插画",
-    mascot: "吉祥物插画",
     image: "自定义图片",
     gradient: "渐变底色",
   }[currentBgRole] || "原生插画";
@@ -6725,10 +6689,9 @@ function BuilderProperties({
                 <span style={{ fontSize: 11, fontWeight: 700, color: "#1e293b" }}>背景图形态与插画风格</span>
                 <span style={{ fontSize: 9.5, color: "#6366f1", background: "#eef2ff", padding: "1px 6px", borderRadius: 4, fontWeight: 700 }}>当前：{currentBgRoleLabel}</span>
               </div>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 6 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 6 }}>
                 {[
                   { key: "illustration", label: "原生插画", type: "Hero Image" },
-                  { key: "mascot", label: "吉祥物插画", type: "Mascot Illustration" },
                   { key: "image", label: "自定义图片", type: "Hero Image" },
                   { key: "gradient", label: "渐变底色", type: "Hero Image" },
                 ].map((m) => {
@@ -6751,20 +6714,11 @@ function BuilderProperties({
                         justifyContent: "center",
                       }}
                       onClick={() => {
-                        if (m.key === "mascot") {
-                          updateNode(active.id, {
-                            type: "Mascot Illustration",
-                            label: "背景图 (吉祥物插画)",
-                            content: active.config?.mascotType || "crown-gift",
-                            config: { ...(active.config || {}), mascotType: active.config?.mascotType || "crown-gift", bgMode: "mascot" },
-                          });
-                        } else {
-                          updateNode(active.id, {
-                            type: "Hero Image",
-                            label: `背景图 (${m.label})`,
-                            config: { ...(active.config || {}), bgMode: m.key },
-                          });
-                        }
+                        updateNode(active.id, {
+                          type: "Hero Image",
+                          label: `背景图 (${m.label})`,
+                          config: { ...(active.config || {}), bgMode: m.key },
+                        });
                         notify?.(`已切换背景图形态为：${m.label}`);
                       }}
                     >
@@ -6775,62 +6729,7 @@ function BuilderProperties({
               </div>
 
               {/* Sub-role controls for 背景图 */}
-              {currentBgRole === "mascot" ? (
-                <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
-                  <Field label="官方吉祥物形态">
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 6 }}>
-                      <button
-                        type="button"
-                        style={{
-                          fontSize: 10.5,
-                          padding: "8px 4px",
-                          borderRadius: 6,
-                          border: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "2px solid #6C3EDE" : "1px solid #CBD5E1",
-                          background: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "#F5F0FF" : "#FFF",
-                          color: (active.config?.mascotType === "crown-gift" || !active.config?.mascotType) ? "#6C3EDE" : "#475569",
-                          fontWeight: 700,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "crown-gift" }, content: "crown-gift" })}
-                      >
-                        皇冠之星<br /><span style={{ fontSize: 9.5, opacity: 0.8 }}>(失效样式)</span>
-                      </button>
-                      <button
-                        type="button"
-                        style={{
-                          fontSize: 10.5,
-                          padding: "8px 4px",
-                          borderRadius: 6,
-                          border: active.config?.mascotType === "binoculars" ? "2px solid #FF6A00" : "1px solid #CBD5E1",
-                          background: active.config?.mascotType === "binoculars" ? "#FFF7ED" : "#FFF",
-                          color: active.config?.mascotType === "binoculars" ? "#FF6A00" : "#475569",
-                          fontWeight: 700,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "binoculars" }, content: "binoculars" })}
-                      >
-                        望远镜星<br /><span style={{ fontSize: 9.5, opacity: 0.8 }}>(访客样式)</span>
-                      </button>
-                      <button
-                        type="button"
-                        style={{
-                          fontSize: 10.5,
-                          padding: "8px 4px",
-                          borderRadius: 6,
-                          border: active.config?.mascotType === "translate-coin" ? "2px solid #FF8A00" : "1px solid #CBD5E1",
-                          background: active.config?.mascotType === "translate-coin" ? "#FEF7E5" : "#FFF",
-                          color: active.config?.mascotType === "translate-coin" ? "#FF8A00" : "#475569",
-                          fontWeight: 700,
-                          cursor: "pointer",
-                        }}
-                        onClick={() => updateNode(active.id, { config: { ...active.config, mascotType: "translate-coin" }, content: "translate-coin" })}
-                      >
-                        翻译金币<br /><span style={{ fontSize: 9.5, opacity: 0.8 }}>(非订阅样式)</span>
-                      </button>
-                    </div>
-                  </Field>
-                </div>
-              ) : currentBgRole === "image" ? (
+              {currentBgRole === "image" ? (
                 <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 4 }}>
                   <Field label="自定义背景图片 URL">
                     <input
@@ -8377,7 +8276,7 @@ function LayoutSettings({
           </span>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             {[
-              { id: "trial-tpl-1", name: "模版四-单张样式新版", desc: "单图吉祥物 · 3阶段时间轴 · 双套餐切换" },
+              { id: "trial-tpl-1", name: "模版四-单张样式新版", desc: "单图插画 · 3阶段时间轴 · 双套餐切换" },
               { id: "trial-tpl-2", name: "模版五-多张轮播图新版", desc: "3张轮播卡片 · 垂直提醒 · 试用后套餐" },
             ].map((t) => {
               const checked = curSubId === t.id;

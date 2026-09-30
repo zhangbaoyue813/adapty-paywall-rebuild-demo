@@ -375,7 +375,7 @@ export default function BackendArchitectureDocs() {
               <li><strong>定位：</strong>物料库与模板注册中心。</li>
               <li><strong>三大预设类型：</strong>
                 <br />① <code>VIP失效样式</code>（针对流失用户，展示历史进步变量矩阵与续订挽留）
-                <br />② <code>非VIP样式</code>（针对未付费访客拦截，大橙字展示7天访客数与望远镜吉祥物）
+                <br />② <code>非VIP样式</code>（针对未付费访客拦截，大橙字展示7天访客数与权益方案）
                 <br />③ <code>非订阅状态样式</code>（针对免费高频用户，展示沟通努力数据与升级引导）
               </li>
               <li><strong>配置要素：</strong>备注名称、样式类型下拉、生效状态开关、1:1 弹窗视觉装配。</li>
