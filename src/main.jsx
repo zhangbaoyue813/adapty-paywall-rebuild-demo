@@ -1333,14 +1333,10 @@ function App() {
     if (templateIdx !== -1) {
       setTemplateSelected(templateIdx);
       setAppliedTemplate(templateIdx);
-      setBuilderNodes(createBuilderNodes(tId));
-      setActiveNode(
-        tId === "ht-onboarding"
-          ? "trial-t1-hero"
-          : tId === "ht-content-paywall"
-          ? "cp-metrics"
-          : "headline"
-      );
+      const initialNodes = createBuilderNodes(tId);
+      setBuilderNodes(initialNodes);
+      const firstValidNode = initialNodes.find((n) => n.enabled !== false) || initialNodes[0];
+      setActiveNode(firstValidNode?.id || null);
     }
     setView("builder");
   };
@@ -1894,7 +1890,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         title: "全屏平铺版 (粉白 20% 折扣)",
         displayMode: "fullscreen",
         desc: "全屏页面 · VIP 会员 额外 20% 优惠",
-        image: "/templates/template1.jpg",
+        image: "./templates/template1.jpg",
         theme: {
           ...DEFAULT_ENTRY_CONFIG,
           subTemplate: "tpl-1",
@@ -1926,7 +1922,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         title: "半屏底窗版 (给新用户专属礼包)",
         displayMode: "bottom-sheet",
         desc: "顶部搜附近母语者大图 + 下半屏弹窗卡片",
-        image: "/templates/template2.jpg",
+        image: "./templates/template2.jpg",
         theme: {
           ...DEFAULT_ENTRY_CONFIG,
           subTemplate: "tpl-2",
@@ -1956,7 +1952,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         title: "全屏版 (蓝色特权轮播)",
         displayMode: "fullscreen",
         desc: "经典全屏特权页 · 底部按钮总价",
-        image: "/templates/vip_pkg_tpl1.png",
+        image: "./templates/vip_pkg_tpl1.png",
         theme: {
           primaryColor: "#0284C7",
           btnColor: "#0284C7",
@@ -1986,7 +1982,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         title: "弹窗版 (新客轻量浮层)",
         displayMode: "modal",
         desc: "居中/半屏弹窗 · 右上角关闭按钮 · 暖橙特惠",
-        image: "/templates/vip_pkg_tpl2.png",
+        image: "./templates/vip_pkg_tpl2.png",
         theme: {
           primaryColor: "#F59E0B",
           btnColor: "#F59E0B",
@@ -2470,7 +2466,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         name: `模板 ${nextNum}`,
         title: `翡翠尊享版 ${nextNum}`,
         desc: `第 ${nextNum} 套独立会员套餐方案`,
-        image: nextNum % 2 === 0 ? "/templates/vip_pkg_tpl2.png" : "/templates/vip_pkg_tpl1.png",
+        image: nextNum % 2 === 0 ? "./templates/vip_pkg_tpl2.png" : "./templates/vip_pkg_tpl1.png",
         theme: {
           primaryColor: "#10B981",
           btnColor: "#10B981",
@@ -2500,7 +2496,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         name: `模板 ${nextNum}`,
         title: `自定义新客模版 ${nextNum}`,
         desc: `第 ${nextNum} 套独立搭配组件`,
-        image: nextNum % 2 === 0 ? "/templates/template2.jpg" : "/templates/template1.jpg",
+        image: nextNum % 2 === 0 ? "./templates/template2.jpg" : "./templates/template1.jpg",
         theme: {
           ...DEFAULT_ENTRY_CONFIG,
           subTemplate: newId,

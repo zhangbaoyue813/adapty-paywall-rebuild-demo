@@ -789,7 +789,7 @@ textarea { min-height: 80px; resize: vertical; }
   to { transform: scale(1); opacity: 1; }
 }
 
-/* 顶部波浪头图与吉祥物 (Paywall Wave Hero & Star Mascot) */
+/* 顶部波浪头图 (Paywall Wave Hero) */
 .ht-wave-hero-container {
   position: relative;
   background: #6144e8;
