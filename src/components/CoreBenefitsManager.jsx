@@ -65,8 +65,8 @@ function Switch({ checked, onChange, disabled }) {
   );
 }
 
-// HelloTalk 官方 16 项标准 VIP 特权库，规范化 shortName 与图标映射
-export const HELLOTALK_OFFICIAL_PRIVILEGES = [
+// 官方核心模版 16 项标准 VIP 特权库，规范化 shortName 与图标映射
+export const STANDARD_OFFICIAL_PRIVILEGES = [
   {
     id: "ht-p-translate",
     icon: "文A",
@@ -235,7 +235,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
         let tag = (parts[2] || "").trim();
         let icon = "💎";
 
-        const matched = HELLOTALK_OFFICIAL_PRIVILEGES.find(
+        const matched = STANDARD_OFFICIAL_PRIVILEGES.find(
           (p) => p.name === fullTitle || p.shortName === fullTitle || fullTitle.includes(p.shortName)
         );
         if (matched) {
@@ -258,7 +258,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
         };
       });
     }
-    return HELLOTALK_OFFICIAL_PRIVILEGES.filter((p) => p.defaultSelected).map((p) => ({
+    return STANDARD_OFFICIAL_PRIVILEGES.filter((p) => p.defaultSelected).map((p) => ({
       id: p.id,
       icon: p.icon,
       title: p.shortName || p.name,
@@ -467,7 +467,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
               cursor: "pointer",
             }}
           >
-            全部特权库 ({HELLOTALK_OFFICIAL_PRIVILEGES.length})
+            全部特权库 ({STANDARD_OFFICIAL_PRIVILEGES.length})
           </button>
           <button
             type="button"
@@ -585,7 +585,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
                 orderIndex: idx,
               }));
 
-              const unselectedItems = HELLOTALK_OFFICIAL_PRIVILEGES.filter(
+              const unselectedItems = STANDARD_OFFICIAL_PRIVILEGES.filter(
                 (p) => !selectedTitles.has(p.shortName) && !selectedTitles.has(p.name)
               ).map((p) => ({
                 id: p.id,
@@ -677,7 +677,7 @@ export default function CoreBenefitsManager({ node, updateNode, notify, themeCon
                         </div>
                       ) : (
                         <div style={{ fontSize: 10, color: "#94a3b8", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
-                          {item.desc || "HelloTalk VIP 核心专享特权"}
+                          {item.desc || "VIP 核心专享特权"}
                         </div>
                       )}
                     </div>

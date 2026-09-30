@@ -9,9 +9,9 @@ import {
 export const DEFAULT_ENTRY_CONFIG = {
   subTemplate: "tpl-1", // "tpl-1" (模板1: 粉白高光折扣版) | "tpl-2" (模板2: 暖橙插画新客礼包版)
   bgImage: "",
-  mainFontColor: "#2D1832", // 包含HelloTalk VIP色值,标题色,原价色值,倒计时色值
+  mainFontColor: "#2D1832", // 包含VIP 会员色值,标题色,原价色值,倒计时色值
   titleLang: "Simplified Chinese",
-  titleKicker: "HelloTalk VIP",
+  titleKicker: "VIP 会员",
   titleText: "首年额外 20% 优惠！",
   discountMode: "default", // "default" (默认文案: 带变量) | "flexible" (灵活文案: 纯文本)
   flexibleText: "新客专享限时破冰特惠",
@@ -95,7 +95,7 @@ export default function EntryPriceConfigManager({ node, updateNode, config: prop
       >
         <span style={{ fontSize: 16, marginTop: 1 }}>ⓘ</span>
         <div style={{ fontSize: 11, color: "#166534", lineHeight: 1.5 }}>
-          <strong>HelloTalk CMS 具体内容配置区：</strong>
+          <strong>商业化配置后台 具体内容配置区：</strong>
           <br />
           下面不同区块配置的色值代表在该区块内配置的文案在客户端显示的颜色，根据配置月/年/终身的模板在价格文案选框内选择展示对应的价格文案。
         </div>
@@ -142,7 +142,7 @@ export default function EntryPriceConfigManager({ node, updateNode, config: prop
                 marginBottom: 6,
               }}
             >
-              <span style={{ fontSize: 10, fontWeight: 700, color: "#E11D48" }}>HelloTalk VIP</span>
+              <span style={{ fontSize: 10, fontWeight: 700, color: "#E11D48" }}>VIP 会员</span>
               <span style={{ fontSize: 8, background: "#FF4D6D", color: "#fff", padding: "1px 6px", borderRadius: 4 }}>
                 额外 20% 优惠
               </span>
@@ -290,7 +290,7 @@ export default function EntryPriceConfigManager({ node, updateNode, config: prop
             </div>
           </div>
           <span style={{ fontSize: 10, color: "#dc2626", display: "block" }}>
-            *包含 HelloTalk VIP 色值、标题色、原价色值、Offer ends 倒计时色值
+            *包含 VIP 会员 色值、标题色、原价色值、Offer ends 倒计时色值
           </span>
         </div>
 

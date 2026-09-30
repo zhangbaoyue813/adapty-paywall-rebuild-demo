@@ -16,7 +16,7 @@ import {
   Sliders,
 } from "lucide-react";
 
-export const ALL_HELLOTALK_PRIVILEGES = [
+export const ALL_STANDARD_PRIVILEGES = [
   { id: "p-nearby-search", name: "搜索附近的人", desc: "与附近的人畅聊更多语言", icon: "📍", show: true, carousel: true },
   { id: "p-global-search", name: "搜索全世界的语伴", desc: "一键瞬移至全球 150+ 城市母语圈", icon: "🌐", show: true, carousel: true },
   { id: "p-visitors", name: "解锁谁看了我", desc: "查看完整访客记录，开启无痕访问", icon: "👀", show: true, carousel: true },
@@ -38,7 +38,7 @@ export const ALL_HELLOTALK_PRIVILEGES = [
 const AVAILABLE_ICONS = ["📍", "🌐", "👀", "🤖", "⚡", "🕶️", "🚫", "🚻", "💬", "📈", "🎙️", "✨", "🗣️", "📝", "👑", "🎧", "💎", "🚀", "🌟", "💡"];
 
 export default function PrivilegeSwitchManager({ node, updateNode }) {
-  const privileges = node.config?.privileges || ALL_HELLOTALK_PRIVILEGES;
+  const privileges = node.config?.privileges || ALL_STANDARD_PRIVILEGES;
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [newName, setNewName] = useState("");
@@ -125,7 +125,7 @@ export default function PrivilegeSwitchManager({ node, updateNode }) {
   };
 
   const resetToDefault = () => {
-    savePrivileges(ALL_HELLOTALK_PRIVILEGES);
+    savePrivileges(ALL_STANDARD_PRIVILEGES);
   };
 
   const activeCarouselPrivileges = privileges.filter((p) => p.show && p.carousel);
@@ -243,7 +243,7 @@ export default function PrivilegeSwitchManager({ node, updateNode }) {
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f8fafc" }}>
               <div>
                 <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "#1e293b", display: "flex", alignItems: "center", gap: 8 }}>
-                  <SlidersHorizontal size={18} color="#6366f1" /> HelloTalk 特权与轮播管理
+                  <SlidersHorizontal size={18} color="#6366f1" /> VIP 特权与轮播管理
                 </h2>
               </div>
               <button

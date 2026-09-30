@@ -31,7 +31,7 @@ import {
   ContentTranslateCoinMascot,
 } from "./ContentPaywallMascots";
 
-// 3 Default Styles from HelloTalk backend screenshots
+// 3 Default Styles from Paywall backend screenshots
 export const OFFICIAL_CONTENT_PAYWALL_STYLES = [
   {
     id: "style-vip-expired",
@@ -217,7 +217,7 @@ export default function ContentPaywallManager({ onOpenInBuilder, notify }) {
 
   return (
     <div style={{ padding: "0 4px 60px" }}>
-      {/* Top Breadcrumbs matching HelloTalk CMS */}
+      {/* Top Breadcrumbs matching 商业化配置后台 */}
       <div
         style={{
           display: "flex",
@@ -254,7 +254,7 @@ export default function ContentPaywallManager({ onOpenInBuilder, notify }) {
               fontWeight: 600,
             }}
           >
-            测试环境 · HelloTalk CMS v2.4
+            测试环境 · 商业化配置后台 v2.4
           </span>
         </div>
       </div>
@@ -916,7 +916,7 @@ export default function ContentPaywallManager({ onOpenInBuilder, notify }) {
 
             {/* Modal Body: Left Form (40%) + Right Phone Canvas (60%) */}
             <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
-              {/* Left Column: Real HelloTalk Form */}
+              {/* Left Column: Real Paywall Form */}
               <div
                 style={{
                   width: "42%",

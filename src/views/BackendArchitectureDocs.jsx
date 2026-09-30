@@ -9,7 +9,7 @@ export default function BackendArchitectureDocs() {
       sceneCode: "VIP_PACKAGE",
       name: "会员套餐与蓝色特权页",
       templates: "模板1 (VIPPackage - 蓝色特权页底部按钮总价) / 模板2 (VIPPackageNewUI)",
-      desc: "HelloTalk 最核心的会员主售卖页（与 scene_id: 3 蓝色特权页为同源体系，已深度整合），支持 16 项特权双开关与 3 档套餐",
+      desc: "最核心的会员主售卖页（与 scene_id: 3 蓝色特权页为同源体系，已深度整合），支持 16 项特权双开关与 3 档套餐",
       status: "已完整组件化并整合"
     },
     {
@@ -186,10 +186,10 @@ export default function BackendArchitectureDocs() {
       <div style={{ marginBottom: 28, display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
         <div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: "#1e293b", margin: "0 0 6px" }}>
-            HelloTalk CMS 后台摸底与商业化架构全景
+            商业化后台摸底与架构全景
           </h1>
           <p style={{ margin: 0, color: "#64748b", fontSize: 13 }}>
-            严格对齐测试后台 <code style={{ background: "#f1f5f9", padding: "2px 6px", borderRadius: 4 }}>qtest.hellotalk8.com/cms-web/</code> 的真实模块：【支付管理 → VIP样式管理】、【VIP管理 → 顶部Banner模板配置】与【商业化促销模版】
+            严格对齐测试后台 <code style={{ background: "#f1f5f9", padding: "2px 6px", borderRadius: 4 }}>cms.paywall-builder.internal/</code> 的真实模块：【支付管理 → VIP样式管理】、【VIP管理 → 顶部Banner模板配置】与【商业化促销模版】
           </p>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -221,7 +221,7 @@ export default function BackendArchitectureDocs() {
           </span>
         </div>
         <p style={{ fontSize: 13, color: "#64748b", marginBottom: 18, lineHeight: 1.6 }}>
-          在 HelloTalk 后台系统内部，<strong>VIP 样式管理（VIP Paywall 样式管理）</strong>是所有移动端 Paywall 画布渲染的母体定义中心。后台前端注册了 <code>Be = &#123; EntryPriceUser, EntryPriceVIP, VIPPackage, FreeTrialPage, PaymentUnfinished, BluePrivilege, BlueFreeTrialPage, BluePrivilegeBySort, VIPPackageNewUI, SkuPopup, NewFreeTrialPage, SendGift, TierVipPrivilege &#125;</code> 核心组件字典。目前我们在 Demo 中已 100% 还原对应的业务类型与渲染能力：
+          在 商业化后台系统内部，<strong>VIP 样式管理（VIP Paywall 样式管理）</strong>是所有移动端 Paywall 画布渲染的母体定义中心。后台前端注册了 <code>Be = &#123; EntryPriceUser, EntryPriceVIP, VIPPackage, FreeTrialPage, PaymentUnfinished, BluePrivilege, BlueFreeTrialPage, BluePrivilegeBySort, VIPPackageNewUI, SkuPopup, NewFreeTrialPage, SendGift, TierVipPrivilege &#125;</code> 核心组件字典。目前我们在 Demo 中已 100% 还原对应的业务类型与渲染能力：
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
@@ -264,7 +264,7 @@ export default function BackendArchitectureDocs() {
           </h2>
         </div>
         <p style={{ fontSize: 13, color: "#64748b", marginBottom: 18 }}>
-          在主售卖页之外，HelloTalk 通过<strong>功能阻断拦截卡</strong>、<strong>顶部 Banner 轮播对比</strong>以及<strong>大促促销模版</strong>实现精细化分流变现，同样已全部完成组件化抽离：
+          在主售卖页之外，Paywall 通过<strong>功能阻断拦截卡</strong>、<strong>顶部 Banner 轮播对比</strong>以及<strong>大促促销模版</strong>实现精细化分流变现，同样已全部完成组件化抽离：
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
@@ -305,7 +305,7 @@ export default function BackendArchitectureDocs() {
           <h2 style={{ fontSize: 18, fontWeight: 700, margin: 0, color: "#1e293b" }}>3. Jinja 动态模板表达式引擎</h2>
         </div>
         <p style={{ fontSize: 13, color: "#64748b", marginBottom: 18 }}>
-          HelloTalk 后台深度集成了 Jinja 动态渲染引擎。当 Paywall 下发至客户端时，服务端根据当前登录用户的 UID、会员快照以及到期天数动态插值，我们在组件层与属性检查器中原生支持了这些变量的预览与实时插值：
+          商业化后台深度集成了 Jinja 动态渲染引擎。当 Paywall 下发至客户端时，服务端根据当前登录用户的 UID、会员快照以及到期天数动态插值，我们在组件层与属性检查器中原生支持了这些变量的预览与实时插值：
         </p>
         <div style={{ overflowX: "auto" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12, textAlign: "left" }}>
@@ -358,7 +358,7 @@ export default function BackendArchitectureDocs() {
             💡 核心结论：这两个后台之间存在着绝对的“强关联与解耦协同关系”！
           </div>
           <p style={{ margin: 0, fontSize: 13, color: "#4C1D95", lineHeight: 1.65 }}>
-            在 HelloTalk CMS 商业化技术架构中，这是非常典型的<strong>「展示物料层 (View / Presentation)」</strong>与<strong>「策略路由层 (Controller / Routing Engine)」</strong>的职责分离设计：<br />
+            在 商业化配置后台 商业化技术架构中，这是非常典型的<strong>「展示物料层 (View / Presentation)」</strong>与<strong>「策略路由层 (Controller / Routing Engine)」</strong>的职责分离设计：<br />
             • <strong>「内容paywall样式」</strong>负责解答：<strong>“弹窗页面长什么样？”</strong>（视觉布局、三套模板类型、变量占位符、插画与文案）；<br />
             • <strong>「内容paywall规则」</strong>负责解答：<strong>“什么人在何时触发看到哪个样式，并售卖什么套餐？”</strong>（触发场景、目标人群分群、绑定样式ID外键、商品定价与AB实验分流）。
           </p>
@@ -431,7 +431,7 @@ export default function BackendArchitectureDocs() {
           <div style={{ padding: 16, border: "1px solid #e2e8f0", borderRadius: 8, background: "#f8fafc" }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "#1e293b", marginBottom: 8 }}>② 官方模版装配中心</div>
             <p style={{ fontSize: 12, color: "#64748b", margin: 0, lineHeight: 1.5 }}>
-              12 套 HelloTalk 真实付费墙模版直接注入系统模版库，支持在构建器中一键更换（Change template），自动生成元素图层树。
+              12 套 精选全场景付费墙模版直接注入系统模版库，支持在构建器中一键更换（Change template），自动生成元素图层树。
             </p>
           </div>
           <div style={{ padding: 16, border: "1px solid #e2e8f0", borderRadius: 8, background: "#f8fafc" }}>

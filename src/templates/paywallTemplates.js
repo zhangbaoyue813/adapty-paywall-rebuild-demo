@@ -235,7 +235,7 @@ export const PAYWALL_TEMPLATES = [
         props: {
           type: "carousel",
           reviews: [
-            { author: "Ken (Tokyo)", content: "用了 HelloTalk VIP 之后，找了 3 个母语语伴，口语进步神速！", tag: "英语学习者" },
+            { author: "Ken (Tokyo)", content: "用了 VIP 会员 之后，找了 3 个母语语伴，口语进步神速！", tag: "英语学习者" },
             { author: "Maria (Madrid)", content: "AI 纠错功能太惊艳了，发动态前都会帮我修正语法！", tag: "中文进阶者" }
           ]
         }
@@ -339,7 +339,7 @@ export const PAYWALL_TEMPLATES = [
         type: "HeaderTitle",
         props: {
           title: { "zh-CN": "选择适合你的会员等级", "en": "Choose Your Perfect Membership" },
-          subtitle: { "zh-CN": "升级 VIP+，解锁 HelloTalk 最前沿 AI 语伴辅导", "en": "Upgrade to VIP+ for advanced AI tutor and deeper learning." },
+          subtitle: { "zh-CN": "升级 VIP+，解锁 高阶 AI 辅导与特权", "en": "Upgrade to VIP+ for advanced AI tutor and deeper learning." },
           color: "#0F172A",
           align: "center"
         }

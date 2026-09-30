@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Layers, Sparkles, Bell, CreditCard, ChevronRight } from "lucide-react";
 
 export const DEFAULT_SLIDES_CONFIG = {
-  slide1Title: "免费体验HelloTalk会员",
+  slide1Title: "免费体验 VIP 会员",
   slide1Items: [
     { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
     { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
@@ -11,7 +11,7 @@ export const DEFAULT_SLIDES_CONFIG = {
   ],
   slide2Title: "到期前提醒",
   slide2Timeline: [
-    { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
+    { day: "Day 1", desc: "成为 VIP 会员，享受学习与交流的乐趣", icon: "crown" },
     { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
     { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
   ],
@@ -169,7 +169,7 @@ export default function OnboardingMultiSlidesManager({
               type="text"
               value={cfg.slide1Title}
               onChange={(e) => updateConfigField("slide1Title", e.target.value)}
-              placeholder="如: 免费体验HelloTalk会员"
+              placeholder="如: 免费体验 VIP 会员"
               style={{
                 width: "100%",
                 padding: "7px 10px",

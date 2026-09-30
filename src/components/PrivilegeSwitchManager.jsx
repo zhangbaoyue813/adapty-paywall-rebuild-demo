@@ -18,7 +18,7 @@ import {
   List,
 } from "lucide-react";
 
-export const ALL_HELLOTALK_PRIVILEGES = [
+export const ALL_STANDARD_PRIVILEGES = [
   { id: "p-nearby-search", name: "搜索附近的人", desc: "与附近的人畅聊更多语言", icon: "📍", show: true, carousel: true },
   { id: "p-global-search", name: "搜索全世界的语伴", desc: "一键瞬移至全球 150+ 城市母语圈", icon: "🌐", show: true, carousel: true },
   { id: "p-visitors", name: "解锁谁看了我", desc: "查看完整访客记录，开启无痕访问", icon: "👀", show: true, carousel: true },
@@ -54,19 +54,19 @@ function getInitialPrivileges(node) {
         .filter(Boolean);
     }
     if (selectedNames.length > 0) {
-      return ALL_HELLOTALK_PRIVILEGES.map((item) => ({
+      return ALL_STANDARD_PRIVILEGES.map((item) => ({
         ...item,
         show: selectedNames.some((n) => item.name.includes(n) || n.includes(item.name)),
         carousel: false,
       }));
     }
-    return ALL_HELLOTALK_PRIVILEGES.map((item, idx) => ({
+    return ALL_STANDARD_PRIVILEGES.map((item, idx) => ({
       ...item,
       show: idx < 3,
       carousel: false,
     }));
   }
-  return ALL_HELLOTALK_PRIVILEGES;
+  return ALL_STANDARD_PRIVILEGES;
 }
 
 export default function PrivilegeSwitchManager({ node, updateNode, notify, defaultMode }) {
@@ -195,7 +195,7 @@ export default function PrivilegeSwitchManager({ node, updateNode, notify, defau
 
   const resetToDefault = () => {
     if (currentMode === "list") {
-      const resetList = ALL_HELLOTALK_PRIVILEGES.map((item, idx) => ({
+      const resetList = ALL_STANDARD_PRIVILEGES.map((item, idx) => ({
         ...item,
         show: idx < 3,
         carousel: false,
@@ -203,7 +203,7 @@ export default function PrivilegeSwitchManager({ node, updateNode, notify, defau
       savePrivileges(resetList);
       notify?.("已恢复官方默认推荐 3 项特权");
     } else {
-      savePrivileges(ALL_HELLOTALK_PRIVILEGES);
+      savePrivileges(ALL_STANDARD_PRIVILEGES);
       notify?.("已恢复全部默认轮播特权");
     }
   };
@@ -717,7 +717,7 @@ export default function PrivilegeSwitchManager({ node, updateNode, notify, defau
             <div style={{ padding: "16px 20px", borderBottom: "1px solid #e2e8f0", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#f8fafc" }}>
               <div>
                 <h2 style={{ fontSize: 16, fontWeight: 700, margin: 0, color: "#1e293b", display: "flex", alignItems: "center", gap: 8 }}>
-                  <SlidersHorizontal size={18} color="#6366f1" /> HelloTalk 特权与轮播管理
+                  <SlidersHorizontal size={18} color="#6366f1" /> VIP 特权与轮播管理
                 </h2>
               </div>
               <button

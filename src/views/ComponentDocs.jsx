@@ -8,7 +8,7 @@ const COMPONENTS_AUDIT_DATA = [
     status: "需修改 (已改造完成)",
     statusType: "warning",
     origin: "原 Demo 的 Text",
-    reason: "原 Demo 只有单行静态文本；HelloTalk 核心业务必须依赖 Jinja 变量插值（如 {{nick_name}}、{{vip_expired_days}}）以及副标题与徽章支持。",
+    reason: "原 Demo 只有单行静态文本；Paywall 核心业务必须依赖 Jinja 变量插值（如 {{nick_name}}、{{vip_expired_days}}）以及副标题与徽章支持。",
     props: ["title", "subtitle", "kicker", "align", "color", "jinjaVars"],
     rebuilt: "已重构为 HeaderTitle.jsx，原生支持 Jinja 解析与中英多语言。"
   },
@@ -48,7 +48,7 @@ const COMPONENTS_AUDIT_DATA = [
     status: "需修改 (已改造完成)",
     statusType: "warning",
     origin: "原 Demo 的 List / List Item",
-    reason: "原 Demo 仅支持单列排版。HelloTalk 业务中有大量的 2x2 宫格（如附近人特权）与时间线（试用倒计）场景。",
+    reason: "原 Demo 仅支持单列排版。商业化业务中有大量的 2x2 宫格（如附近人特权）与时间线（试用倒计）场景。",
     props: ["items", "layoutMode (vertical/grid/timeline)", "iconColor"],
     rebuilt: "已重构为 BenefitList.jsx，支持 vertical, grid, timeline 三种排版切换。"
   },
@@ -58,7 +58,7 @@ const COMPONENTS_AUDIT_DATA = [
     status: "需重写 (已全新开发)",
     statusType: "danger",
     origin: "原 Demo 无此组件",
-    reason: "HelloTalk VIP vs VIP+ 双阶特权是最高频的商业化升级入口，原 Demo 缺失对比表组件。",
+    reason: "VIP 会员 vs VIP+ 双阶特权是最高频的商业化升级入口，原 Demo 缺失对比表组件。",
     props: ["tiers", "features", "locale"],
     rebuilt: "已全新编写 ComparisonTable.jsx，支持 2 阶 / 3 阶勾选矩阵对比。"
   },
@@ -129,10 +129,10 @@ export default function ComponentDocs() {
     <div className="component-docs-page p-6 max-w-6xl mx-auto">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900">
-          HelloTalk 通用 Paywall 组件清单与现有代码评估报告
+          通用 Paywall 组件清单与现有代码评估报告
         </h2>
         <p className="text-sm text-gray-600 mt-1">
-          逐项比对 GitHub 仓库 AI 扒下的代码 vs HelloTalk 真实业务需求，明确可用性并完成现代化重构。
+          逐项比对 GitHub 仓库 AI 扒下的代码 vs 真实商业化业务需求，明确可用性并完成现代化重构。
         </p>
       </div>
 

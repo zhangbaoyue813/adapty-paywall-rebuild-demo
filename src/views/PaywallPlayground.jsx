@@ -21,10 +21,10 @@ export default function PaywallPlayground({ locale, setLocale }) {
         <div>
           <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
             <Sparkles size={20} className="text-emerald-500" />
-            HelloTalk 付费墙模版与组件化工作台
+            Paywall 付费墙模版与组件化工作台
           </h2>
           <p className="text-xs text-gray-500 mt-0.5">
-            基于 HelloTalk 真实 CMS 商业化模型构建 · 12 大通用积木自由拼装 · 实时动态渲染
+            基于 Paywall 真实 CMS 商业化模型构建 · 12 大通用积木自由拼装 · 实时动态渲染
           </p>
         </div>
 

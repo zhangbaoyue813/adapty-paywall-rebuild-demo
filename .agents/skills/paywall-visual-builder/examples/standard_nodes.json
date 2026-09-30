@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "title": "HelloTalk Paywall Node AST Standards",
+  "title": "Paywall Node AST Standards",
   "components": {
     "Header": {
       "id": "node-header-sample",

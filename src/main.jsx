@@ -64,12 +64,11 @@ import {
 import "./styles.css";
 import "./paywall-components.css";
 import BackendArchitectureDocs from "./views/BackendArchitectureDocs";
-import PrivilegeSwitchManager, { ALL_HELLOTALK_PRIVILEGES } from "./components/PrivilegeSwitchManager";
+import PrivilegeSwitchManager, { ALL_STANDARD_PRIVILEGES } from "./components/PrivilegeSwitchManager";
 import BenefitChecklistManager from "./components/BenefitChecklistManager";
-import CoreBenefitsManager, { HELLOTALK_OFFICIAL_PRIVILEGES } from "./components/CoreBenefitsManager";
+import CoreBenefitsManager, { STANDARD_OFFICIAL_PRIVILEGES } from "./components/CoreBenefitsManager";
 import { DEFAULT_ENTRY_CONFIG } from "./components/EntryPriceConfigManager";
 import ComparisonTableManager, { DEFAULT_FREE_VS_VIP_ITEMS, DEFAULT_VIP_VS_PLUS_ITEMS } from "./components/ComparisonTableManager";
-import HelloTalkMascot from "./components/HelloTalkMascot";
 import ContentPaywallManager from "./components/ContentPaywallManager";
 import TrialTimelineManager from "./components/TrialTimelineManager";
 import OnboardingMultiSlidesManager from "./components/OnboardingMultiSlidesManager";
@@ -80,7 +79,7 @@ import {
 } from "./components/ContentPaywallMascots";
 
 const originalPaywalls = [
-  // HelloTalk CMS「VIP 样式管理」核心 Paywall 商业化矩阵
+  // 商业化配置后台「VIP 样式管理」核心 Paywall 商业化矩阵
   { id: "ht-content-paywall", name: "内容Paywall样式 (CONTENT_PAYWALL)", state: "Live", products: 1, startedAt: "20 Sep 2026", templateId: "ht-content-paywall", scene: "内容弹窗/访客/失效挽留" },
   { id: "ht-vip-package", name: "会员套餐与蓝色特权页 (VIP_PACKAGE · BLUE_PRIVILEGE)", state: "Live", products: 3, startedAt: "01 Jan 2026", templateId: "ht-vip-package", scene: "会员套餐与蓝色特权主售卖" },
   { id: "ht-entry-aggregation", name: "入门价格页 (ENTRY_PRICE)", state: "Live", products: 2, startedAt: "22 Jun 2026", templateId: "ht-entry-aggregation", scene: "新手特惠 (双模板+倒计时)" },
@@ -152,15 +151,15 @@ const missingItems = [
 ];
 
 const templates = [
-  // HelloTalk CMS「VIP 样式管理」10 大核心与拓展商业化模版
+  // 商业化配置后台「VIP 样式管理」10 大核心与拓展商业化模版
   {
     id: "ht-vip-package",
     title: "会员套餐与蓝色特权页 (VIP_PACKAGE · BLUE_PRIVILEGE)",
-    subtitle: "整合 HelloTalk 经典蓝色特权轮播与 3 档会员套餐主售卖",
+    subtitle: "整合 Paywall 经典蓝色特权轮播与 3 档会员套餐主售卖",
     tags: ["3 products", "16项特权轮播", "双开关管理", "日单价折算"],
     productCount: 3,
     media: "image",
-    category: "HelloTalk 官方 (VIP样式管理)",
+    category: "官方核心模版 (VIP样式管理)",
     theme: "violet",
     visual: "vipplus",
   },
@@ -171,7 +170,7 @@ const templates = [
     tags: ["模版四-单张样式", "模版五-多张轮播图", "3天VIP免费试用", "挽留弹窗"],
     productCount: 2,
     media: "image",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "violet",
     visual: "onboarding",
   },
@@ -182,7 +181,7 @@ const templates = [
     tags: ["2 products", "Badges", "Dual buttons"],
     productCount: 2,
     media: "image",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "night",
     visual: "guest",
   },
@@ -193,7 +192,7 @@ const templates = [
     tags: ["2 products", "Badges", "Map Radar"],
     productCount: 2,
     media: "image",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "ocean",
     visual: "nearby",
   },
@@ -204,7 +203,7 @@ const templates = [
     tags: ["2 products", "Badges", "Language chips"],
     productCount: 2,
     media: "image",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "lavender",
     visual: "languages",
   },
@@ -215,7 +214,7 @@ const templates = [
     tags: ["2 products", "Timer", "Badges"],
     productCount: 2,
     media: "none",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "sale",
     visual: "black-friday",
   },
@@ -226,7 +225,7 @@ const templates = [
     tags: ["2 products", "Badges", "Jinja Variables"],
     productCount: 2,
     media: "image",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "peach",
     visual: "retain",
   },
@@ -237,7 +236,7 @@ const templates = [
     tags: ["2 products", "Switch Tabs", "VIP+ Perks"],
     productCount: 2,
     media: "image",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "violet",
     visual: "switch",
   },
@@ -248,7 +247,7 @@ const templates = [
     tags: ["2 products", "Comparison Table"],
     productCount: 2,
     media: "none",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "white",
     visual: "compare",
   },
@@ -259,7 +258,7 @@ const templates = [
     tags: ["3 products", "Bottom Sheet", "Fast IAP"],
     productCount: 3,
     media: "image",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "white",
     visual: "bottom-sheet",
   },
@@ -270,7 +269,7 @@ const templates = [
     tags: ["双模板切换", "24h倒计时", "5维色值系统", "最多3项特权"],
     productCount: 2,
     media: "image",
-    category: "HelloTalk 官方 (VIP样式管理)",
+    category: "官方核心模版 (VIP样式管理)",
     theme: "lime",
     visual: "entry",
   },
@@ -281,7 +280,7 @@ const templates = [
     tags: ["2 products", "VIP+ Perks", "Lifetime Plan"],
     productCount: 2,
     media: "image",
-    category: "HelloTalk 官方",
+    category: "官方核心模版",
     theme: "night",
     visual: "vipplus",
   },
@@ -292,7 +291,7 @@ const templates = [
     tags: ["3套样式类型", "动态变量矩阵", "1:1官方对标"],
     productCount: 1,
     media: "image",
-    category: "HelloTalk 官方 (VIP样式管理)",
+    category: "官方核心模版 (VIP样式管理)",
     theme: "violet",
     visual: "content-paywall",
   },
@@ -745,9 +744,9 @@ function createBuilderNodes(templateId = "ht-onboarding") {
     return [
       hero(),
       node("badge", "Badge Tag", "VIP 特权中心", 0, { color: "#6366F1", variant: "pill" }),
-      node("headline", "Header", "成为 HelloTalk VIP · 解锁核心特权", 0, { variant: "headline" }),
+      node("headline", "Header", "成为 VIP 会员 · 解锁核心特权", 0, { variant: "headline" }),
       node("subhead", "Subhead", "左右滑动探索 16 大母语学习特权与专属功能", 0, { variant: "body" }),
-      node("carousel-cards", "Carousel Cards", "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球 150+ 城市母语圈\n👀 解锁谁看了我|查看完整访客足迹，开启隐身访问\n🤖 无限翻译&字幕|实时母语级纠错，告别中式表达\n⚡ 匹配不同母语语伴|优先匹配多母语语伴\n🎧 无损原声发音下载|离线随时随地跟读练习，纯正发音纠偏", 0, { privileges: ALL_HELLOTALK_PRIVILEGES }),
+      node("carousel-cards", "Carousel Cards", "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球 150+ 城市母语圈\n👀 解锁谁看了我|查看完整访客足迹，开启隐身访问\n🤖 无限翻译&字幕|实时母语级纠错，告别中式表达\n⚡ 匹配不同母语语伴|优先匹配多母语语伴\n🎧 无损原声发音下载|离线随时随地跟读练习，纯正发音纠偏", 0, { privileges: ALL_STANDARD_PRIVILEGES }),
       node("products", "Products", "12 个月|¥368|¥30.67/月|节省56%\n3 个月|¥208|¥67.33/月|季卡灵活\n终身 VIP|¥798|终身尊享|一次付费", 0, { variant: "rich-tiers" }),
       node("purchase", "Purchase Button", "开启 VIP 特权 · 继续", 0, { label: "purchase", subtitle: "加入全球 5000 万语言学习者的行列" }),
       node("dismiss", "Dismiss Button", "暂时不用，谢谢", 0, { color: "#94a3b8" }),
@@ -760,7 +759,7 @@ function createBuilderNodes(templateId = "ht-onboarding") {
     return [
       hero(),
       node("badge", "Badge Tag", "7天免费体验", 0, { color: "#1ECA92", variant: "pill" }),
-      node("headline", "Header", "免费开启 HelloTalk VIP 特权", 0, { variant: "headline" }),
+      node("headline", "Header", "免费开启 VIP 特权", 0, { variant: "headline" }),
       node("subhead", "Subhead", "零门槛体验全球语伴畅聊与 AI 实时纠错", 0, { variant: "body" }),
       node("benefits", "Benefit List", "每日无限制即时翻译与纠错\nAI 语法助手实时母语级润色\n全球漫游找语伴与高级筛选\n听原声发音与专属头像标识", 0),
       node("trial-toggle", "Toggle", "免费试用 7 天|试用期结束前可随时取消，不收取费用", 0, { defaultState: "On" }),
@@ -819,7 +818,7 @@ function createBuilderNodes(templateId = "ht-onboarding") {
       hero(),
       node("timer", "Timer", "04:59:59", 0, { label: "倒计时", timerLabel: "黑五限时活动倒计时", variant: "card", hours: 24 }),
       node("badge", "Badge Tag", "黑五年度 5 折大促", 0, { color: "#FF4D4F", variant: "pill" }),
-      node("headline", "Header", "HelloTalk 黑五狂欢 · 限时 5 折", 0, { variant: "headline" }),
+      node("headline", "Header", "年度黑五狂欢 · 限时 5 折", 0, { variant: "headline" }),
       node("subhead", "Subhead", "全年仅此一次最低折扣，外语学习特权全部解锁", 0, { variant: "body" }),
       node("benefits", "Benefit List", "无限制翻译与 AI 语法智能纠错\n全球任意国家和城市无缝漫游\n专属黑五金色 VIP 身份勋章与头像框\n尊享客服通道与优先语伴匹配", 0),
       node("products", "Products", "终身 VIP 会员|¥398 (原价 ¥796)|仅需一次付费，终身享用|立省 ¥398\n年度 VIP 会员|¥128/年|仅 ¥0.35/天|5折特惠", 0, { variant: "rich-tiers" }),
@@ -849,7 +848,7 @@ function createBuilderNodes(templateId = "ht-onboarding") {
         label: "切换标签",
         activeTab: 0,
       }),
-      node("headline", "Header", "HelloTalk VIP", 0, {
+      node("headline", "Header", "VIP 会员", 0, {
         label: "标题",
         variant: "brand-hero",
         bullets: [
@@ -899,7 +898,7 @@ function createBuilderNodes(templateId = "ht-onboarding") {
         label: "切换标签",
         activeTab: 1,
       }),
-      node("headline", "Header", "HelloTalk VIP PLUS +", 0, {
+      node("headline", "Header", "VIP 会员 PLUS +", 0, {
         label: "标题",
         variant: "brand-hero",
         bullets: [
@@ -968,7 +967,7 @@ function createBuilderNodes(templateId = "ht-onboarding") {
   if (template.id === "ht-entry-aggregation") {
     return [
       node("close", "Dismiss Button", "✕", 0, { variant: "close-icon", position: "top-left", label: "关闭按钮" }),
-      node("headline", "Header", "首年额外 20% 优惠！", 0, { variant: "headline", kicker: "HelloTalk VIP 👑", label: "主标题" }),
+      node("headline", "Header", "首年额外 20% 优惠！", 0, { variant: "headline", kicker: "VIP 专享 👑", label: "主标题" }),
       node("subhead", "Subhead", "仅限今日", 0, { variant: "body", color: "#DE6876", label: "副标题" }),
       node("products", "Products", "原价 ¥488/年\n折扣价 ¥388/年", 0, {
         variant: "entry-price-tier",
@@ -1000,7 +999,7 @@ function createBuilderNodes(templateId = "ht-onboarding") {
     return [
       hero(),
       node("badge", "Badge Tag", "VIP+ 旗舰特权", 0, { color: "#F59E0B", variant: "pill" }),
-      node("headline", "Header", "HelloTalk VIP+ 旗舰会员", 0, { variant: "headline" }),
+      node("headline", "Header", "VIP+ 旗舰会员 旗舰会员", 0, { variant: "headline" }),
       node("subhead", "Subhead", "面向深度语言学者与国际职场人士的全语种高端定制特权", 0, { variant: "body" }),
       node("benefits", "Benefit List", "AI 母语导师 24 小时随身口语对话陪练\n无限次全球任意城市漫游与母语者精准结对\n每周独家外教直播微课与学习打卡督导\n专属黑金 VIP+ 徽章与优先客服通道", 0),
       node("products", "Products", "VIP+ 旗舰终身会员|¥898 (限时)|一次付费，终身尊享|尊享首选\nVIP+ 旗舰包年|¥298/年|¥0.81/天|含全套外教微课", 0, { variant: "rich-tiers" }),
@@ -1046,7 +1045,7 @@ function createComponentNode(rawType, index) {
       textRole: "headline",
       color: "#1e293b",
     };
-    content = "HelloTalk VIP 会员专享";
+    content = "VIP 会员 会员专享";
   } else if (rawType === "操作按钮") {
     label = "操作按钮";
     config = {
@@ -1122,7 +1121,7 @@ function createComponentNode(rawType, index) {
     label = "多张轮播图";
     config = {
       variant: "onboarding-3slides",
-      slide1Title: "免费体验HelloTalk会员",
+      slide1Title: "免费体验 VIP 会员",
       slide1Items: [
         { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
         { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
@@ -1131,7 +1130,7 @@ function createComponentNode(rawType, index) {
       ],
       slide2Title: "到期前提醒",
       slide2Timeline: [
-        { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
+        { day: "Day 1", desc: "成为 VIP 会员，享受学习与交流的乐趣", icon: "crown" },
         { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
         { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
       ],
@@ -1140,7 +1139,7 @@ function createComponentNode(rawType, index) {
       slide3Monthly: { name: "1 个月", monthly: "¥78/ 月" },
       slide3SafetyNote: "可随时在 App Store 取消",
     };
-    content = "Slide 1: 免费体验HelloTalk会员\nSlide 2: 到期前提醒\nSlide 3: 选择试用结束后的套餐";
+    content = "Slide 1: 免费体验 VIP 会员\nSlide 2: 到期前提醒\nSlide 3: 选择试用结束后的套餐";
   } else if (rawType === "背景图" || type === "Hero Image") {
     label = "背景图";
     config = {
@@ -1218,15 +1217,15 @@ function saveVerticalListTiers(node, newTiers, updateNode) {
 }
 
 const productOptions = [
-  "HelloTalk VIP 年度会员 / Annual",
-  "HelloTalk VIP 连续包月 / Monthly",
-  "HelloTalk VIP+ 旗舰全语种 / Annual",
+  "VIP 年度会员 / Annual",
+  "VIP 连续包月 / Monthly",
+  "VIP+ 旗舰年卡 / Annual",
 ];
 
 const observedProductRows = [
-  { product: "HelloTalk VIP 年度会员", period: "Annual", offer: "黑五大促 5 折" },
-  { product: "HelloTalk VIP 连续包月", period: "Monthly", offer: "首月特惠" },
-  { product: "HelloTalk VIP+ 旗舰年卡", period: "Annual", offer: "赠外教微课" },
+  { product: "VIP 年度会员", period: "Annual", offer: "黑五大促 5 折" },
+  { product: "VIP 连续包月", period: "Monthly", offer: "首月特惠" },
+  { product: "VIP+ 旗舰年卡", period: "Annual", offer: "赠外教微课" },
 ];
 
 const zhCopy = {
@@ -1294,7 +1293,7 @@ function App() {
   const [rememberCompliance, setRememberCompliance] = useState(false);
   const [templateSelected, setTemplateSelected] = useState(initialIdx);
   const [appliedTemplate, setAppliedTemplate] = useState(initialIdx);
-  const [templateLinks, setTemplateLinks] = useState({ terms: "https://hellotalk.com/terms", privacy: "https://hellotalk.com/privacy" });
+  const [templateLinks, setTemplateLinks] = useState({ terms: "https://legal.paywall-builder.internal/terms", privacy: "https://legal.paywall-builder.internal/privacy" });
   const [builderTab, setBuilderTab] = useState("tree");
   const [builderNodes, setBuilderNodes] = useState(() => createBuilderNodes("ht-entry-aggregation"));
   const [activeNode, setActiveNode] = useState("t1-headline");
@@ -1886,7 +1885,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
   const [onboardingCarouselSlide, setOnboardingCarouselSlide] = useState(0);
   const [canvasZoom, setCanvasZoom] = useState(1);
 
-  // HelloTalk Multi-template Presets Map (Both Entry Price & VIP Package)
+  // Paywall Multi-template Presets Map (Both Entry Price & VIP Package)
   const [templatePresetsMap, setTemplatePresetsMap] = useState(() => ({
     "ht-entry-aggregation": [
       {
@@ -1894,7 +1893,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         name: "模板 1",
         title: "全屏平铺版 (粉白 20% 折扣)",
         displayMode: "fullscreen",
-        desc: "全屏页面 · HelloTalk VIP 额外 20% 优惠",
+        desc: "全屏页面 · VIP 会员 额外 20% 优惠",
         image: "/templates/template1.jpg",
         theme: {
           ...DEFAULT_ENTRY_CONFIG,
@@ -1903,7 +1902,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           btnColor: "#C85B6B",
           mainFontColor: "#2D1832",
           titleText: "首年额外 20% 优惠！",
-          titleKicker: "HelloTalk VIP 👑",
+          titleKicker: "VIP 专享 👑",
           promoText: "仅限今日",
           priceNow: "折扣价 ¥388/年",
           priceOriginal: "原价 ¥488/年",
@@ -1912,7 +1911,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         },
         nodes: [
           { id: "t1-close", type: "Dismiss Button", label: "关闭按钮", content: "✕", depth: 0, enabled: true, config: { variant: "close-icon", position: "top-left" } },
-          { id: "t1-headline", type: "Header", label: "主标题", content: "首年额外 20% 优惠！", depth: 0, enabled: true, config: { variant: "headline", kicker: "HelloTalk VIP 👑" } },
+          { id: "t1-headline", type: "Header", label: "主标题", content: "首年额外 20% 优惠！", depth: 0, enabled: true, config: { variant: "headline", kicker: "VIP 专享 👑" } },
           { id: "t1-subhead", type: "Subhead", label: "副标题", content: "仅限今日", depth: 0, enabled: true, config: { variant: "body", color: "#DE6876" } },
           { id: "t1-products", type: "Products", label: "特惠价格", content: "原价 ¥488/年\n折扣价 ¥388/年", depth: 0, enabled: true, config: { variant: "entry-price-tier", displayMode: "clean-text", priceOriginal: "原价 ¥488/年", priceNow: "折扣价 ¥388/年" } },
           { id: "t1-benefits", type: "Benefit List", label: "核心特权", content: "搜索附近的人\n解锁谁看了我\n无限翻译&字幕", depth: 0, enabled: true, config: { maxCount: 3, styleVariant: "entry-checks", selectedBenefits: ["搜索附近的人", "解锁谁看了我", "无限翻译&字幕"] } },
@@ -1943,7 +1942,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         nodes: [
           { id: "t2-hero", type: "Hero Image", label: "背景图", content: "寻找身边母语者", depth: 0, enabled: true, config: { bgMode: "illustration", sloganText: "寻找身边母语者", themeColor: "orange", showCloseBtn: true, bubbleBg: "#2563eb" } },
           { id: "t2-headline", type: "Header", label: "主标题", content: "给新用户的专属礼包", depth: 0, enabled: true, config: { variant: "headline" } },
-          { id: "t2-products", type: "Products", label: "特惠价格", content: "HelloTalk VIP 新客专属礼包|特惠价 ¥128/年|原价 ¥248/年|限时优惠", depth: 0, enabled: true, config: { variant: "entry-price-tier", promoBadge: "限时优惠", discountTag: "-20% 折扣", priceNow: "特惠价 ¥128/年", priceOriginal: "原价 ¥248/年", priceSub: "仅 ¥0.35/天 · 新客立省 20% · 随时取消" } },
+          { id: "t2-products", type: "Products", label: "特惠价格", content: "VIP 新客专属礼包|特惠价 ¥128/年|原价 ¥248/年|限时优惠", depth: 0, enabled: true, config: { variant: "entry-price-tier", promoBadge: "限时优惠", discountTag: "-20% 折扣", priceNow: "特惠价 ¥128/年", priceOriginal: "原价 ¥248/年", priceSub: "仅 ¥0.35/天 · 新客立省 20% · 随时取消" } },
           { id: "t2-purchase", type: "Purchase Button", label: "购买按钮", content: "立即继续", depth: 0, enabled: true, config: { label: "购买按钮", color: "#F59E0B" } },
           { id: "t2-links", type: "Legal Footer", label: "免责声明", content: "服务条款 · 隐私政策 · 恢复购买", depth: 0, enabled: true },
           { id: "t2-benefits", type: "Benefit List", label: "核心特权", content: "搜索附近的人\n解锁谁看了我\n无限翻译&字幕", depth: 0, enabled: false, config: { maxCount: 3, styleVariant: "entry-checks", selectedBenefits: ["搜索附近的人", "解锁谁看了我", "无限翻译&字幕"] } },
@@ -1964,14 +1963,14 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           btnTextColor: "#FFFFFF",
           subTemplate: "pkg-tpl-1",
           otherColor: "#0284C7",
-          titleText: "成为 HelloTalk VIP",
+          titleText: "成为 VIP 会员",
           btnText: "立即开通",
           bgGradient: "linear-gradient(180deg, #0F172A 0%, #1E293B 40%, #0F172A 100%)",
           isDark: true,
         },
         nodes: [
-          { id: "pkg-t1-banner", type: "Header", label: "顶部横幅", content: "成为 HelloTalk VIP", depth: 0, enabled: true, config: { variant: "vip-banner", badge: "VIP 特权", subtitle: "畅享 16 项高阶语言学习特权" } },
-          { id: "pkg-t1-carousel", type: "Carousel Cards", label: "特权轮播", content: "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球 150+ 城市母语圈\n👀 解锁谁看了我|查看完整访客记录，开启无痕访问\n🤖 无限翻译&字幕|实时母语级纠错，告别中式表达\n⚡ 匹配不同母语语伴|优先匹配目标语种正统母语者\n🎧 无损原声发音下载|离线随时随地跟读练习", depth: 0, enabled: true, config: { privileges: ALL_HELLOTALK_PRIVILEGES, autoScroll: true } },
+          { id: "pkg-t1-banner", type: "Header", label: "顶部横幅", content: "成为 VIP 会员", depth: 0, enabled: true, config: { variant: "vip-banner", badge: "VIP 特权", subtitle: "畅享 16 项高阶语言学习特权" } },
+          { id: "pkg-t1-carousel", type: "Carousel Cards", label: "特权轮播", content: "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球 150+ 城市母语圈\n👀 解锁谁看了我|查看完整访客记录，开启无痕访问\n🤖 无限翻译&字幕|实时母语级纠错，告别中式表达\n⚡ 匹配不同母语语伴|优先匹配目标语种正统母语者\n🎧 无损原声发音下载|离线随时随地跟读练习", depth: 0, enabled: true, config: { privileges: ALL_STANDARD_PRIVILEGES, autoScroll: true } },
           { id: "pkg-t1-products", type: "Products", label: "横向套餐卡片", content: "3个月|¥37.33/月|¥112\n12个月|¥24.99/月|¥298|省54%|推荐\n终身|¥798|一次性购买", depth: 0, enabled: true, config: { variant: "3-column-tiers", selectedTier: 1, tiers: [
             { name: "3个月", monthly: "¥37.33/月", total: "总价 ¥112", period: "3个月", badge: "", save: "" },
             { name: "12个月", monthly: "¥24.99/月", total: "总价 ¥298", period: "12个月", badge: "推荐", save: "省54%", isRecommended: true },
@@ -2085,10 +2084,10 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
         },
         nodes: [
           { id: "trial-t2-hero", type: "Hero Image", label: "背景图", content: "专享会员\n更好练习外语", depth: 0, enabled: true, config: { variant: "onboarding-carousel-hero", mascot: true, closeBtn: true } },
-          { id: "trial-t2-carousel", type: "Carousel Cards", label: "多张轮播图", content: "Slide 1: 免费体验HelloTalk会员\nSlide 2: 到期前提醒\nSlide 3: 选择试用结束后的套餐", depth: 0, enabled: true, config: {
+          { id: "trial-t2-carousel", type: "Carousel Cards", label: "多张轮播图", content: "Slide 1: 免费体验 VIP 会员\nSlide 2: 到期前提醒\nSlide 3: 选择试用结束后的套餐", depth: 0, enabled: true, config: {
             variant: "onboarding-3slides",
             currentSlide: 0,
-            slide1Title: "免费体验HelloTalk会员",
+            slide1Title: "免费体验 VIP 会员",
             slide1Items: [
               { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
               { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
@@ -2097,7 +2096,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
             ],
             slide2Title: "到期前提醒",
             slide2Timeline: [
-              { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
+              { day: "Day 1", desc: "成为 VIP 会员，享受学习与交流的乐趣", icon: "crown" },
               { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
               { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
             ],
@@ -2478,14 +2477,14 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           btnTextColor: "#FFFFFF",
           subTemplate: newId,
           otherColor: "#10B981",
-          titleText: `HelloTalk VIP 尊享方案 ${nextNum}`,
+          titleText: `VIP 会员 尊享方案 ${nextNum}`,
           btnText: "立即开通 VIP",
           bgGradient: "linear-gradient(180deg, #ECFDF5 0%, #D1FAE5 40%, #FFFFFF 100%)",
           isDark: false,
         },
         nodes: [
-          { id: `${newId}-banner`, type: "Header", label: "顶部 VIP Banner", content: `HelloTalk VIP 尊享方案 ${nextNum}`, depth: 0, enabled: true, config: { variant: "vip-badge-header", badge: "VIP 进阶特权", subtitle: "尊享全球语伴交流与 AI 纠错" } },
-          { id: `${newId}-carousel`, type: "Carousel Cards", label: "特权轮播卡片", content: "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球母语圈\n👀 解锁谁看了我|查看访客足迹", depth: 0, enabled: true, config: { privileges: ALL_HELLOTALK_PRIVILEGES, autoScroll: true } },
+          { id: `${newId}-banner`, type: "Header", label: "顶部 VIP Banner", content: `VIP 会员 尊享方案 ${nextNum}`, depth: 0, enabled: true, config: { variant: "vip-badge-header", badge: "VIP 进阶特权", subtitle: "尊享全球语伴交流与 AI 纠错" } },
+          { id: `${newId}-carousel`, type: "Carousel Cards", label: "特权轮播卡片", content: "📍 搜索附近的人|与附近的人畅聊更多语言\n🌐 搜索全世界的语伴|一键瞬移至全球母语圈\n👀 解锁谁看了我|查看访客足迹", depth: 0, enabled: true, config: { privileges: ALL_STANDARD_PRIVILEGES, autoScroll: true } },
           { id: `${newId}-products`, type: "Products", label: "横向套餐卡片", content: "1个月|¥28|¥28\n12个月|¥19.99/月|¥238|省50%|推荐\n终身|¥698|一次性购买", depth: 0, enabled: true, config: { variant: "3-column-tiers", selectedTier: 1, tiers: [
             { name: "1个月", monthly: "¥28/月", total: "总价 ¥28", period: "1个月", badge: "", save: "" },
             { name: "12个月", monthly: "¥19.99/月", total: "总价 ¥238", period: "12个月", badge: "推荐", save: "省50%", isRecommended: true },
@@ -2506,14 +2505,14 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
           ...DEFAULT_ENTRY_CONFIG,
           subTemplate: newId,
           otherColor: nextNum % 2 === 0 ? "#F59E0B" : "#7C3AED",
-          titleText: `HelloTalk VIP 专属新礼遇 ${nextNum}`,
+          titleText: `VIP 会员 专属新礼遇 ${nextNum}`,
           flexibleText: "新客专享限时破冰特惠 · 自定义配置",
           promoText: "限时专享礼遇",
           btnText: "立即领取特惠",
         },
         nodes: [
           { id: `${newId}-hero`, type: "Hero Image", label: "背景图", content: "寻找身边母语者", depth: 0, enabled: true, config: { bgMode: "illustration", sloganText: "寻找身边母语者", themeColor: "orange", showCloseBtn: true, bubbleBg: "#2563eb" } },
-          { id: `${newId}-headline`, type: "Header", label: "标题", content: `HelloTalk VIP 专属新礼遇 ${nextNum}`, depth: 0, enabled: true, config: { variant: "headline" } },
+          { id: `${newId}-headline`, type: "Header", label: "标题", content: `VIP 会员 专属新礼遇 ${nextNum}`, depth: 0, enabled: true, config: { variant: "headline" } },
           { id: `${newId}-subhead`, type: "Subhead", label: "副标题", content: "新客特惠 · 额外立省 20% · 仅此一次机会", depth: 0, enabled: true, config: { variant: "body" } },
           { id: `${newId}-timer`, type: "Timer", label: "倒计时", content: "限时优惠结束倒计时", depth: 0, enabled: true, config: { hours: 24, label: "限时优惠结束倒计时" } },
           { id: `${newId}-products`, type: "Products", label: "产品套餐", content: "VIP 超值会员|$19.99/year|$24.99/year|限时专享礼遇", depth: 0, enabled: true, config: { variant: "entry-price-tier", promoBadge: "限时专享礼遇", discountTag: "-20% OFF", priceNow: "$19.99/year", priceOriginal: "$24.99/year", priceSub: "仅 $0.05/天 · 随时取消" } },
@@ -3054,7 +3053,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                     <div className="iphone-app-backdrop-header">
                       <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                         <ChevronLeft size={16} />
-                        <span>HelloTalk 会员</span>
+                        <span>VIP 会员</span>
                       </div>
                       <MoreVertical size={15} />
                     </div>
@@ -3100,13 +3099,13 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                   <div className="iphone-bottom-sheet-screen">
                     {currentTemplate?.id === "ht-vip-pop" ? (
                       <div className="ht-pop-app-backdrop" style={{ height: "28%", minHeight: 165, position: "relative", background: "#f8fafc", overflow: "hidden" }}>
-                        {/* HelloTalk In-App Top Navbar & Content matching Figure 2 */}
+                        {/* Paywall In-App Top Navbar & Content matching Figure 2 */}
                         <div style={{ padding: "8px 14px 4px", display: "flex", flexDirection: "column", gap: 8 }}>
                           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                             <ChevronLeft size={20} color="#1e293b" style={{ cursor: "pointer" }} />
                             <div style={{ display: "flex", alignItems: "center", gap: 5 }}>
-                              <span style={{ fontSize: 13, fontWeight: 800, color: "#1e293b" }}>HelloTalk VIP</span>
-                              <span style={{ fontSize: 9, fontWeight: 900, background: "#10b981", color: "#fff", padding: "1px 4px", borderRadius: 3 }}>HT</span>
+                              <span style={{ fontSize: 13, fontWeight: 800, color: "#1e293b" }}>VIP 会员</span>
+                              <span style={{ fontSize: 9, fontWeight: 900, background: "#10b981", color: "#fff", padding: "1px 4px", borderRadius: 3 }}>VIP</span>
                             </div>
                             <Settings size={18} color="#1e293b" style={{ cursor: "pointer" }} />
                           </div>
@@ -3356,7 +3355,7 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
                   </div>
                 )}
 
-                {/* HelloTalk 挽留弹窗交互浮层 (Exit Retain Modal) */}
+                {/* 挽留弹窗交互浮层 (Exit Retain Modal) */}
                 {showRetainModal && (
                   <div className="ht-retain-modal-overlay" onClick={() => setShowRetainModal(false)}>
                     <div className="ht-retain-modal-card" onClick={(e) => e.stopPropagation()}>
@@ -3607,8 +3606,8 @@ function PaywallWorkspace({ selected, draft, setDraft, view, setView, duplicate,
               </button>
               {productPickerOpen && (
                 <div className="product-add-menu">
-                  <button onClick={() => { setTransientProducts((items) => [...items, { product: "HelloTalk VIP 季度卡", period: "3 months", offer: "限时特惠" }]); setProductPickerOpen(false); }}>
-                    HelloTalk VIP 季度卡
+                  <button onClick={() => { setTransientProducts((items) => [...items, { product: "VIP 季度卡", period: "3 months", offer: "限时特惠" }]); setProductPickerOpen(false); }}>
+                    VIP 季度卡
                   </button>
                 </div>
               )}
@@ -3719,7 +3718,7 @@ function TimerPreview({ node, themeConfig, isDarkTheme = false }) {
   );
 }
 
-function HelloTalkStarMascot({ size = 68 }) {
+function PaywallStarMascot({ size = 68 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -4102,7 +4101,7 @@ function PreviewElement({
           <div className="ht-brand-hero-vip">
             <div className="ht-brand-hero-vip-left">
               <div className="ht-brand-vip-title">
-                HelloTalk<span className="ht-brand-vip-gradient-text">VIP</span>
+                Paywall<span className="ht-brand-vip-gradient-text">VIP</span>
               </div>
               <div className="ht-brand-bullets-list">
                 {bullets.map((b, i) => (
@@ -4111,14 +4110,26 @@ function PreviewElement({
               </div>
             </div>
             <div className="ht-brand-hero-vip-right">
-              <HelloTalkMascot size={94} />
+              <div style={{
+                width: 72,
+                height: 72,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0.05) 100%)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                border: "1px solid rgba(255,255,255,0.3)",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.12)"
+              }}>
+                <Crown size={38} color="#FFD700" />
+              </div>
             </div>
           </div>
         );
       } else {
         return wrap(
           <div className="ht-brand-hero-plus">
-            <div className="ht-brand-plus-brand">HelloTalk</div>
+            <div className="ht-brand-plus-brand">Paywall</div>
             <div className="ht-brand-plus-huge-title">VIP PLUS +</div>
             <div className="ht-brand-bullets-list" style={{ marginTop: 6 }}>
               {bullets.map((b, i) => (
@@ -4220,7 +4231,7 @@ function PreviewElement({
             boxShadow: "0 4px 12px rgba(245, 158, 11, 0.12)",
           }}
         >
-          {/* Mini Phone Illustration from HelloTalk Template 2 */}
+          {/* Mini Phone Illustration from Paywall Template 2 */}
           <div style={{ display: "flex", justifyContent: "center", marginBottom: 8 }}>
             <div
               style={{
@@ -4282,7 +4293,7 @@ function PreviewElement({
     const mainFontColor = themeConfig?.mainFontColor || "#2D1832";
     // 模板 1 (全屏平铺版 / 真实 App 原版): 左对齐排版 + VIP 皇冠前缀
     if (themeConfig?.subTemplate === "tpl-1" || node.id === "t1-headline" || node.config?.kicker) {
-      const kicker = node.config?.kicker || themeConfig?.titleKicker || "HelloTalk VIP 👑";
+      const kicker = node.config?.kicker || themeConfig?.titleKicker || "VIP 专享 👑";
       return wrap(
         <div style={{ textAlign: "left", padding: "4px 0 2px" }}>
           {kicker && (
@@ -4460,7 +4471,7 @@ function PreviewElement({
         setCarouselIndex(idx);
       };
 
-      const s1Title = node.config?.slide1Title || "免费体验HelloTalk会员";
+      const s1Title = node.config?.slide1Title || "免费体验 VIP 会员";
       const s1Items = node.config?.slide1Items || [
         { title: "翻译", desc: "随聊随翻，提高你的词汇量", icon: "文A" },
         { title: "多语言", desc: "150种语言随时添加和切换", icon: "globe" },
@@ -4470,7 +4481,7 @@ function PreviewElement({
 
       const s2Title = node.config?.slide2Title || "到期前提醒";
       const s2Timeline = node.config?.slide2Timeline || [
-        { day: "Day 1", desc: "成为HelloTalk会员，享受学习与交流的乐趣", icon: "crown" },
+        { day: "Day 1", desc: "成为 VIP 会员，享受学习与交流的乐趣", icon: "crown" },
         { day: "Day 2", desc: "收到体验即将结束的通知", icon: "bell" },
         { day: "Day 3", desc: "24小时前取消则无需支付任何费用，否则当日扣款", icon: "clock" },
       ];
@@ -4809,7 +4820,7 @@ function PreviewElement({
               <span style={{ fontSize: 20 }}>{currentCard.icon || "💎"}</span>
               <strong style={{ fontSize: 14, color: "#1e293b" }}>{currentCard.title || currentCard.name}</strong>
             </div>
-            <p style={{ fontSize: 11.5, color: "#64748b", margin: 0, lineHeight: 1.4 }}>{currentCard.desc || "HelloTalk VIP 核心专享特权"}</p>
+            <p style={{ fontSize: 11.5, color: "#64748b", margin: 0, lineHeight: 1.4 }}>{currentCard.desc || "VIP 核心专享特权"}</p>
           </div>
           {cards.length > 1 && (
             <div className="carousel-dots" style={{ display: "flex", justifyContent: "center", gap: 6, marginTop: 8 }}>
@@ -4860,7 +4871,7 @@ function PreviewElement({
                   {item.tag && <span className="ht-privilege-tag">{item.tag}</span>}
                 </div>
                 {node.config?.showSubtitle !== false && (
-                  <span>{item.desc || "HelloTalk VIP 核心专享特权"}</span>
+                  <span>{item.desc || "VIP 核心专享特权"}</span>
                 )}
               </div>
             </div>
@@ -5816,7 +5827,7 @@ function PreviewElement({
           }}
         >
           <Sparkles size={16} style={{ marginRight: 6 }} />
-          <span>{node.config?.sloganText || node.content || "HelloTalk VIP 特权俱乐部"}</span>
+          <span>{node.config?.sloganText || node.content || "VIP 特权俱乐部"}</span>
         </div>
       );
     }
@@ -5911,7 +5922,7 @@ function PreviewElement({
               }}
             >
               <Sparkles size={13} />
-              <span>HelloTalk VIP 特权俱乐部</span>
+              <span>VIP 特权俱乐部</span>
             </div>
           )}
         </div>
@@ -5921,7 +5932,7 @@ function PreviewElement({
     return wrap(
       <div className="preview-hero-container">
         <div className="hero-glow-badge">
-          <Sparkles size={14} /> HelloTalk VIP Club
+          <Sparkles size={14} /> VIP Club
         </div>
       </div>
     );
@@ -6308,7 +6319,7 @@ function BuilderProperties({
                         let newContent = active.content;
                         let newConfig = { ...(active.config || {}) };
                         if (r.id === "Header") {
-                          if (!newContent || newContent.length > 60 || newContent.includes("|")) newContent = "HelloTalk VIP 核心专享特权";
+                          if (!newContent || newContent.length > 60 || newContent.includes("|")) newContent = "VIP 核心专享特权";
                         } else if (r.id === "Subhead") {
                           if (!newContent || newContent.length > 60 || newContent.includes("|")) newContent = "畅享 16 项高阶语言学习特权与专属服务";
                         } else if (r.id === "Text") {
@@ -6448,7 +6459,7 @@ function BuilderProperties({
                   <Field label="顶部前缀 / VIP 标识">
                     <input
                       value={active.config?.kicker ?? ""}
-                      placeholder="例如：HelloTalk VIP 核心专享"
+                      placeholder="例如：VIP 核心专享"
                       onChange={(e) => updateNode(active.id, { config: { ...active.config, kicker: e.target.value } })}
                     />
                   </Field>
@@ -7175,7 +7186,7 @@ function BuilderProperties({
                                 ...(active.config || {}),
                                 variant: "carousel",
                                 styleVariant: "carousel",
-                                privileges: active.config?.privileges || ALL_HELLOTALK_PRIVILEGES,
+                                privileges: active.config?.privileges || ALL_STANDARD_PRIVILEGES,
                               },
                             });
                           } else {
@@ -8262,7 +8273,7 @@ function LayoutSettings({
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, paddingBottom: 8, borderBottom: "1px solid #f1f5f9" }}>
           <div>
             <h3 style={{ margin: 0, fontSize: 14, fontWeight: 800, color: "#0f172a" }}>注册引导与免费试用页 设置</h3>
-            <span style={{ fontSize: 10, color: "#64748b" }}>HelloTalk 官方后台 CMS 1:1 对标配置</span>
+            <span style={{ fontSize: 10, color: "#64748b" }}>官方核心模版后台 CMS 1:1 对标配置</span>
           </div>
           <button className="secondary" style={{ fontSize: 10.5, padding: "3px 8px" }} onClick={() => setModal({ kind: "templates" })}>
             切换页面
@@ -8548,7 +8559,7 @@ function LayoutSettings({
       <h3>全局布局设置</h3>
       <Field label="当前模版">
         <div className="inline-select">
-          <span>{appliedTemplate !== null ? templates[appliedTemplate].title : "HelloTalk Onboarding"}</span>
+          <span>{appliedTemplate !== null ? templates[appliedTemplate].title : "Paywall Onboarding"}</span>
           <button className="secondary" onClick={() => setModal({ kind: "templates" })}>更换模版</button>
         </div>
       </Field>
@@ -8622,8 +8633,8 @@ function ComplianceModal({ compliance, setCompliance, rememberCompliance, setRem
 }
 
 function TemplateRequirementsModal({ onClose, onContinue }) {
-  const [termsUrl, setTermsUrl] = useState("https://hellotalk.com/terms");
-  const [privacyUrl, setPrivacyUrl] = useState("https://hellotalk.com/privacy");
+  const [termsUrl, setTermsUrl] = useState("https://legal.paywall-builder.internal/terms");
+  const [privacyUrl, setPrivacyUrl] = useState("https://legal.paywall-builder.internal/privacy");
   return (
     <Modal title="模版必备链接验证" onClose={onClose}>
       <p className="modal-copy">首次保存模版需要核验服务条款与隐私政策。</p>
@@ -8658,9 +8669,9 @@ function DeviceTestModal({ onClose }) {
         <div style={{ width: 140, height: 140, margin: "0 auto 16px", border: "2px solid #e2e8f0", borderRadius: 12, display: "grid", placeItems: "center", background: "#f8fafc" }}>
           <Smartphone size={48} color="#64748b" />
         </div>
-        <p className="modal-copy">使用手机相机扫描二维码，或通过 HelloTalk App 内部预览链接打开体验。</p>
+        <p className="modal-copy">使用手机相机扫描二维码，或通过 客户端 App 内部预览链接打开体验。</p>
         <div className="test-link" style={{ display: "flex", gap: 6, maxWidth: 360, margin: "0 auto" }}>
-          <input defaultValue="https://hellotalk.com/paywall/preview?id=ht-onboarding" readOnly />
+          <input defaultValue="https://preview.paywall-builder.internal/preview?id=ht-onboarding" readOnly />
           <button className="icon" title="复制链接"><Copy size={16} /></button>
         </div>
         <div className="modal-actions" style={{ justifyContent: "center", marginTop: 24 }}>
@@ -8692,7 +8703,7 @@ function MigrationModal({ onClose }) {
   return (
     <Modal title="从已有设计复制" onClose={onClose}>
       <p className="modal-copy">选择源业务线，直接克隆其元素树与样式配置。</p>
-      <Field label="选择来源"><input defaultValue="HelloTalk iOS - Onboarding Trial" readOnly /></Field>
+      <Field label="选择来源"><input defaultValue="iOS - 新客引导试用方案" readOnly /></Field>
       <div className="modal-actions">
         <button className="secondary" onClick={onClose}>取消</button>
         <button className="primary" onClick={onClose}>开始复制</button>
@@ -8704,7 +8715,7 @@ function MigrationModal({ onClose }) {
 function AddAppModal({ onClose }) {
   return (
     <Modal title="新建业务线" onClose={onClose}>
-      <Field label="业务线名称"><input placeholder="例如：HelloTalk 英语外教专区" /></Field>
+      <Field label="业务线名称"><input placeholder="例如：国际语言交流专区" /></Field>
       <div className="modal-actions">
         <button className="secondary" onClick={onClose}>取消</button>
         <button className="primary" onClick={onClose}>确认创建</button>

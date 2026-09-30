@@ -267,7 +267,7 @@ textarea { min-height: 80px; resize: vertical; }
 .preview-cta { display: grid; gap: 1px; place-items: center; }.preview-cta small { color: #eee8ff; font-size: 8px; }.preview-carousel p { display: grid; gap: 3px; }.preview-carousel p strong { color: #4b4357; font-size: 10px; }.preview-carousel p small { color: #696372; font-size: 9px; line-height: 1.35; }
 .nested-add-wrap { position: relative; display: inline-block; }.nested-add-menu { position: absolute; z-index: 3; top: calc(100% + 6px); left: 0; display: grid; min-width: 150px; padding: 5px; border: 1px solid #e3deed; border-radius: 6px; background: #fff; box-shadow: 0 8px 20px rgba(44, 29, 78, .14); }.nested-add-menu button { padding: 8px 10px; border: 0; border-radius: 4px; background: transparent; color: #40394f; text-align: left; }.nested-add-menu button:hover { background: #f4efff; }
 
-/* Minimalist HelloTalk CMS Style Template Selection (1:1 with Official Backend) */
+/* Minimalist 商业化配置后台 Style Template Selection (1:1 with Official Backend) */
 .entry-template-shelf {
   background: #ffffff;
   border: 1px solid #e2e8f0;
@@ -539,7 +539,7 @@ textarea { min-height: 80px; resize: vertical; }
   opacity: 0.8;
 }
 
-/* 3-Column Product Tiers (Matching Real HelloTalk VIP Package CMS) */
+/* 3-Column Product Tiers (Matching Real VIP 会员 Package CMS) */
 .preview-products-3col {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -686,7 +686,7 @@ textarea { min-height: 80px; resize: vertical; }
 }
 
 /* ===================================================
-   HelloTalk 注册引导与免费试用页 (FREE_TRIAL) 专属高保真样式
+   注册引导与免费试用页 (FREE_TRIAL) 专属高保真样式
    =================================================== */
 
 /* 挽留弹窗 (Exit Retain Modal) */
@@ -789,7 +789,7 @@ textarea { min-height: 80px; resize: vertical; }
   to { transform: scale(1); opacity: 1; }
 }
 
-/* 顶部波浪头图与吉祥物 (HelloTalk Wave Hero & Star Mascot) */
+/* 顶部波浪头图与吉祥物 (Paywall Wave Hero & Star Mascot) */
 .ht-wave-hero-container {
   position: relative;
   background: #6144e8;
