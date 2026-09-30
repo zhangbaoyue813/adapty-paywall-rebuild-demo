@@ -75,10 +75,10 @@ export default function ComparisonTableManager({ node, updateNode, notify, onSwi
     ? config.items
     : (currentMode === "vip-vs-plus" ? DEFAULT_VIP_VS_PLUS_ITEMS : DEFAULT_FREE_VS_VIP_ITEMS);
 
-  // 纯中文默认列标题，彻底杜绝中英文混杂
-  const featureColTitle = config.featureColTitle || "特权功能";
-  const col1Title = config.col1Title || (currentMode === "vip-vs-plus" ? "VIP会员" : "普通会员");
-  const col2Title = config.col2Title || (currentMode === "vip-vs-plus" ? "VIP+会员" : "VIP会员");
+  // 纯中文默认列标题，支持用户任意自定义修改（如 VIP、VIP+、标准版等）
+  const featureColTitle = config.featureColTitle !== undefined ? config.featureColTitle : "特权功能";
+  const col1Title = config.col1Title !== undefined ? config.col1Title : (currentMode === "vip-vs-plus" ? "VIP会员" : "普通会员");
+  const col2Title = config.col2Title !== undefined ? config.col2Title : (currentMode === "vip-vs-plus" ? "VIP+会员" : "VIP会员");
   const showExpandCaret = config.showExpandCaret !== false;
 
   const handleSwitchMode = (mode) => {

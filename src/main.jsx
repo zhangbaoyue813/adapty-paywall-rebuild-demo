@@ -3761,11 +3761,11 @@ function PreviewElement({
 
   const wrap = (content, className = "") => {
     const wrapStyle = {
-      ...(userTextAlign ? { textAlign: userTextAlign } : {}),
+      ...(userTextAlign ? { textAlign: userTextAlign, "--user-text-align": userTextAlign } : {}),
       ...(userPadding ? { padding: userPadding } : {}),
       ...(userMargin ? { margin: userMargin } : {}),
       ...(userMaxWidth ? { maxWidth: userMaxWidth, width: "100%", marginLeft: "auto", marginRight: "auto", boxSizing: "border-box" } : {}),
-      ...(userFontSize ? { fontSize: userFontSize } : {}),
+      ...(userFontSize ? { fontSize: userFontSize, "--user-font-size": userFontSize } : {}),
       ...(node.style || {}),
     };
 
@@ -3972,7 +3972,7 @@ function PreviewElement({
           </button>
         </div>
         <div style={{ padding: "8px 0 10px" }}>
-          <h2 className="ht-hero-title-text">
+          <h2 className="ht-hero-title-text" style={userFontSize ? { fontSize: userFontSize } : {}}>
             {title}
           </h2>
         </div>
@@ -4011,7 +4011,7 @@ function PreviewElement({
           </button>
         </div>
         <div style={{ padding: "4px 0 8px" }}>
-          <h2 className="ht-hero-title-text" style={{ lineHeight: 1.25 }}>
+          <h2 className="ht-hero-title-text" style={{ lineHeight: 1.25, ...(userFontSize ? { fontSize: userFontSize } : {}) }}>
             {lines.map((l, i) => <div key={i}>{l}</div>)}
           </h2>
         </div>
@@ -4037,12 +4037,16 @@ function PreviewElement({
         return wrap(
           <div className="ht-brand-hero-vip">
             <div className="ht-brand-hero-vip-left">
-              <div className="ht-brand-vip-title">
-                Paywall<span className="ht-brand-vip-gradient-text">VIP</span>
+              <div className="ht-brand-vip-title" style={userFontSize ? { fontSize: userFontSize } : {}}>
+                {node.content && node.content !== "VIP 会员" ? (
+                  renderInterpolated(node.content)
+                ) : (
+                  <>Paywall<span className="ht-brand-vip-gradient-text">VIP</span></>
+                )}
               </div>
               <div className="ht-brand-bullets-list">
                 {bullets.map((b, i) => (
-                  <div key={i} className="ht-brand-bullet-item">{b}</div>
+                  <div key={i} className="ht-brand-bullet-item" style={userFontSize ? { fontSize: `calc(${userFontSize} * 0.7)` } : {}}>{b}</div>
                 ))}
               </div>
             </div>
@@ -4067,10 +4071,16 @@ function PreviewElement({
         return wrap(
           <div className="ht-brand-hero-plus">
             <div className="ht-brand-plus-brand">Paywall</div>
-            <div className="ht-brand-plus-huge-title">VIP PLUS +</div>
+            <div className="ht-brand-plus-huge-title" style={userFontSize ? { fontSize: userFontSize } : {}}>
+              {node.content && node.content !== "VIP 会员 PLUS +" ? (
+                renderInterpolated(node.content)
+              ) : (
+                "VIP PLUS +"
+              )}
+            </div>
             <div className="ht-brand-bullets-list" style={{ marginTop: 6 }}>
               {bullets.map((b, i) => (
-                <div key={i} className="ht-brand-bullet-item dark">{b}</div>
+                <div key={i} className="ht-brand-bullet-item dark" style={userFontSize ? { fontSize: `calc(${userFontSize} * 0.7)` } : {}}>{b}</div>
               ))}
             </div>
           </div>
@@ -4344,28 +4354,31 @@ function PreviewElement({
     const isComparePage = currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare" || node.id === "switch-tabs";
     if (isComparePage) {
       const isPlus = activeCompareTab === 1;
+      const [tab0 = "VIP", tab1 = "VIP+"] = (node.content || "VIP|VIP+").split("|");
       return wrap(
         <div className="ht-compare-switch-container">
           <div className={`ht-compare-switch-pill ${isPlus ? "dark-theme" : "light-theme"}`}>
             <button
               type="button"
               className={`ht-switch-tab-item ${!isPlus ? "vip-active-light" : "vip-inactive-dark"}`}
+              style={userFontSize ? { fontSize: userFontSize } : {}}
               onClick={(e) => {
                 e.stopPropagation();
                 setActiveCompareTab?.(0);
               }}
             >
-              VIP
+              {tab0}
             </button>
             <button
               type="button"
               className={`ht-switch-tab-item ${isPlus ? "plus-active-dark" : "plus-inactive-light"}`}
+              style={userFontSize ? { fontSize: userFontSize } : {}}
               onClick={(e) => {
                 e.stopPropagation();
                 setActiveCompareTab?.(1);
               }}
             >
-              VIP+
+              {tab1}
             </button>
           </div>
         </div>
@@ -4691,13 +4704,20 @@ function PreviewElement({
     if (isComparePage || variant === "pill-capsule" || variant === "badge-pill") {
       const discountText = node.config?.discount || "20% OFF";
       const timeText = node.config?.time || "14:43:23";
-      const labelText = node.config?.timerLabel || node.config?.label;
+      const labelText = node.config?.timerLabel || (node.config?.label !== "倒计时" ? node.config?.label : null);
+      const displayText = node.content && node.content !== "20% OFF 14:43:23" ? node.content : null;
       return wrap(
         <div style={{ display: "flex", justifyContent: "center", margin: "2px 0 8px" }}>
-          <div className={`ht-compare-timer-capsule ${isPlus ? "dark-theme" : "light-theme"}`}>
+          <div className={`ht-compare-timer-capsule ${isPlus ? "dark-theme" : "light-theme"}`} style={userFontSize ? { fontSize: userFontSize } : {}}>
             {labelText ? <span style={{ fontWeight: 700, marginRight: 4 }}>{labelText}</span> : null}
-            <span>{discountText}</span>
-            <span style={{ margin: "0 6px" }}>{timeText}</span>
+            {displayText ? (
+              <span>{displayText}</span>
+            ) : (
+              <>
+                <span>{discountText}</span>
+                <span style={{ margin: "0 6px" }}>{timeText}</span>
+              </>
+            )}
           </div>
         </div>
       );
@@ -4804,7 +4824,7 @@ function PreviewElement({
               </div>
               <div className="ht-privilege-info">
                 <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-                  <strong>{item.title || item.name}</strong>
+                  <strong style={userFontSize ? { fontSize: userFontSize } : {}}>{item.title || item.name}</strong>
                   {item.tag && <span className="ht-privilege-tag">{item.tag}</span>}
                 </div>
                 {node.config?.showSubtitle !== false && (
@@ -4856,7 +4876,7 @@ function PreviewElement({
                   {item.icon || "💎"}
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 12, fontWeight: 700, color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                  <div style={{ fontSize: userFontSize || 12, fontWeight: 700, color: "#1e293b", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                     {item.title}
                   </div>
                   {item.tag ? (
@@ -4910,7 +4930,7 @@ function PreviewElement({
               <Check size={19} strokeWidth={3.2} />
             </div>
             <div>
-              <div style={{ fontSize: 16.5, fontWeight: 700, color: privilegeColor, lineHeight: 1.3 }}>
+              <div style={{ fontSize: userFontSize || 16.5, fontWeight: 700, color: privilegeColor, lineHeight: 1.3 }}>
                 {item.title}
               </div>
               {showSubtitle && item.desc && (
@@ -4936,15 +4956,9 @@ function PreviewElement({
     const items = Array.isArray(node.config?.items) && node.config.items.length > 0
       ? node.config.items
       : (isPlus ? DEFAULT_VIP_VS_PLUS_ITEMS : DEFAULT_FREE_VS_VIP_ITEMS);
-    const featureColTitle = (node.config?.featureColTitle && node.config.featureColTitle !== "Features")
-      ? node.config.featureColTitle
-      : "特权功能";
-    const col1Title = (node.config?.col1Title && node.config.col1Title !== "Free" && node.config.col1Title !== "VIP")
-      ? node.config.col1Title
-      : (isPlus ? "VIP会员" : "普通会员");
-    const col2Title = (node.config?.col2Title && node.config.col2Title !== "VIP" && node.config.col2Title !== "VIP+")
-      ? node.config.col2Title
-      : (isPlus ? "VIP+会员" : "VIP会员");
+    const featureColTitle = node.config?.featureColTitle ?? "特权功能";
+    const col1Title = node.config?.col1Title ?? (isPlus ? "VIP会员" : "普通会员");
+    const col2Title = node.config?.col2Title ?? (isPlus ? "VIP+会员" : "VIP会员");
     const showExpandCaret = node.config?.showExpandCaret !== false;
 
     return wrap(
@@ -4955,13 +4969,13 @@ function PreviewElement({
         <div className="ht-compare-table-grid">
           {/* Header Row */}
           <div className="ht-table-header-row">
-            <div className={`ht-th-feature ${isPlus ? "dark" : "light"}`}>
+            <div className={`ht-th-feature ${isPlus ? "dark" : "light"}`} style={userFontSize ? { fontSize: userFontSize } : {}}>
               {featureColTitle}
             </div>
-            <div className={`ht-th-col1 ${isPlus ? "dark" : "light"}`}>
+            <div className={`ht-th-col1 ${isPlus ? "dark" : "light"}`} style={userFontSize ? { fontSize: userFontSize } : {}}>
               {col1Title}
             </div>
-            <div className={`ht-th-col2 ${isPlus ? "plus-text" : "gold-text"}`}>
+            <div className={`ht-th-col2 ${isPlus ? "plus-text" : "gold-text"}`} style={userFontSize ? { fontSize: userFontSize } : {}}>
               {col2Title}
             </div>
           </div>
@@ -4971,13 +4985,13 @@ function PreviewElement({
             {items.map((item, idx) => (
               <div key={item.id || idx} className="ht-table-row">
                 {/* Feature Name Col */}
-                <div className={`ht-td-feature ${isPlus ? "dark" : "light"}`}>
+                <div className={`ht-td-feature ${isPlus ? "dark" : "light"}`} style={userFontSize ? { fontSize: `calc(${userFontSize} * 0.85)` } : {}}>
                   <span>{item.name}</span>
                   {showExpandCaret && <ChevronDown size={11} style={{ opacity: 0.6, flexShrink: 0 }} />}
                 </div>
 
                 {/* Col 1 */}
-                <div className={`ht-td-col1 ${isPlus ? "dark" : "light"}`}>
+                <div className={`ht-td-col1 ${isPlus ? "dark" : "light"}`} style={userFontSize ? { fontSize: `calc(${userFontSize} * 0.82)` } : {}}>
                   {item.col1Type === "lock" || item.col1Val === "🔒" ? (
                     <Lock size={12} color="#94A3B8" />
                   ) : (
@@ -4986,7 +5000,7 @@ function PreviewElement({
                 </div>
 
                 {/* Col 2 (Highlighted Pill) */}
-                <div className={`ht-td-col2 ${isPlus ? "dark" : "light"}`}>
+                <div className={`ht-td-col2 ${isPlus ? "dark" : "light"}`} style={userFontSize ? { fontSize: `calc(${userFontSize} * 0.82)` } : {}}>
                   {item.col2Type === "check" || item.col2Val === "✓" ? (
                     <div className={isPlus ? "ht-check-badge-purple" : "ht-check-badge-orange"}>
                       <Check size={11} strokeWidth={3.5} />
@@ -5066,6 +5080,15 @@ function PreviewElement({
 
     if (effectiveVariant === "onboarding-dual-tiers") {
       const curSelected = selectedOnboardingTier ?? 0;
+      const tiersList = (Array.isArray(node.config?.tiers) && node.config.tiers.length >= 2)
+        ? node.config.tiers
+        : [
+            { name: "12个月", monthly: "¥40.67/月", total: "总价 ¥488", discount: "48%OFF", badge: "免费试用", hasTrial: true },
+            { name: "月费会员", monthly: "¥78.00月", total: "按月扣费", discount: "", badge: "直接购买", hasTrial: false },
+          ];
+      const tier0 = tiersList[0] || {};
+      const tier1 = tiersList[1] || {};
+
       return wrap(
         <div className="ht-dual-tiers-container">
           {/* Tier 0: 12个月 */}
@@ -5076,15 +5099,17 @@ function PreviewElement({
               onSelectOnboardingTier?.(0);
             }}
           >
-            <div className="ht-tier-badge-pill">免费试用</div>
+            {(tier0.badge || tier0.hasTrial) && (
+              <div className="ht-tier-badge-pill">{tier0.badge || "免费试用"}</div>
+            )}
             <div className="ht-tier-content-row">
               <div className="ht-tier-col-left">
-                <span className="ht-tier-title-main">12个月</span>
-                <span className="ht-tier-price-sub">¥488</span>
+                <span className="ht-tier-title-main" style={userFontSize ? { fontSize: userFontSize } : {}}>{tier0.name || "12个月"}</span>
+                {tier0.total && <span className="ht-tier-price-sub">{tier0.total}</span>}
               </div>
               <div className="ht-tier-col-right">
-                <span className="ht-tier-price-main">¥40.67/月</span>
-                <span className="ht-tier-discount-pill">48%OFF</span>
+                <span className="ht-tier-price-main" style={userFontSize ? { fontSize: userFontSize } : {}}>{tier0.monthly || "¥40.67/月"}</span>
+                {tier0.discount && <span className="ht-tier-discount-pill">{tier0.discount}</span>}
               </div>
             </div>
           </div>
@@ -5097,13 +5122,15 @@ function PreviewElement({
               onSelectOnboardingTier?.(1);
             }}
           >
-            {curSelected === 1 && <div className="ht-tier-badge-pill">直接购买</div>}
+            {curSelected === 1 && (tier1.badge || "直接购买") && (
+              <div className="ht-tier-badge-pill">{tier1.badge || "直接购买"}</div>
+            )}
             <div className="ht-tier-content-row">
               <div className="ht-tier-col-left">
-                <span className="ht-tier-title-main">月费会员</span>
+                <span className="ht-tier-title-main" style={userFontSize ? { fontSize: userFontSize } : {}}>{tier1.name || "月费会员"}</span>
               </div>
               <div className="ht-tier-col-right">
-                <span className="ht-tier-price-main">¥78.00月</span>
+                <span className="ht-tier-price-main" style={userFontSize ? { fontSize: userFontSize } : {}}>{tier1.monthly || "¥78.00月"}</span>
               </div>
             </div>
           </div>
@@ -5367,6 +5394,7 @@ function PreviewElement({
         <button
           type="button"
           className={`ht-compare-purchase-btn ${isPlus ? "dark-theme" : "light-theme"}`}
+          style={userFontSize ? { fontSize: userFontSize } : {}}
           onClick={(e) => {
             e.stopPropagation();
             notify?.(isPlus ? "已触发 VIP+ 旗舰会员订阅结账流程" : "已触发 VIP 会员订阅结账流程");
@@ -5390,7 +5418,7 @@ function PreviewElement({
               color: "#FFFFFF",
               border: "none",
               borderRadius: 24,
-              fontSize: 15,
+              fontSize: userFontSize || 15,
               fontWeight: 800,
               cursor: "pointer",
               boxShadow: `0 4px 14px ${color}40`,
@@ -5646,8 +5674,8 @@ function PreviewElement({
     if (isComparePage && (currentTemplate?.id === "ht-switch-compare" || currentTemplate?.id === "ht-tier-compare")) {
       const isPlus = activeCompareTab === 1;
       return wrap(
-        <div className={`ht-compare-legal-footer ${isPlus ? "dark-theme" : "light-theme"}`}>
-          如果当前缴费期限24小时没有取消续订，系统会自动续订，费用将从你的iTunes账户收取，你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的<strong>服务条款</strong>及<strong>隐私政策</strong>
+        <div className={`ht-compare-legal-footer ${isPlus ? "dark-theme" : "light-theme"}`} style={userFontSize ? { fontSize: userFontSize } : {}}>
+          {node.content || "如果当前缴费期限24小时没有取消续订，系统会自动续订，费用将从你的iTunes账户收取，你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息，请访问我们的服务条款及隐私政策"}
         </div>
       );
     }
@@ -5655,7 +5683,7 @@ function PreviewElement({
       const legalText = node.content || "免费3天试用后,系统会以¥488自动续订,可随时取消。费用将从你的iTunes账户收取,你可随时前往iTunes商店的设置界面管理自己的订阅设定。有关详细信息,请访问我们的[服务条款]及[隐私政策]";
       return wrap(
         <div className="preview-legal-footer" style={{ textAlign: "center", padding: "4px 10px 16px" }}>
-          <p className="legal-disclaimer" style={{ color: "#9ca3af", fontSize: 9.5, lineHeight: 1.45, margin: 0 }}>
+          <p className="legal-disclaimer" style={{ color: "#9ca3af", fontSize: userFontSize || 9.5, lineHeight: 1.45, margin: 0 }}>
             {legalText}
           </p>
         </div>
