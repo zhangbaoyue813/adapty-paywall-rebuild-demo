@@ -3718,57 +3718,7 @@ function TimerPreview({ node, themeConfig, isDarkTheme = false }) {
   );
 }
 
-function PaywallStarMascot({ size = 68 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="htMascotBodyGrad" x1="25" y1="15" x2="80" y2="85" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FFDE43" />
-          <stop offset="0.6" stopColor="#FFB800" />
-          <stop offset="1" stopColor="#FF9500" />
-        </linearGradient>
-      </defs>
 
-      {/* Little Red-Orange Legs at bottom */}
-      <path d="M42 74 Q39 84 36 86" stroke="#E64A19" strokeWidth="3.5" strokeLinecap="round" />
-      <path d="M56 74 Q58 84 62 86" stroke="#E64A19" strokeWidth="3.5" strokeLinecap="round" />
-
-      {/* Main Yellow Mascot Body with Waving Left Hand */}
-      <path
-        d="M32 20 C36 12 46 16 46 25 C46 27 48 29 50 29 C53 29 55 24 58 18 C64 12 73 17 71 27 C70 30 72 33 76 34 C84 37 87 47 80 54 C77 56 77 60 79 63 C83 71 76 80 67 77 C64 76 60 78 58 81 C53 87 43 86 40 79 C38 76 35 75 32 76 C23 79 17 69 22 61 C24 58 23 54 20 52 C12 47 13 36 22 34 C26 33 28 29 28 26 C28 22 30 20 32 20 Z"
-        fill="url(#htMascotBodyGrad)"
-      />
-
-      {/* Left Heart Eye (Pink #FF2D55) */}
-      <path
-        d="M37 43 C37 39.5 34 37 31 37 C27.5 37 25.5 40 25.5 43 C25.5 47.5 30.5 51 31 51.5 C31.5 51 36.5 47.5 36.5 43 Z"
-        fill="#FF2D55"
-      />
-      <circle cx="29.5" cy="41" r="1.3" fill="#FFFFFF" />
-
-      {/* Right Heart Eye (Pink #FF2D55) */}
-      <path
-        d="M57 43 C57 39.5 54 37 51 37 C47.5 37 45.5 40 45.5 43 C45.5 47.5 50.5 51 51 51.5 C51.5 51 56.5 47.5 56.5 43 Z"
-        fill="#FF2D55"
-      />
-      <circle cx="49.5" cy="41" r="1.3" fill="#FFFFFF" />
-
-      {/* Blushing Cheeks */}
-      <ellipse cx="24" cy="49" rx="3.5" ry="2" fill="#FF5252" opacity="0.6" />
-      <ellipse cx="60" cy="49" rx="3.5" ry="2" fill="#FF5252" opacity="0.6" />
-
-      {/* Open Smiling Mouth with Tongue */}
-      <path d="M37 53 Q42 60 46 53 Z" fill="#880E4F" />
-      <path d="M39 55 Q42 59 44 55" fill="#FF4081" />
-
-      {/* Yellow Sparkle 4-point Star at right */}
-      <path
-        d="M86 52 L88.5 46 L91 52 L97 54.5 L91 57 L88.5 63 L86 57 L80 54.5 Z"
-        fill="#FFD54F"
-      />
-    </svg>
-  );
-}
 
 function PreviewElement({
   node,
