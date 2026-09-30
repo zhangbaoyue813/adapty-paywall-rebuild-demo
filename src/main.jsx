@@ -1408,7 +1408,7 @@ function App() {
   return (
     <div className="app">
       <aside className="sidebar">
-        <div className="brand" style={{ background: "linear-gradient(135deg, #1ECA92 0%, #6366F1 100%)" }}>H</div>
+        <div className="brand" style={{ background: "linear-gradient(135deg, #1ECA92 0%, #6366F1 100%)" }}>P</div>
         <nav>
           {nav.map(([label, Icon, targetView]) => (
             <button
@@ -1428,11 +1428,11 @@ function App() {
         <header className="topbar">
           <div className="app-switcher-wrap">
             <button className="app-switcher" onClick={() => setAppMenuOpen((open) => !open)}>
-              <b style={{ background: "#1ECA92" }}>HT</b> HelloTalk VIP 商业化中心 <ChevronDown size={15} />
+              <b style={{ background: "#1ECA92" }}>PW</b> Paywall <ChevronDown size={15} />
             </button>
             {appMenuOpen && (
               <div className="app-menu">
-                <button className="app-menu-current"><b style={{ background: "#1ECA92" }}>HT</b><span>HelloTalk VIP 商业化</span><Check size={15} /></button>
+                <button className="app-menu-current"><b style={{ background: "#1ECA92" }}>PW</b><span>Paywall</span><Check size={15} /></button>
                 <button onClick={() => { setAppMenuOpen(false); setModal({ kind: "add-app" }); }}><Plus size={16} /> 新建业务线</button>
               </div>
             )}
@@ -1631,7 +1631,7 @@ function PaywallList({
     <section>
       <div className="page-heading">
         <div>
-          <h1>HelloTalk Paywalls <span>↗</span></h1>
+          <h1>Paywall <span>↗</span></h1>
           <p>涵盖新客破冰、功能阻断、节日大促、到期挽留与双阶对比等 {paywalls.length} 套全场景模版</p>
         </div>
         <button className="primary" onClick={() => setView("create")}>创建付费墙</button>
